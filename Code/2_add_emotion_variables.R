@@ -83,8 +83,9 @@ library(textdata)
 
 #write.csv(nrc, "/Users/skiss/OneDrive - Wilfrid Laurier University/Coding/sentiment-lexicons/nrc.csv")
 #This line reads my local copy in
-nrc<-read.csv("/Users/skiss/OneDrive - Wilfrid Laurier University/Coding/sentiment-lexicons/nrc.csv")
-
+#nrc<-read.csv("/Users/skiss/OneDrive - Wilfrid Laurier University/Coding/sentiment-lexicons/nrc.csv")
+#write.csv(nrc, "Data/nrc.csv")
+nrc<-read.csv(file="Data/nrc.csv")
 # nrc %>% 
 #   filter(.,sentiment!='negative'&sentiment!='positive')-> nrc
 # 
@@ -183,7 +184,6 @@ on18 %>%
   pivot_wider(., names_from=c("sentiment"),id_cols=c("id"), values_from=c("n", "tf", "idf", "tf_idf"), values_fill=0, values_fn=max)->fin_emotions_count_wgt
 
 
-?pivot_wider
 on18 %>%
   select(id, imm.y) %>% 
   unnest_tokens(word, imm.y, token='words') %>% 
