@@ -3,11 +3,12 @@ library(tidyverse)
 library(haven)
 library(here)
 library(labelled)
-# Import Data
+#### Import Data####
 on18<-read_sav(file=here("Data/Ontario ES 2018 LISPOP.sav"))
 names(on18)
 
 library(car)
+#### Individual Finanical Situation Questions ####
 #Recode $50 stress question, 1 disagree, 0 disagree
 #Note for all economic questions, indivfin, I am recoding 1 to be the rich, comfortable or better answer. Overall, rich people will have higher values. Variables marked with_rev are coded in the other direction. 
 
@@ -261,7 +262,8 @@ names(on18)
 
 
 #
-#
+#### Media Consumption Habits ####
+#Define TV watchers
 on18 %>%
   mutate(TV=case_when(
     CBCTV == 1 ~1,
@@ -271,7 +273,7 @@ on18 %>%
    CityTV==1 ~1,
    TRUE~0
   )) -> on18
-
+#Define Newspaper Watchers
 on18 %>%
 mutate(Newspaper=case_when(
   GlobeandMail == 1 ~ 1,
@@ -450,13 +452,14 @@ on18 %>%
                       hydro2_rev="from hydro scaled 0 to 1 and reversed")->on18
 
 
-#Combine Trust in media
+#### Combine Trust in media ####
 on18$trustbiasnews2<-scales::rescale(as.numeric(on18$trustbiasnews))
 on18$trustfactnews2<-scales::rescale(as.numeric(on18$trustfactnews))
 on18$trustfactnews2
+# This calculates the average of the two. 
 on18 %>% rowwise() %>% mutate(trust_media= mean(c(trustbiasnews2,trustfactnews2), na.rm=T))->on18
 
-#Create Social Media Users
+#### Create Social Media Users####
 
 on18 %>% 
   mutate(Social_Use=case_when(
@@ -476,7 +479,7 @@ on18$Social_Use2<-car::Recode(on18$Social_Use, "'Never'='Never' ; 'Several times
                                                                          'About once a day', 
                                                                          'Several times a day'))
 table(on18$Social_Use2)
-#Export
+#### Export to SPSS File ####
 names(on18)
 write_sav(on18, path=here("data/on18_with_emotion_responses.sav"))
 
