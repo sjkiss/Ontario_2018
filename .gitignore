@@ -1,3 +1,7 @@
 .httr-oauth
 .Rproj.user
 Data/tweets.rda
+Data/campaign_tweets/*.*
+CPSR/
+R_Code/
+ProQuestDocuments_*.txt
