@@ -110,8 +110,8 @@ policies %>%
 # pivot down the agreement variables after rename
 policies_sd_down <- policies_sd %>%
   pivot_longer(cols = !Social_Use,
-               names_to = "Policy Issue", 
-               values_to = "Standard Deviation")
+               names_to = "Policy_Issue", 
+               values_to = "Standard_Deviation")
 #This is what we have now
 # social_use | agreement_1 | agreement_2 |
 # Heavy | 4 | 3|
@@ -130,4 +130,15 @@ policies_sd_down <- policies_sd %>%
 
 View(policies_sd_down)
 
-
+policies_sd_down[-c(25:48, 61:72, 97:108), ] %>%
+ggplot(., aes(x = Policy_Issue, y = 0, colour = Social_Use, linetype = Social_Use)) + 
+  geom_errorbar(aes (ymin = 0 - Standard_Deviation, ymax = 0 + Standard_Deviation), width =.2, 
+                                                                       position = position_dodge(.8)) + labs(x = "Policy Issue", y = "Standard Deviation", colour = "Social Media Use", linetype = "Social Media Use") +
+  scale_x_discrete(labels = c("Big Business Benefits Everyone", "Climate Change", "Youth Should Receive Drug Benefits",
+                              "Post Secondary Education Should be Free", "The Government Should Help Racial Minorities", "The Government Should Help Women", 
+                              "Sex-Ed Curriculum is Inappropriate", "The Government Should Reduce Income Inequality", "Increasing Minimum Wage Increases Prices",
+                              "Higher Coporate Taxes are Good", "Higher Personal Taxes are Good", "Health Care Should be Privatized")) +  scale_linetype_manual(values = c("solid", "dashed", "solid", "dotted", "dashed")) + 
+  scale_colour_manual(values = c("black", "black", "grey", "grey", "grey")) + 
+  geom_vline(xintercept = c(1.5, 2.5, 3.5, 4.5, 5.5, 6.5, 7.5, 8.5, 9.5, 10.5, 11.5))+ coord_flip() + theme_bw()  + theme(axis.text.y=element_text(angle = 20, vjust = 0.5), legend.position ="bottom") + 
+  guides(colour = guide_legend(nrow = 3, byrow = T, title.position = "top", hjust = 0.5, reverse = T), linetype = guide_legend(nrow = 3, byrow = T, title.position = "top", hjust = 0.5, reverse = T)) -> policy_issue_sd_graph
+ggsave(plot = policy_issue_sd_graph, "Plots/policy_issues_sd.png", width = 12, height = 8)
