@@ -130,15 +130,30 @@ policies_sd_down <- policies_sd %>%
 
 View(policies_sd_down)
 
-policies_sd_down[-c(25:48, 61:72, 97:108), ] %>%
-ggplot(., aes(x = Policy_Issue, y = 0, colour = Social_Use, linetype = Social_Use)) + 
+policies_sd_down$Policy_Issue <- factor(policies_sd_down$Policy_Issue, levels = c(policy_names, "climate_views"), 
+                                        labels = c("The Government Should Help Racial Minorities", "The Government Should Help Women", 
+                                                   "Higher Coporate Taxes are Good", "Higher Personal Taxes are Good",  "Health Care Should be Privatized", 
+                                                   "Increasing Minimum Wage Increases Prices", "The Government Should Reduce Income Inequality", "More Business Benefits Everyone", 
+                                                   "Youth Should Receive Drug Benefits", "Post Secondary Education Should be Free", "Sex-Ed Curriculum is Inappropriate", "Climate Change"))
+
+
+#### GRAPH STANDARD DEVIATIONS BY POLICY ISSUE ####
+policies_sd_down [-c(97:108), ]%>%
+  ggplot(., aes(x = 0, y = Standard_Deviation, colour = Social_Use, linetype = Social_Use)) + 
   geom_errorbar(aes (ymin = 0 - Standard_Deviation, ymax = 0 + Standard_Deviation), width =.2, 
-                                                                       position = position_dodge(.8)) + labs(x = "Policy Issue", y = "Standard Deviation", colour = "Social Media Use", linetype = "Social Media Use") +
-  scale_x_discrete(labels = c("Big Business Benefits Everyone", "Climate Change", "Youth Should Receive Drug Benefits",
-                              "Post Secondary Education Should be Free", "The Government Should Help Racial Minorities", "The Government Should Help Women", 
-                              "Sex-Ed Curriculum is Inappropriate", "The Government Should Reduce Income Inequality", "Increasing Minimum Wage Increases Prices",
-                              "Higher Coporate Taxes are Good", "Higher Personal Taxes are Good", "Health Care Should be Privatized")) +  scale_linetype_manual(values = c("solid", "dashed", "solid", "dotted", "dashed")) + 
-  scale_colour_manual(values = c("black", "black", "grey", "grey", "grey")) + 
-  geom_vline(xintercept = c(1.5, 2.5, 3.5, 4.5, 5.5, 6.5, 7.5, 8.5, 9.5, 10.5, 11.5))+ coord_flip() + theme_bw()  + theme(axis.text.y=element_text(angle = 20, vjust = 0.5), legend.position ="bottom") + 
-  guides(colour = guide_legend(nrow = 3, byrow = T, title.position = "top", hjust = 0.5, reverse = T), linetype = guide_legend(nrow = 3, byrow = T, title.position = "top", hjust = 0.5, reverse = T)) -> policy_issue_sd_graph
-ggsave(plot = policy_issue_sd_graph, "Plots/policy_issues_sd.png", width = 12, height = 8)
+                position = position_dodge(.8)) + facet_wrap(~Policy_Issue, labeller = label_wrap_gen(width=30)) + labs(x = "Social Media Use", y = "Standard Deviation", colour = "Social Media Use", linetype = "Social Media Use") + 
+  coord_flip() + theme_bw()  + theme(axis.text.y=element_blank(), axis.ticks.y = element_blank(), legend.position ="bottom", strip.text = element_text(size=8)) +  guides(colour = guide_legend(nrow = 3, byrow = T, title.position = "top", hjust = 0.5, reverse = T), linetype = guide_legend(nrow = 3, byrow = T, title.position = "top", hjust = 0.5, reverse = T)) +
+  scale_colour_manual(values = c("grey", "black", "grey" , "black" , "grey", "black", "grey", "black")) +
+  scale_linetype_manual(values = c("twodash","twodash","longdash", "longdash", "dashed", "dashed", "solid", "solid")) -> policy_issue_sd_graph
+ggsave(plot = policy_issue_sd_graph, "Plots/policy_issues_sd.png", width = 12, height = 7)
+
+#alternative graph
+#policies_sd_down[-c(25:48, 61:72, 97:108), ] %>%
+#  ggplot(., aes(x = Policy_Issue, y = 0, colour = Social_Use, linetype = Social_Use)) + 
+#  geom_errorbar(aes (ymin = 0 - Standard_Deviation, ymax = 0 + Standard_Deviation), width =.2, 
+#                position = position_dodge(.8)) + labs(x = "Policy Issue", y = "Standard Deviation", colour = "Social Media Use", linetype = "Social Media Use") +
+#  scale_linetype_manual(values = c("solid", "dashed", "solid", "dotted", "dashed")) + 
+#  scale_colour_manual(values = c("black", "black", "grey", "grey", "grey")) + 
+#  geom_vline(xintercept = c(1.5, 2.5, 3.5, 4.5, 5.5, 6.5, 7.5, 8.5, 9.5, 10.5, 11.5))+ coord_flip() + theme_bw()  + theme(axis.text.y=element_text(angle = 20, vjust = 0.5), legend.position ="bottom") + 
+#  guides(colour = guide_legend(nrow = 3, byrow = T, title.position = "top", hjust = 0.5, reverse = T), linetype = guide_legend(nrow = 3, byrow = T, title.position = "top", hjust = 0.5, reverse = T)) 
+
