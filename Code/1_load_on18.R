@@ -470,14 +470,17 @@ on18 %>%
   add_value_labels(Social_Use=c(Never=0))->on18
 table(as_factor(on18$Social_Use))
 on18$Social_Use<-as_factor(on18$Social_Use)
-on18$Social_Use2<-car::Recode(on18$Social_Use, "'Never'='Never' ; 'Several times in a year'='Less than once a week' ;
-                              'About once a month'='Less than once a week' ; 
+on18$Social_Use2<-car::Recode(on18$Social_Use, "'Never'='Never' ; 
+'Several times in a year'='Less than once a week' ;
+                              'About once a month'='Less than once a week' ;
                               'Several times a month'='Less than once a week';
-                              'Never'='Less than once a week'", levels=c('Never', 'Less than once a week', 
-                                                                         'About once a week', 
-                                                                         'Several times a week', 
-                                                                         'About once a day', 
-                                                                         'Several times a day'))
+                              'Never'='Less than once a week'", 
+                              levels=c('Never', 
+                                       'Less than once a week', 
+                                       'About once a week', 
+ 'Several times a week', 
+'About once a day', 
+'Several times a day'))
 table(on18$Social_Use2)
 #### Export to SPSS File ####
 names(on18)

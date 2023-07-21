@@ -68,10 +68,10 @@ on18 %>%
   View()
 on18$pol_knowledge
 on18 %>%
-  group_by(Social_Use) %>%
+  group_by(Social_Use2) %>%
   summarise(mean = mean(pol_knowledge, na.rm = T), sd = sd(pol_knowledge, na.rm = T)) 
 
-table(on18$Social_Use, on18$pol_knowledge)
+table(on18$Social_Use2, on18$pol_knowledge)
 
 #### Policy polarization ####
 # R social media users frothing at the mouth extremists
@@ -97,13 +97,14 @@ names(policies)<-policy_names
 policies <- mutate_all(policies, function(x) as.numeric(as.character(x)))
 range01 <- function(x, ...){(x-min(x, ...))/(max(x, ...)-min(x, ...))}
 policies <- range01(policies, na.rm = T)
-policies %>%  
- bind_cols(., on18$Social_Use)->policies
 
-names(policies)<-c(policy_names, "Social_Use")
+policies %>%  
+ bind_cols(., on18$Social_Use2)->policies
+
+names(policies)<-c(policy_names, "Social_Use2")
 
 policies %>%
-  group_by(Social_Use) %>%
+  group_by(Social_Use2) %>%
   summarise(across(everything(), sd, na.rm = T), .groups = "drop") -> policies_sd
 
 
@@ -111,9 +112,9 @@ policies %>%
 # Take on18
 # pivot down the agreement variables after rename
 policies_sd_down <- policies_sd %>%
-  pivot_longer(cols = !Social_Use,
-               names_to = "Policy Issue", 
-               values_to = "Standard Deviation")
+  pivot_longer(cols = !Social_Use2,
+               names_to = "Policy_Issue", 
+               values_to = "Standard_Deviation")
 #This is what we have now
 # social_use | agreement_1 | agreement_2 |
 # Heavy | 4 | 3|
@@ -130,6 +131,69 @@ policies_sd_down <- policies_sd %>%
 # Then Group by Social_Use and variable
 # Summarize by sd()
 
-View(policies_sd_down)
 
+#View(policies_sd_down)
+
+policies_sd_down$Policy_Issue <- factor(policies_sd_down$Policy_Issue, levels = c(policy_names, "climate_views"), 
+                                        labels = c("The Government Should Help Racial Minorities", "The Government Should Help Women", 
+                                                   "Higher Coporate Taxes are Good", "Higher Personal Taxes are Good",  "Health Care Should be Privatized", 
+                                                   "Increasing Minimum Wage Increases Prices", "The Government Should Reduce Income Inequality", "More Business Benefits Everyone", 
+                                                   "Youth Should Receive Drug Benefits", "Post Secondary Education Should be Free", "Sex-Ed Curriculum is Inappropriate", "Climate Change"))
+
+
+#### GRAPH STANDARD DEVIATIONS BY POLICY ISSUE ####
+
+# I am trying to understand why you are excluding these rows
+policies_sd_down [-c(97:108), ]
+policies_sd_down[97:108,]
+#OK, these seme to come from respondents who did not respond to their social media use
+#So we can exclude them. 
+#Here is a quicker way to exclude them
+policies_sd_down
+policies_sd_down %>% 
+  filter(complete.cases(.)) %>% 
+  #instead of setting x to be zero I want x to be the Standard Deviation
+  ggplot(., aes(x = Standard_Deviation, 
+              #And I want y to be the Social Media Use
+              #You did this lower down with coord_flip()
+              #Which is an old way of switching x and y. 
+              #Now, however, ggplot() lets you just specify whichever
+              # one you want to be horizontal and vertical with x and y
+                y = Social_Use2, 
+                colour = Social_Use2)) + 
+  geom_point()+
+ # geom_errorbar(aes (ymin = 0 - Standard_Deviation, ymax = 0 + Standard_Deviation), width =.2, 
+                #position = position_dodge(.8)) + 
+  facet_wrap(~Policy_Issue, labeller = label_wrap_gen(width=30)) +
+  labs(x = "Standard Deviation", y= "Social Media Use") + 
+   theme_bw()  + 
+  theme(axis.text.y=element_blank(),
+        axis.ticks.y = element_blank(), 
+        #I actually don't like the legend on the bottom for this reason.
+        # We actually have a categorical variable (Social_Use2)
+        # That has an intuitive order to it, never to a lot
+        # I would like to capture that order in a legend that goes from low tohigh
+        #But I am going to uncomment poutting the legend in the bottom.
+       # legend.position ="bottom", 
+        strip.text = element_text(size=8))+
+# guides(colour = guide_legend(nrow = 3, byrow = T, title.position = "top", hjust = 0.5, reverse = T), linetype = guide_legend(nrow = 3, byrow = T, title.position = "top", hjust = 0.5, reverse = T)) +
+  #But this introduces a new problem which is that the 
+  # Category "never" is at the top of the legend
+  #Try making the graph, stopping the code at line 176
+  # by deleting the +
+  #Then add it back in and see the difference
+  guides(color=guide_legend(reverse=T))->policy_issue_sd_graph
+   #scale_colour_manual(guide=guide_legend(reverse=T))
+ # scale_linetype_manual(values = c("twodash","twodash","longdash", "longdash", "dashed", "dashed", "solid", "solid")) -> policy_issue_sd_graph
+ggsave(plot = policy_issue_sd_graph, "Plots/policy_issues_sd.png", width = 12, height = 7)
+
+#alternative graph
+#policies_sd_down[-c(25:48, 61:72, 97:108), ] %>%
+#  ggplot(., aes(x = Policy_Issue, y = 0, colour = Social_Use, linetype = Social_Use)) + 
+#  geom_errorbar(aes (ymin = 0 - Standard_Deviation, ymax = 0 + Standard_Deviation), width =.2, 
+#                position = position_dodge(.8)) + labs(x = "Policy Issue", y = "Standard Deviation", colour = "Social Media Use", linetype = "Social Media Use") +
+#  scale_linetype_manual(values = c("solid", "dashed", "solid", "dotted", "dashed")) + 
+#  scale_colour_manual(values = c("black", "black", "grey", "grey", "grey")) + 
+#  geom_vline(xintercept = c(1.5, 2.5, 3.5, 4.5, 5.5, 6.5, 7.5, 8.5, 9.5, 10.5, 11.5))+ coord_flip() + theme_bw()  + theme(axis.text.y=element_text(angle = 20, vjust = 0.5), legend.position ="bottom") + 
+#  guides(colour = guide_legend(nrow = 3, byrow = T, title.position = "top", hjust = 0.5, reverse = T), linetype = guide_legend(nrow = 3, byrow = T, title.position = "top", hjust = 0.5, reverse = T)) 
 
