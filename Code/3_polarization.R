@@ -1,5 +1,7 @@
 #Add in a line that sources the first script 1_load_on18
 source("Code/1_load_on18.R")
+#Always a good idea to throw a check in here.
+names(on18)
 #### Political Knowledge #### 
 #Create one political knowledge variable using the variables on political knowledge.
 # R gets 1 if they got each response right
