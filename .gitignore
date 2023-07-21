@@ -1,4 +1,4 @@
-.httr-oauth
+.DS_Store
 .Rproj.user
 Data/tweets.rda
 Data/campaign_tweets/*.*

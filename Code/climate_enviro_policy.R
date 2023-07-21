@@ -1,5 +1,5 @@
-source('1_load_on18.R')
-source('1_load_ipsos.R')
+source('Code/1_load_on18.R')
+#source('Code/1_load_ipsos.R')
 look('climate', on18.labs)
 look('warm', on18.labs)
 look('green', on18.labs)
