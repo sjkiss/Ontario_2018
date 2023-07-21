@@ -197,3 +197,17 @@ ggsave(plot = policy_issue_sd_graph, "Plots/policy_issues_sd.png", width = 12, h
 #  geom_vline(xintercept = c(1.5, 2.5, 3.5, 4.5, 5.5, 6.5, 7.5, 8.5, 9.5, 10.5, 11.5))+ coord_flip() + theme_bw()  + theme(axis.text.y=element_text(angle = 20, vjust = 0.5), legend.position ="bottom") + 
 #  guides(colour = guide_legend(nrow = 3, byrow = T, title.position = "top", hjust = 0.5, reverse = T), linetype = guide_legend(nrow = 3, byrow = T, title.position = "top", hjust = 0.5, reverse = T)) 
 
+
+#### Affective Polarization ####
+# We need the party feeling scores
+lookfor(on18, "feel")
+on18 %>% 
+  select(starts_with("partyeval")) %>% 
+  glimpse()
+
+on18 %>% 
+  select(starts_with("partyeval")) %>% 
+  summary()
+on18 %>% 
+  select(starts_with("partyeval")) %>% 
+  val_labels()
