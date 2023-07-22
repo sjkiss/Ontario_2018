@@ -204,10 +204,50 @@ lookfor(on18, "feel")
 on18 %>% 
   select(starts_with("partyeval")) %>% 
   glimpse()
-
+# so it looks like I took the step sometime of 
+# scaling these variables to 0 and 1, and they end in 
+# _out.
 on18 %>% 
   select(starts_with("partyeval")) %>% 
   summary()
+#Looks like the originals run from 0 to 5
 on18 %>% 
   select(starts_with("partyeval")) %>% 
   val_labels()
+on18 %>% 
+  select(starts_with("partyeval")) %>% 
+  var_label()
+#Looks like 4 is Green
+# 1 is Liberal
+# 3 is NDP
+# 2 isPC
+# 0 is Really dislike and 5 is really like. 
+ 
+#Let's use the _out ones.
+
+on18 %>% 
+  select(id,starts_with("partyeval")&ends_with("out"))->affect
+names(affect)
+affect %>% 
+  rename(Green_Like=2, Liberal_Like=3, NDP_Like=4, PC_Like=5)->affect
+#For each respondent, we will need an average like for the parties
+# This is mean(like)_i
+#So we need to effectively calculate a mean for each row. 
+#Each row is one R. 
+affect %>% 
+  rowwise() %>% 
+  mutate(mean_like=mean(c_across(2:5), na.rm=T))->affect
+
+#Now we need to take each R's like score for each party
+# And subtract the mean from it. 
+#my guit is that we should pivot this down
+#Could you:
+# 1) pivot down the party like scores (not the respondent id)
+# and not the mean like
+# 2) Then, in my mind's eye, we will have a column
+# of party like scores and a column of mean like values
+# It should be easy to just subtract the mean like column
+# From the party like scores. 
+# 3) Then squre that last column
+# 4) Then we should just sum those up for each respondent.
+
