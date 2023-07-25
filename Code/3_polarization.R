@@ -49,7 +49,7 @@ on18 %>%
            #This will paste the name of the column with _correct
            #Exactly like you did above.
            .names="{.col}_correct")
-    )->on18
+  )->on18
 #Now you can quickly check that it worked
 on18 %>% 
   select(ends_with("_correct"))
@@ -99,7 +99,7 @@ range01 <- function(x, ...){(x-min(x, ...))/(max(x, ...)-min(x, ...))}
 policies <- range01(policies, na.rm = T)
 
 policies %>%  
- bind_cols(., on18$Social_Use2)->policies
+  bind_cols(., on18$Social_Use2)->policies
 
 names(policies)<-c(policy_names, "Social_Use2")
 
@@ -154,19 +154,19 @@ policies_sd_down %>%
   filter(complete.cases(.)) %>% 
   #instead of setting x to be zero I want x to be the Standard Deviation
   ggplot(., aes(x = Standard_Deviation, 
-              #And I want y to be the Social Media Use
-              #You did this lower down with coord_flip()
-              #Which is an old way of switching x and y. 
-              #Now, however, ggplot() lets you just specify whichever
-              # one you want to be horizontal and vertical with x and y
+                #And I want y to be the Social Media Use
+                #You did this lower down with coord_flip()
+                #Which is an old way of switching x and y. 
+                #Now, however, ggplot() lets you just specify whichever
+                # one you want to be horizontal and vertical with x and y
                 y = Social_Use2, 
                 colour = Social_Use2)) + 
   geom_point()+
- # geom_errorbar(aes (ymin = 0 - Standard_Deviation, ymax = 0 + Standard_Deviation), width =.2, 
-                #position = position_dodge(.8)) + 
+  # geom_errorbar(aes (ymin = 0 - Standard_Deviation, ymax = 0 + Standard_Deviation), width =.2, 
+  #position = position_dodge(.8)) + 
   facet_wrap(~Policy_Issue, labeller = label_wrap_gen(width=30)) +
   labs(x = "Standard Deviation", y= "Social Media Use") + 
-   theme_bw()  + 
+  theme_bw()  + 
   theme(axis.text.y=element_blank(),
         axis.ticks.y = element_blank(), 
         #I actually don't like the legend on the bottom for this reason.
@@ -174,17 +174,17 @@ policies_sd_down %>%
         # That has an intuitive order to it, never to a lot
         # I would like to capture that order in a legend that goes from low tohigh
         #But I am going to uncomment poutting the legend in the bottom.
-       # legend.position ="bottom", 
+        # legend.position ="bottom", 
         strip.text = element_text(size=8))+
-# guides(colour = guide_legend(nrow = 3, byrow = T, title.position = "top", hjust = 0.5, reverse = T), linetype = guide_legend(nrow = 3, byrow = T, title.position = "top", hjust = 0.5, reverse = T)) +
+  # guides(colour = guide_legend(nrow = 3, byrow = T, title.position = "top", hjust = 0.5, reverse = T), linetype = guide_legend(nrow = 3, byrow = T, title.position = "top", hjust = 0.5, reverse = T)) +
   #But this introduces a new problem which is that the 
   # Category "never" is at the top of the legend
   #Try making the graph, stopping the code at line 176
   # by deleting the +
   #Then add it back in and see the difference
   guides(color=guide_legend(reverse=T))->policy_issue_sd_graph
-   #scale_colour_manual(guide=guide_legend(reverse=T))
- # scale_linetype_manual(values = c("twodash","twodash","longdash", "longdash", "dashed", "dashed", "solid", "solid")) -> policy_issue_sd_graph
+#scale_colour_manual(guide=guide_legend(reverse=T))
+# scale_linetype_manual(values = c("twodash","twodash","longdash", "longdash", "dashed", "dashed", "solid", "solid")) -> policy_issue_sd_graph
 ggsave(plot = policy_issue_sd_graph, "Plots/policy_issues_sd.png", width = 12, height = 7)
 
 #alternative graph
@@ -222,7 +222,7 @@ on18 %>%
 # 3 is NDP
 # 2 isPC
 # 0 is Really dislike and 5 is really like. 
- 
+
 #Let's use the _out ones.
 
 on18 %>% 
@@ -244,10 +244,43 @@ affect %>%
 #Could you:
 # 1) pivot down the party like scores (not the respondent id)
 # and not the mean like
+affect_pol_cal <- affect %>%
+  pivot_longer(cols = !c(id, mean_like),
+               names_to = "Party", 
+               values_to = "Party_like_score")
 # 2) Then, in my mind's eye, we will have a column
 # of party like scores and a column of mean like values
 # It should be easy to just subtract the mean like column
+
+affect_pol_cal$like_mean <- (affect_pol_cal$Party_like_score - affect_pol_cal$mean_like)^2
 # From the party like scores. 
 # 3) Then squre that last column
+
+affect_pol_cal %>%
+  group_by(id) %>%
+  summarise(Soc_dis = sum(like_mean)) -> Soc_dis_scores
+
+Soc_dis_scores$Soc_dis <- sqrt(Soc_dis_scores$Soc_dis)
+
 # 4) Then we should just sum those up for each respondent.
+
+full_join(on18, Soc_dis_scores, by = join_by(id)) -> on18
+
+on18 %>%
+  group_by(Social_Use2) %>%
+  summarise(mean = mean(Soc_dis, na.rm = T), sd = sd(Soc_dis, na.rm = T)) -> mean_affect_scores
+
+mean_affect_scores %>% 
+  filter(complete.cases(.)) %>% 
+  ggplot(., aes(x = mean, 
+                y = Social_Use2, 
+                colour = Social_Use2)) + 
+  geom_point()+
+  geom_errorbar(aes (xmin = mean - sd, xmax = mean + sd), width =.2) + 
+  labs(x = "Mean", y= "Social Media Use") + 
+  theme_bw()  + 
+  theme(axis.text.y=element_blank(),
+        axis.ticks.y = element_blank(), 
+        strip.text = element_text(size=8))+
+  guides(color=guide_legend(reverse=T)) -> affect_scores_social_use
 
