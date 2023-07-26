@@ -302,6 +302,8 @@ on18 %>%
 names(affect)
 affect %>% 
   rename(Green_Like=2, Liberal_Like=3, NDP_Like=4, PC_Like=5)->affect
+
+affect_wt <- affect
 #For each respondent, we will need an average like for the parties
 # This is mean(like)_i
 #So we need to effectively calculate a mean for each row. 
@@ -332,7 +334,7 @@ affect_pol_cal %>%
   group_by(id) %>%
   summarise(Soc_dis = sum(like_mean)) -> Soc_dis_scores
 
-Soc_dis_scores$Soc_dis <- sqrt(Soc_dis_scores$Soc_dis)
+Soc_dis_scores$Soc_dis <- sqrt(Soc_dis_scores$Soc_dis/4)
 
 # 4) Then we should just sum those up for each respondent.
 
@@ -358,5 +360,43 @@ mean_affect_scores %>%
 
 
 on18 %>%
-  group_by(Primary_media2) %>%
+  group_by(Primary_media) %>%
   summarise(mean = mean(Soc_dis, na.rm = T), sd = sd(Soc_dis, na.rm = T))
+
+#### Weighted Affective Polarization (WAP) Scores ####
+
+affect_wt$Green_Like_wt <- (affect$Green_Like * 0.046)
+affect_wt$PC_Like_wt <- (affect$PC_Like * 0.405)
+affect_wt$Liberal_Like_wt <- (affect$Liberal_Like * 0.196)
+affect_wt$NDP_Like_wt <- (affect$NDP_Like * 0.336)
+
+affect_wt %>% 
+  rowwise() %>% 
+  mutate(mean_like=mean(c_across(6:9), na.rm=T))->affect_wt
+
+affect_pol_cal_wt <- affect_wt %>%
+  select(., !(6:9)) %>%
+  pivot_longer(cols = !c(id, mean_like),
+               names_to = "Party", 
+               values_to = "Party_like_score")
+
+affect_pol_cal_wt %>%
+mutate(vote_share=case_when(Party == "Green_Like" ~ 0.046, Party == "Liberal_Like" ~ 0.196, Party == "NDP_Like" ~ 0.336, 
+                            Party == "PC_Like" ~ 0.405
+  
+)) -> affect_pol_cal_wt
+
+affect_pol_cal_wt$like_mean <- (affect_pol_cal_wt$Party_like_score - affect_pol_cal_wt$mean_like)^2
+affect_pol_cal_wt$like_mean_wt <- (affect_pol_cal_wt$like_mean * affect_pol_cal_wt$vote_share)
+
+affect_pol_cal_wt %>%
+  group_by(id) %>%
+  summarise(WAP = sum(like_mean_wt)) -> WAP_scores
+
+WAP_scores$WAP <- sqrt(WAP_scores$WAP)
+
+full_join(on18, WAP_scores, by = join_by(id)) -> on18
+
+on18 %>%
+  group_by(Social_Use2) %>%
+  summarise(mean = mean(WAP, na.rm = T), sd = sd(WAP, na.rm = T))
