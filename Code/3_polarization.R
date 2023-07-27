@@ -162,7 +162,7 @@ policies_sd_social_use_down <- policies_sd_social_use %>%
 
 policies_sd_social_use_down$Policy_Issue <- factor(policies_sd_social_use_down$Policy_Issue, levels = c(policy_names, "climate_views"), 
                                         labels = c("The Government Should Help Racial Minorities", "The Government Should Help Women", 
-                                                   "Higher Coporate Taxes are Good", "Higher Personal Taxes are Good",  "Health Care Should be Privatized", 
+                                                   "Higher Corporate Taxes are Good", "Higher Personal Taxes are Good",  "Health Care Should be Privatized", 
                                                    "Increasing Minimum Wage Increases Prices", "The Government Should Reduce Income Inequality", "More Business Benefits Everyone", 
                                                    "Youth Should Receive Drug Benefits", "Post Secondary Education Should be Free", "Sex-Ed Curriculum is Inappropriate", "Climate Change"))
 
