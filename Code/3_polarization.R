@@ -131,7 +131,9 @@ names(policies_social_use)<-c(policy_names, "Social_Use2")
 
 policies_social_use %>%
   group_by(Social_Use2) %>%
-  summarise(across(everything(), sd, na.rm = T), .groups = "drop") -> policies_sd_social_use
+  summarise(across(everything(), sd, na.rm = T), .groups = "drop") %>% 
+  View()
+-> policies_sd_social_use
 
 
 #Calculate standard deviation for each. 
@@ -272,7 +274,7 @@ policies_media_down %>%
 
 #### Affective Polarization ####
 # We need the party feeling scores
-lookfor(on18, "feel")
+
 on18 %>% 
   select(starts_with("partyeval")) %>% 
   glimpse()
@@ -325,7 +327,7 @@ affect_pol_cal <- affect %>%
 # 2) Then, in my mind's eye, we will have a column
 # of party like scores and a column of mean like values
 # It should be easy to just subtract the mean like column
-
+affect_pol_cal
 affect_pol_cal$like_mean <- (affect_pol_cal$Party_like_score - affect_pol_cal$mean_like)^2
 # From the party like scores. 
 # 3) Then squre that last column
@@ -340,9 +342,11 @@ Soc_dis_scores$Soc_dis <- sqrt(Soc_dis_scores$Soc_dis/4)
 
 full_join(on18, Soc_dis_scores, by = join_by(id)) -> on18
 
+#Check this out
+
 on18 %>%
   group_by(Social_Use2) %>%
-  summarise(mean = mean(Soc_dis, na.rm = T), sd = sd(Soc_dis, na.rm = T)) -> mean_affect_scores
+  summarise(mean = mean(Soc_dis, na.rm = T), sd = sd(Soc_dis, na.rm = T), n=n(), se=sd/sqrt(n))->mean_affect_scores 
 
 mean_affect_scores %>% 
   filter(complete.cases(.)) %>% 
@@ -350,14 +354,14 @@ mean_affect_scores %>%
                 y = Social_Use2, 
                 colour = Social_Use2)) + 
   geom_point()+
-  geom_errorbar(aes (xmin = mean - sd, xmax = mean + sd), width =.2) + 
+  geom_errorbar(aes (xmin = mean - (1.96*se), xmax = mean + (1.96*se)), width =.2) + 
   labs(x = "Mean", y= "Social Media Use") + 
   theme_bw()  + 
   theme(axis.text.y=element_blank(),
         axis.ticks.y = element_blank(), 
         strip.text = element_text(size=8))+
-  guides(color=guide_legend(reverse=T)) -> affect_scores_social_use
-
+  guides(color=guide_legend(reverse=T))+xlim(c(0,0.5)) -> affect_scores_social_use
+affect_scores_social_use
 
 on18 %>%
   group_by(Primary_media) %>%
@@ -400,3 +404,12 @@ full_join(on18, WAP_scores, by = join_by(id)) -> on18
 on18 %>%
   group_by(Social_Use2) %>%
   summarise(mean = mean(WAP, na.rm = T), sd = sd(WAP, na.rm = T))
+# Tasks for July 28
+# did means of interest by primary media
+# fit three OLS models for each policy variable with 
+# SD of policy variable as DV
+# Model 1 only legacy media
+# Model 2 only interest
+# Model 3 legacy media plus interest
+# https://r4ds.had.co.nz/many-models.html
+# check to see if anyone has ever used SD as a DV. 
