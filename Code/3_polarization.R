@@ -131,9 +131,7 @@ names(policies_social_use)<-c(policy_names, "Social_Use2")
 
 policies_social_use %>%
   group_by(Social_Use2) %>%
-  summarise(across(everything(), sd, na.rm = T), .groups = "drop") %>% 
-  View()
--> policies_sd_social_use
+  summarise(across(everything(), sd, na.rm = T), .groups = "drop") -> policies_sd_social_use
 
 
 #Calculate standard deviation for each. 
@@ -402,8 +400,126 @@ WAP_scores$WAP <- sqrt(WAP_scores$WAP)
 full_join(on18, WAP_scores, by = join_by(id)) -> on18
 
 on18 %>%
+  group_by(Primary_media) %>%
+  summarise(mean = mean(pointerst_ONint, na.rm = T), sd = sd(pointerst_ONint, na.rm = T))
+
+
+on18 %>%
   group_by(Social_Use2) %>%
   summarise(mean = mean(WAP, na.rm = T), sd = sd(WAP, na.rm = T))
+
+sd_mean <- function(x, ...){sqrt(((x - mean(x, ...))/ sd(x, ...))^2)}
+  
+#policies$sd_mean_hrm <- sd_mean(policies$help_racial_minorities, na.rm = T)
+
+
+#create number of standard deviations from mean variable
+
+policies_social_use_sd_dis <- do.call(cbind, lapply(policies_social_use[, 1:11], sd_mean, na.rm = T)) 
+policies_social_use_sd_dis %>%
+  bind_cols(., on18$Social_Use2)->policies_social_use_sd_dis
+names(policies_social_use_sd_dis)<-c(policy_names, "Social_Use2")
+
+se <- function(x, ...){
+  sd <- sd(x,...)
+  n <- n()
+  se <- sd/sqrt(n)
+}
+
+policies_social_use_sd_dis %>%
+  group_by(Social_Use2) %>%
+  summarise( across(everything(), list(.mean = mean, .se = se), na.rm = T )) -> policies_social_use_sd_dis_mean
+
+on18 <- cbind(on18, policies_social_use_sd_dis)
+
+policies_sd_social_dis_down <- policies_social_use_sd_dis_mean %>%
+  pivot_longer(cols = !Social_Use2,
+               names_to = c("Policy_Issue", ".value"), 
+              names_sep = "\\." )
+
+policies_sd_social_dis_down %>% 
+  filter(complete.cases(.)) %>%
+  ggplot(., aes(x = mean, 
+                y = Social_Use2, 
+                colour = Social_Use2)) + 
+  geom_point()+ facet_wrap(~Policy_Issue, labeller = label_wrap_gen(width=30)) +
+  geom_errorbar(aes (xmin = mean - (1.96*se), xmax = mean + (1.96*se)), width =.2) + 
+  labs(x = "Mean", y= "Social Media Use") + 
+  theme_bw()  + 
+  theme(axis.text.y=element_blank(),
+        axis.ticks.y = element_blank(), 
+        strip.text = element_text(size=8))+
+  guides(color=guide_legend(reverse=T))
+
+#check
+mean(policies$help_racial_minorities, na.rm = T)
+sd(policies$help_racial_minorities, na.rm = T)
+#observation #1
+# 0.95 = (x-x̄)/σ
+# 0.95 = (0.75-0.481)/0.282 
+# 0.95 = 0.95
+
+policies_social_use_sd_dis %>%
+  bind_cols(., on18$Primary_media) %>%
+  bind_cols(., on18$pointerst_ONint) ->policies_social_use_sd_dis2
+names(policies_social_use_sd_dis2)<-c(policy_names, "Social_Use2", "Primary_Media", "pointerst_ONint")
+
+policies_social_use_sd_dis2 %>%
+  pivot_longer(cols = 1:11, names_to = "Policy_Issue", values_to = "distance") -> policies_social_use_sd_dis2_down
+
+pivot_longer(cols = !Social_Use2,
+             names_to = c("Policy_Issue", ".value"), 
+             names_sep = "\\." )
+
+mods_Interest <- policies_social_use_sd_dis2_down %>%
+  group_by(Policy_Issue) %>%
+  summarise(lm_mod = list(lm(distance ~ pointerst_ONint))) %>% 
+  mutate(tidied = map(lm_mod, tidy, conf.int = T)) %>%
+  unnest(tidied)
+
+mods_Interest <- select(mods_Interest, -lm_mod) %>%
+  filter(!term == "(Intercept)")
+
+mods_media <- policies_social_use_sd_dis2_down %>%
+  group_by(Policy_Issue) %>%
+  summarise(lm_mod = list(lm(distance ~ Primary_Media))) %>% 
+  mutate(tidied = map(lm_mod, tidy, conf.int = T)) %>%
+  unnest(tidied)
+
+mods_media <- select(mods_media, -lm_mod) %>% #remove lm_mod column 
+  filter(!term == "(Intercept)") #remove intercept
+
+
+mods_all <- policies_social_use_sd_dis2_down %>%
+  group_by(Policy_Issue) %>%
+  summarise(lm_mod = list(lm(distance ~ pointerst_ONint + Primary_Media))) %>% 
+  mutate(tidied = map(lm_mod, tidy, conf.int = T)) %>%
+  unnest(tidied)
+
+mods_all <- select(mods_all, -lm_mod) %>%
+  filter(!term == "(Intercept)")
+
+#graph models
+
+mods_Interest %>% 
+  ggplot(aes(x = estimate, y = term)) + geom_point() + 
+  geom_linerange(aes(xmin=conf.low, xmax = conf.high), position = position_dodge(width=.75)) +
+  facet_wrap(~Policy_Issue, labeller = label_wrap_gen(width=30)) + geom_vline(xintercept = 0) + theme_bw()
+
+mods_media %>% 
+  ggplot(aes(x = estimate, y = term)) + geom_point() + 
+  geom_linerange(aes(xmin=conf.low, xmax = conf.high), position = position_dodge(width=.75)) +
+  facet_wrap(~Policy_Issue, labeller = label_wrap_gen(width=30)) + geom_vline(xintercept = 0) + theme_bw()
+
+mods_all %>% 
+  ggplot(aes(x = estimate, y = term)) + geom_point() + 
+  geom_linerange(aes(xmin=conf.low, xmax = conf.high), position = position_dodge(width=.75)) +
+  facet_wrap(~Policy_Issue, labeller = label_wrap_gen(width=30)) + geom_vline(xintercept = 0) + theme_bw()
+
+#policies_social_use %>%
+#  group_by(Social_Use2) %>%
+#  summarise(mean = mean(sd_mean_hrm, na.rm = T))
+
 # Tasks for July 28
 # did means of interest by primary media
 # fit three OLS models for each policy variable with 

@@ -3,6 +3,7 @@ library(tidyverse)
 library(haven)
 library(here)
 library(labelled)
+library(broom)
 #### Import Data####
 on18<-read_sav(file=here("Data/Ontario ES 2018 LISPOP.sav"))
 names(on18)
