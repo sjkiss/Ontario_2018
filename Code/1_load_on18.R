@@ -172,6 +172,8 @@ summary(on18$age)
 on18$age2<-recode(on18$age, "45:100=1; 0:44=0; else=NA")
 on18$age3<-scales::rescale(on18$age, to=c(0,1))
 
+#Rescale Political Interest
+on18$Interest<-scales::rescale(as.numeric(on18$pointerst_ONint), to=c(0,1))
 # Income
 #Income
 on18$income

@@ -409,13 +409,16 @@ on18 %>%
   summarise(mean = mean(WAP, na.rm = T), sd = sd(WAP, na.rm = T))
 
 sd_mean <- function(x, ...){sqrt(((x - mean(x, ...))/ sd(x, ...))^2)}
-  
+# From Polacko somewhere.
+
 #policies$sd_mean_hrm <- sd_mean(policies$help_racial_minorities, na.rm = T)
 
 
 #create number of standard deviations from mean variable
-
+policies_social_use
 policies_social_use_sd_dis <- do.call(cbind, lapply(policies_social_use[, 1:11], sd_mean, na.rm = T)) 
+#Policies_social_use_sd_dis is now each R's distance from the mean in SD. 
+head(policies_social_use_sd_dis)
 policies_social_use_sd_dis %>%
   bind_cols(., on18$Social_Use2)->policies_social_use_sd_dis
 names(policies_social_use_sd_dis)<-c(policy_names, "Social_Use2")
@@ -428,15 +431,15 @@ se <- function(x, ...){
 
 policies_social_use_sd_dis %>%
   group_by(Social_Use2) %>%
-  summarise( across(everything(), list(.mean = mean, .se = se), na.rm = T )) -> policies_social_use_sd_dis_mean
-
+  summarise( across(everything(), list(mean = mean, se = se), na.rm = T )) -> policies_social_use_sd_dis_mean
+policies_social_use_sd_dis_mean
 on18 <- cbind(on18, policies_social_use_sd_dis)
 
 policies_sd_social_dis_down <- policies_social_use_sd_dis_mean %>%
   pivot_longer(cols = !Social_Use2,
                names_to = c("Policy_Issue", ".value"), 
               names_sep = "\\." )
-
+policies_sd_social_dis_down
 policies_sd_social_dis_down %>% 
   filter(complete.cases(.)) %>%
   ggplot(., aes(x = mean, 
@@ -450,7 +453,7 @@ policies_sd_social_dis_down %>%
         axis.ticks.y = element_blank(), 
         strip.text = element_text(size=8))+
   guides(color=guide_legend(reverse=T))
-
+# Note no pattern
 #check
 mean(policies$help_racial_minorities, na.rm = T)
 sd(policies$help_racial_minorities, na.rm = T)
@@ -461,57 +464,72 @@ sd(policies$help_racial_minorities, na.rm = T)
 
 policies_social_use_sd_dis %>%
   bind_cols(., on18$Primary_media) %>%
-  bind_cols(., on18$pointerst_ONint) ->policies_social_use_sd_dis2
-names(policies_social_use_sd_dis2)<-c(policy_names, "Social_Use2", "Primary_Media", "pointerst_ONint")
+  bind_cols(., on18$Interest) ->policies_social_use_sd_dis2
+names(policies_social_use_sd_dis2)<-c(policy_names, "Social_Use2", "Primary_Media", "Interest")
 
 policies_social_use_sd_dis2 %>%
   pivot_longer(cols = 1:11, names_to = "Policy_Issue", values_to = "distance") -> policies_social_use_sd_dis2_down
-
-pivot_longer(cols = !Social_Use2,
-             names_to = c("Policy_Issue", ".value"), 
-             names_sep = "\\." )
+policies_social_use_sd_dis2_down
+# pivot_longer(cols = !Social_Use2,
+#              names_to = c("Policy_Issue", ".value"), 
+#              names_sep = "\\." )
 
 mods_Interest <- policies_social_use_sd_dis2_down %>%
   group_by(Policy_Issue) %>%
-  summarise(lm_mod = list(lm(distance ~ pointerst_ONint))) %>% 
-  mutate(tidied = map(lm_mod, tidy, conf.int = T)) %>%
-  unnest(tidied)
+  summarise(lm_mod = list(lm(distance ~ Interest))) %>% 
+  mutate(tidied = map(lm_mod, tidy, conf.int = T)) 
 
-mods_Interest <- select(mods_Interest, -lm_mod) %>%
-  filter(!term == "(Intercept)")
+mods_Interest
+library(modelsummary)
+modelsummary(mods_Interest$lm_mod, stars=T)
 
+#Make graph
+mods_Interest %>% 
+  unnest(tidied) %>% 
+  filter(term!="(Intercept)") %>% 
+  ggplot(., aes(x=estimate, y=fct_reorder(Policy_Issue, estimate)))+
+  geom_pointrange(aes(xmin=estimate-(1.96*std.error), xmax=estimate+(1.96*std.error)))
+
+table(on18$Primary_media)
 mods_media <- policies_social_use_sd_dis2_down %>%
   group_by(Policy_Issue) %>%
   summarise(lm_mod = list(lm(distance ~ Primary_Media))) %>% 
-  mutate(tidied = map(lm_mod, tidy, conf.int = T)) %>%
-  unnest(tidied)
+  mutate(tidied = map(lm_mod, tidy, conf.int = T)) 
 
-mods_media <- select(mods_media, -lm_mod) %>% #remove lm_mod column 
-  filter(!term == "(Intercept)") #remove intercept
+modelsummary(mods_media$lm_mod, stars=T)
+mods_media$lm_mod
+mods_media %>% 
+  unnest(tidied) %>% 
+  filter(term!="(Intercept)") %>% 
+  ggplot(., aes(x=estimate, y=fct_reorder(Policy_Issue, estimate), col=term))+
+  geom_pointrange(position="jitter", aes(xmin=estimate-(1.96*std.error), xmax=estimate+(1.96*std.error)))
 
 
 mods_all <- policies_social_use_sd_dis2_down %>%
   group_by(Policy_Issue) %>%
-  summarise(lm_mod = list(lm(distance ~ pointerst_ONint + Primary_Media))) %>% 
-  mutate(tidied = map(lm_mod, tidy, conf.int = T)) %>%
-  unnest(tidied)
+  summarise(lm_mod = list(lm(distance ~ Interest + Primary_Media))) %>% 
+  mutate(tidied = map(lm_mod, tidy, conf.int = T)) 
 
-mods_all <- select(mods_all, -lm_mod) %>%
-  filter(!term == "(Intercept)")
-
+modelsummary(mods_all$lm_mod, stars=T)
 #graph models
 
-mods_Interest %>% 
+mods_Interest %>%
+  unnest(tidied) %>% 
+  filter(term!="(Intercept)") %>% 
   ggplot(aes(x = estimate, y = term)) + geom_point() + 
   geom_linerange(aes(xmin=conf.low, xmax = conf.high), position = position_dodge(width=.75)) +
   facet_wrap(~Policy_Issue, labeller = label_wrap_gen(width=30)) + geom_vline(xintercept = 0) + theme_bw()
 
 mods_media %>% 
+  unnest(tidied) %>% 
+  filter(term!="(Intercept)") %>% 
   ggplot(aes(x = estimate, y = term)) + geom_point() + 
   geom_linerange(aes(xmin=conf.low, xmax = conf.high), position = position_dodge(width=.75)) +
   facet_wrap(~Policy_Issue, labeller = label_wrap_gen(width=30)) + geom_vline(xintercept = 0) + theme_bw()
 
 mods_all %>% 
+  unnest(tidied) %>% 
+  filter(term!="(Intercept)") %>% 
   ggplot(aes(x = estimate, y = term)) + geom_point() + 
   geom_linerange(aes(xmin=conf.low, xmax = conf.high), position = position_dodge(width=.75)) +
   facet_wrap(~Policy_Issue, labeller = label_wrap_gen(width=30)) + geom_vline(xintercept = 0) + theme_bw()
