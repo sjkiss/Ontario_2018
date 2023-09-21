@@ -5,3 +5,11 @@ Data/campaign_tweets/*.*
 CPSR/
 R_Code/
 ProQuestDocuments_*.txt
+black_friday/
+media_analysis/
+MPSA_2020/
+MPSA_2021/
+news_bubbles.R
+newspaper_articles/
+*.Rdata
+*.sav
