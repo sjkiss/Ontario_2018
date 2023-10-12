@@ -1,38 +1,33 @@
-#Add in a line that sources the first script 1_load_on18
+##Load needed scripts to complete analyses
 source("Code/1_load_on18.R")
-#Always a good idea to throw a check in here.
+source("Code/0_functions.R")
+#Check the variables in the dataset.
 names(on18)
-
+glimpse(on18)
 #### Primary News Source ####
 
 on18 %>%
   mutate(Primary_media=case_when(
-    (primarynews_7 == 1 | primarynews_6 == 1) & (primarynews_5 == 0 & primarynews_4 == 0 & primarynews_3 == 0 & primarynews_2 == 0 & primarynews_1 == 0) ~ "Social_Media",
-    (primarynews_4 == 1 | primarynews_5 == 1) & (primarynews_6 == 0 & primarynews_7 == 0 & primarynews_3 == 0 & primarynews_2 == 0 & primarynews_1 == 0) ~ "Online",
-    (primarynews_3 == 1 | primarynews_2 == 1 | primarynews_1 == 1) & (primarynews_5 == 0 & primarynews_4 == 0 & primarynews_6 == 0 & primarynews_7 == 0) ~ "Legacy",
+    (primarynews_7 == 1 | primarynews_6 == 1) & (primarynews_5 == 0 & primarynews_4 == 0 & primarynews_3 == 0 & primarynews_2 == 0 & primarynews_1 == 0) ~ "Social_Media", #For individuals who only use Social Media
+    (primarynews_4 == 1 | primarynews_5 == 1) & (primarynews_6 == 0 & primarynews_7 == 0 & primarynews_3 == 0 & primarynews_2 == 0 & primarynews_1 == 0) ~ "Online", #For individuals who only use online sources that are not social media
+    (primarynews_3 == 1 | primarynews_2 == 1 | primarynews_1 == 1) & (primarynews_5 == 0 & primarynews_4 == 0 & primarynews_6 == 0 & primarynews_7 == 0) ~ "Legacy", #For individuals who only receive news from television or newspapers 
     TRUE ~ "Mixed"
     
   ))->on18
 
-on18 %>%
-  mutate(Primary_media2=case_when(
-    (primarynews_7 == 1 | primarynews_6 == 1 | primarynews_4 == 1 | primarynews_5 == 1) & (primarynews_3 == 0 & primarynews_2 == 0 & primarynews_1 == 0) ~ "Online",
-    (primarynews_3 == 1 | primarynews_2 == 1 | primarynews_1 == 1) & (primarynews_5 == 0 & primarynews_4 == 0 & primarynews_6 == 0 & primarynews_7 == 0) ~ "Legacy",
-    TRUE ~ "Mixed"
-    
-  ))->on18
+# on18 %>%
+#   mutate(Primary_media2=case_when(
+#     (primarynews_7 == 1 | primarynews_6 == 1 | primarynews_4 == 1 | primarynews_5 == 1) & (primarynews_3 == 0 & primarynews_2 == 0 & primarynews_1 == 0) ~ "Online",
+#     (primarynews_3 == 1 | primarynews_2 == 1 | primarynews_1 == 1) & (primarynews_5 == 0 & primarynews_4 == 0 & primarynews_6 == 0 & primarynews_7 == 0) ~ "Legacy",
+#     TRUE ~ "Mixed"
+#     
+#   ))->on18
 
 table(on18$Primary_media)
 #### Political Knowledge #### 
 #Create one political knowledge variable using the variables on political knowledge.
 # R gets 1 if they got each response right
 # sum to 3 divide by 3 to get one variable indicating their knowledge
-
-on18$unsg_correct <- ifelse(on18$unsg == 1, 1, 0)
-on18$financename_correct <- ifelse(on18$financename == 1, 1, 0)
-on18$ggname_correct <- ifelse(on18$ggname == 1, 1, 0)
-on18$nhse_correct <- ifelse(on18$nhse == 1, 1, 0)
-# Here is a quick way to look at what you are dealing with in the original variables
 
 on18 %>% 
   select(unsg:nhse) %>% 
@@ -65,7 +60,7 @@ on18 %>%
     across(.cols=unsg:nhse, 
            #Now add in the function we are going to apply.
            #Note that if_else is just a dplyr version of ifelse()
-           function(x) if_else(x==1, 1, 0), 
+           binaryrecode, 
            # A cool feature of across() is that you can add a suffix or a prefix
            #This will paste the name of the column with _correct
            #Exactly like you did above.
@@ -80,6 +75,8 @@ lookfor(on18, "seats in the House of Commons")
 #This is great
 on18$pol_knowledge <- (on18$unsg_correct + on18$financename_correct + on18$ggname_correct + on18$nhse_correct)/4
 
+
+
 # Add in a check
 on18 %>% 
   ggplot(., aes(x=pol_knowledge))+geom_histogram()
@@ -91,6 +88,8 @@ on18$pol_knowledge
 on18 %>%
   group_by(Social_Use2) %>%
   summarise(mean = mean(pol_knowledge, na.rm = T), sd = sd(pol_knowledge, na.rm = T)) 
+stopifnot((isTRUE(all.equal(on18$pol_knowledge, 
+                            ((on18$unsg_correct + on18$financename_correct + on18$ggname_correct + on18$nhse_correct)/4)))))
 
 table(on18$Social_Use2, on18$pol_knowledge)
 
@@ -121,7 +120,7 @@ policy_names <- c("help_racial_minorities", "help_women", "more_coporate_tax", "
 names(policies)<-policy_names
 #recombine
 policies <- mutate_all(policies, function(x) as.numeric(as.character(x)))
-range01 <- function(x, ...){(x-min(x, ...))/(max(x, ...)-min(x, ...))}
+range01 <- function(x, ...){(x-min(x, ...))/(max(x, ...)-min(x, ...))} 
 policies <- range01(policies, na.rm = T)
 
 policies %>%  
@@ -183,6 +182,7 @@ policies_media_down <- policies_sd_media %>%
   pivot_longer(cols = !Primary_media,
                names_to = "Policy_Issue", 
                values_to = "Standard_Deviation")
+
 #This is what we have now
 # social_use | agreement_1 | agreement_2 |
 # Heavy | 4 | 3|
@@ -408,12 +408,6 @@ on18 %>%
   group_by(Social_Use2) %>%
   summarise(mean = mean(WAP, na.rm = T), sd = sd(WAP, na.rm = T))
 
-sd_mean <- function(x, ...){sqrt(((x - mean(x, ...))/ sd(x, ...))^2)}
-# From Polacko somewhere.
-
-#policies$sd_mean_hrm <- sd_mean(policies$help_racial_minorities, na.rm = T)
-
-
 #create number of standard deviations from mean variable
 policies_social_use
 policies_social_use_sd_dis <- do.call(cbind, lapply(policies_social_use[, 1:11], sd_mean, na.rm = T)) 
@@ -423,15 +417,10 @@ policies_social_use_sd_dis %>%
   bind_cols(., on18$Social_Use2)->policies_social_use_sd_dis
 names(policies_social_use_sd_dis)<-c(policy_names, "Social_Use2")
 
-se <- function(x, ...){
-  sd <- sd(x,...)
-  n <- n()
-  se <- sd/sqrt(n)
-}
 
 policies_social_use_sd_dis %>%
   group_by(Social_Use2) %>%
-  summarise( across(everything(), list(mean = mean, se = se), na.rm = T )) -> policies_social_use_sd_dis_mean
+  summarise( across(everything(), list(.mean = mean, .se = se), na.rm = T )) -> policies_social_use_sd_dis_mean
 policies_social_use_sd_dis_mean
 on18 <- cbind(on18, policies_social_use_sd_dis)
 
@@ -454,25 +443,37 @@ policies_sd_social_dis_down %>%
         strip.text = element_text(size=8))+
   guides(color=guide_legend(reverse=T))
 # Note no pattern
-#check
+
+
+
+policies_social_use_sd_dis %>%
+  bind_cols(., on18$Primary_media) %>%
+  bind_cols(., on18$Interest) ->policies_social_use_sd_dis2
+
+#check to make sure function worked properly
 mean(policies$help_racial_minorities, na.rm = T)
 sd(policies$help_racial_minorities, na.rm = T)
 #observation #1
 # 0.95 = (x-x̄)/σ
 # 0.95 = (0.75-0.481)/0.282 
 # 0.95 = 0.95
+stopifnot(round(policies_social_use_sd_dis2[1 , 1], 3) == round(((0.75-0.4809809)/ 0.2815165), 3)) 
+#stop if function did not work properly 
+on18$Primary_media
+WAP_primarymedia <- lm(WAP ~ Primary_media, data = on18, na.action = na.omit) 
+summary(WAP_primarymedia)
 
-policies_social_use_sd_dis %>%
-  bind_cols(., on18$Primary_media) %>%
-  bind_cols(., on18$Interest) ->policies_social_use_sd_dis2
+WAP_Interest <- lm(WAP ~ Interest, data = on18, na.action = na.omit)
+summary(WAP_Interest)  
+
+WAP_Interact <- lm(WAP ~ Primary_media*Interest, data = on18, na.action = na.omit)
+summary(WAP_Interact)
+
 names(policies_social_use_sd_dis2)<-c(policy_names, "Social_Use2", "Primary_Media", "Interest")
 
 policies_social_use_sd_dis2 %>%
   pivot_longer(cols = 1:11, names_to = "Policy_Issue", values_to = "distance") -> policies_social_use_sd_dis2_down
 policies_social_use_sd_dis2_down
-# pivot_longer(cols = !Social_Use2,
-#              names_to = c("Policy_Issue", ".value"), 
-#              names_sep = "\\." )
 
 mods_Interest <- policies_social_use_sd_dis2_down %>%
   group_by(Policy_Issue) %>%
@@ -494,7 +495,7 @@ table(on18$Primary_media)
 mods_media <- policies_social_use_sd_dis2_down %>%
   group_by(Policy_Issue) %>%
   summarise(lm_mod = list(lm(distance ~ Primary_Media))) %>% 
-  mutate(tidied = map(lm_mod, tidy, conf.int = T)) 
+  mutate(tidied = map(lm_mod, tidy, conf.int = T))
 
 modelsummary(mods_media$lm_mod, stars=T)
 mods_media$lm_mod
@@ -511,6 +512,20 @@ mods_all <- policies_social_use_sd_dis2_down %>%
   mutate(tidied = map(lm_mod, tidy, conf.int = T)) 
 
 modelsummary(mods_all$lm_mod, stars=T)
+
+mods_interact <- policies_social_use_sd_dis2_down %>%
+  group_by(Policy_Issue) %>%
+  summarise(lm_mod = list(lm(distance ~ Interest*Primary_Media))) %>% 
+  mutate(tidied = map(lm_mod, tidy, conf.int = T)) 
+
+modelsummary(mods_interact$lm_mod, stars=T)
+str(policies_social_use_sd_dis2_down)
+#Marginal effects of interaction models
+policies_social_use_sd_dis2_down %>% 
+lm(distance ~ Interest*Primary_Media ,data = ., na.action = na.omit) -> inter
+
+
+
 #graph models
 
 mods_Interest %>%
@@ -533,6 +548,38 @@ mods_all %>%
   ggplot(aes(x = estimate, y = term)) + geom_point() + 
   geom_linerange(aes(xmin=conf.low, xmax = conf.high), position = position_dodge(width=.75)) +
   facet_wrap(~Policy_Issue, labeller = label_wrap_gen(width=30)) + geom_vline(xintercept = 0) + theme_bw()
+
+
+mods_interact %>% 
+  unnest(tidied) %>% 
+  filter(term!="(Intercept)") %>% 
+  ggplot(aes(x = estimate, y = term)) + geom_point() + 
+  geom_linerange(aes(xmin=conf.low, xmax = conf.high), position = position_dodge(width=.75)) +
+  facet_wrap(~Policy_Issue, labeller = label_wrap_gen(width=30)) + geom_vline(xintercept = 0) + theme_bw() -> interaction_models
+ggsave("Plots/interaction_models.png", plot = interaction_models)
+
+extract_model(1) %>% 
+  graph_interaction() -> interact_help_racial_minorities
+extract_model(2) %>% 
+  graph_interaction() -> interact_help_women
+extract_model(3) %>% 
+  graph_interaction() -> interact_more_coporate_tax
+extract_model(4) %>% 
+  graph_interaction() -> interact_more_personal_tax
+extract_model(5) %>% 
+  graph_interaction() -> interact_private_health_care
+extract_model(6) %>% 
+  graph_interaction() -> interact_minimum_wage_to_high_prices
+extract_model(7) %>% 
+  graph_interaction() -> interact_income_inequality
+extract_model(8) %>% 
+  graph_interaction() -> interact_business_benefits_everyone
+extract_model(9) %>% 
+  graph_interaction() -> interact_drug_benefit_u25
+extract_model(10) %>% 
+graph_interaction() -> interact_free_post_secondary
+extract_model(11) %>% 
+  graph_interaction() -> interact_inappropriate_sex_ed
 
 #policies_social_use %>%
 #  group_by(Social_Use2) %>%
