@@ -5,7 +5,7 @@ source("Code/0_functions.R")
 names(on18)
 glimpse(on18)
 #### Primary News Source ####
-
+#Create a variable that classifies individuals based on the primary media type they use
 on18 %>%
   mutate(Primary_media=case_when(
     (primarynews_7 == 1 | primarynews_6 == 1) & (primarynews_5 == 0 & primarynews_4 == 0 & primarynews_3 == 0 & primarynews_2 == 0 & primarynews_1 == 0) ~ "Social_Media", #For individuals who only use Social Media
@@ -89,7 +89,7 @@ on18 %>%
   group_by(Social_Use2) %>%
   summarise(mean = mean(pol_knowledge, na.rm = T), sd = sd(pol_knowledge, na.rm = T)) 
 stopifnot((isTRUE(all.equal(on18$pol_knowledge, 
-                            ((on18$unsg_correct + on18$financename_correct + on18$ggname_correct + on18$nhse_correct)/4)))))
+                            ((on18$unsg_correct + on18$financename_correct + on18$ggname_correct + on18$nhse_correct)/4))))) #Check to ensure the math is correct
 
 table(on18$Social_Use2, on18$pol_knowledge)
 
@@ -460,14 +460,6 @@ sd(policies$help_racial_minorities, na.rm = T)
 stopifnot(round(policies_social_use_sd_dis2[1 , 1], 3) == round(((0.75-0.4809809)/ 0.2815165), 3)) 
 #stop if function did not work properly 
 on18$Primary_media
-WAP_primarymedia <- lm(WAP ~ Primary_media, data = on18, na.action = na.omit) 
-summary(WAP_primarymedia)
-
-WAP_Interest <- lm(WAP ~ Interest, data = on18, na.action = na.omit)
-summary(WAP_Interest)  
-
-WAP_Interact <- lm(WAP ~ Primary_media*Interest, data = on18, na.action = na.omit)
-summary(WAP_Interact)
 
 names(policies_social_use_sd_dis2)<-c(policy_names, "Social_Use2", "Primary_Media", "Interest")
 
@@ -475,13 +467,37 @@ policies_social_use_sd_dis2 %>%
   pivot_longer(cols = 1:11, names_to = "Policy_Issue", values_to = "distance") -> policies_social_use_sd_dis2_down
 policies_social_use_sd_dis2_down
 
+#Create regression models for affective polarization using the weighted affective polarization (WAP) measure
+WAP_primarymedia <- lm(WAP ~ Primary_media, data = on18, na.action = na.omit);summary(WAP_primarymedia) 
+
+WAP_primarymedia_graph <- graph_regression(WAP_primarymedia); WAP_primarymedia_graph
+
+WAP_Interest <- lm(WAP ~ Interest, data = on18, na.action = na.omit); summary(WAP_Interest) 
+WAP_Interest_Graph <- graph_regression(WAP_Interest); WAP_Interest_Graph
+
+WAP_Interact <- lm(WAP ~ Primary_media*Interest, data = on18, na.action = na.omit)
+summary(WAP_Interact)
+
+#Visualize the marginal effects from the interaction effects
+WAP_Interact %>% 
+ggeffect(c("Interest", "Primary_media")) %>% 
+  graph_interaction() -> WAP_Interact_graph
+
+
+#Display Models
+modelsummary(list(WAP_primarymedia, WAP_Interest, WAP_Interact), stars = T) #As numbers
+ggarrange(plotlist = list(WAP_primarymedia_graph, WAP_Interest_Graph, WAP_Interact_graph))
+
+#Create regression models for policy polarization
+
+
+
 mods_Interest <- policies_social_use_sd_dis2_down %>%
   group_by(Policy_Issue) %>%
   summarise(lm_mod = list(lm(distance ~ Interest))) %>% 
   mutate(tidied = map(lm_mod, tidy, conf.int = T)) 
 
 mods_Interest
-library(modelsummary)
 modelsummary(mods_Interest$lm_mod, stars=T)
 
 #Make graph
@@ -520,12 +536,6 @@ mods_interact <- policies_social_use_sd_dis2_down %>%
 
 modelsummary(mods_interact$lm_mod, stars=T)
 str(policies_social_use_sd_dis2_down)
-#Marginal effects of interaction models
-policies_social_use_sd_dis2_down %>% 
-lm(distance ~ Interest*Primary_Media ,data = ., na.action = na.omit) -> inter
-
-
-
 #graph models
 
 mods_Interest %>%
@@ -558,6 +568,9 @@ mods_interact %>%
   facet_wrap(~Policy_Issue, labeller = label_wrap_gen(width=30)) + geom_vline(xintercept = 0) + theme_bw() -> interaction_models
 ggsave("Plots/interaction_models.png", plot = interaction_models)
 
+
+#Create graphs of the marginal effects of the interaction models using the functions defined in "0_functions.R"
+
 extract_model(1) %>% 
   graph_interaction() -> interact_help_racial_minorities
 extract_model(2) %>% 
@@ -581,9 +594,6 @@ graph_interaction() -> interact_free_post_secondary
 extract_model(11) %>% 
   graph_interaction() -> interact_inappropriate_sex_ed
 
-#policies_social_use %>%
-#  group_by(Social_Use2) %>%
-#  summarise(mean = mean(sd_mean_hrm, na.rm = T))
 
 # Tasks for July 28
 # did means of interest by primary media
