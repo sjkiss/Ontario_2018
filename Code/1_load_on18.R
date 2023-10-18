@@ -1,5 +1,4 @@
 #load libraries
-pacman::p_load()
 library(tidyverse)
 library(haven)
 library(here)
