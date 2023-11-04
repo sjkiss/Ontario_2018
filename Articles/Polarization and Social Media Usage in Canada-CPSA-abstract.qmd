@@ -1,8 +1,12 @@
 ---
 title: "Polarization and Social Media Usage in Canada"
-author: ""
-format: pdf
-  
+author: 
+  - Rafael Campos-Gottardo, McGill University
+  - Simon J. Kiss, Wilfrid Laurier University
+format: docx
+bibliography: Polarization.bib
 ---
 
-Increased levels of political polarization are often linked to social media usage. More specifically many studies posit that consuming news on social media leads to increased levels of both affective and policy polarization. However, most of these studies were conducted in the United States with limited evidence indicating whether this relationship also exists in Canada. Therefore, this paper examines the relationship between social media news consumption and both types of political polarization in Canada, using regression estimation. Data are drawn from the Laurier Institute for Public Opinion's (LSIPOP) 2018 Ontario election survey. The results show that the impact of social media usage on polarization is fully mediated by political interest, whereby individuals who are more interested in politics seek out online news sources more readily than individuals who are less interested in politics. These individuals are more polarized. These findings indicate that despite the conventional wisdom that consuming news from social media increases political polarization, this relationship does not seem to hold in the Canadian context. Instead, levels of political interest seem to be the driving force behind greater levels of political polarization in Ontario. 
+Social media is routinely invoked in public discourse as a culprit in higher levels of polarization and democratic instability. These increased levels of polarization have lead to increasing calls for the regulation of some social media websites and implicated them in increasing levels of instability [@napoliSocialMediaPublic2019]. However, the social scientific literature is much more sanguine [@tuckerSocialMediaPolitical2018], implicating elite polarization and increasingly partisan news instead. Moreover, most of these studies were conducted in the United States with limited evidence indicating whether this relationship also exists in Canada [@kubinRoleSocialMedia2021]. Therefore, this paper examines the relationship between self-reported social media consumption, online news consumption and both types of political polarization in Ontario. Data are drawn from the 2018 Ontario Provincial Election Survey, commissioned by the Laurier Institite For The Study Of Public Opinion And Policy. Measures of affective and policy polarization are drawn from Wagner and [-@wagnerAffectivePolarizationMultiparty2021, -@polackoInequalityPolicyPolarization2022]. Consistent with Dubois and Blank's [-@duboisEchoChamberOverstated2018] findings on echo chambers, the results show that the impact of social media usage on polarization is fully mediated by political interest, whereby individuals who are more interested in politics seek out online news sources more readily than individuals who are less interested in politics. These individuals are more polarized. These findings indicate that despite the conventional wisdom that consuming news from social media increases political polarization, this relationship does not seem to hold in the Ontario context. 
+
+# References
