@@ -1,0 +1,68 @@
+---
+title: "Social Media Use And Polarization In Ontario: 2018 Case Study"
+format: pdf
+author: 
+  - Rafael Campos-Gottardo
+  - Simon Kiss
+editor: visual
+bibliography: Polarization.bib
+---
+
+## Introduction
+
+
+```{r}
+#| label: setup
+#| echo: false
+library(knitr)
+opts_knit$set(root.dir=rprojroot::find_rstudio_root_file())
+#opts_chunk$set(warning=F,message=F)
+```
+
+```{r}
+#| label: import
+#| echo: false
+#| warning: false
+#| message: false
+#| results: 'hide'
+#| cache: true
+source("Code/3_polarization.R")
+```
+Will this work? We hope so.
+
+```{r}
+#| label: primary-media-interest-policy
+primary_media_interest_policy
+```
+
+## Social Media And Polarization
+
+- Define polarization, affective and policy
+- Summary state of knowledge from big papers
+  - Against [@boxellInternetCausingPolitical2017] and [@bakshyExposureIdeologicallyDiverse2015]
+  - Try to review [@tuckerSocialMediaPolitical2018, @bavelHowSocialMedia2021,@kubinRoleSocialMedia2021]
+- Summary of existing knowledge in Canada
+  - Summarize [@duboisEchoChamberOverstated2018]
+  - Others? 
+
+## Ontario 2018 Summary
+
+## Summary of OPES, Methods
+
+- Sampling strategy
+- Questions used to construct variables
+
+### Measuring Polarization
+
+- Affective polarization
+- Policy polarization
+
+## Results
+
+## Discussion
+
+## Conclusion
+
+---
+
+# References
