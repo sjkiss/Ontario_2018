@@ -60,13 +60,21 @@ Will this work? We hope so.
 ### Measuring Polarization
 
 #### Affective polarization 
-We measure affective polarization using the Weighted Affective Polarization (WAP) developed by @wagnerAffectivePolarizationMultiparty2021. The WAP equation for parties j and voters i is: $$
+We measure affective polarization using the Weighted Affective Polarization (WAP) equation developed by @wagnerAffectivePolarizationMultiparty2021. The WAP equation for parties j and voters i is: 
+$$
     Spread_i = \sqrt{\sum^{P}_{p=1}v_p(like_{ip} - \overline{like_i})^2}
-    $$ where $v_p$ is the vote share of each party measured as proportion with a range of 0 to 1, and the mean affect scores weighted by party using the following equation: $$
+    $$ 
+where $v_p$ is the vote share of each party measured as proportion with a range of 0 to 1, and the mean affect scores weighted by party using the following equation: 
+$$
     \overline{like_i} = \sum^P_{p=1}(v_p * like_{ip})
     $$
 -   Policy polarization
 
+We used a number of common strategies to measure policy/ideological polarization. The first measure was adapted for individuals from @polackoInequalityPolicyPolarization2022 and uses the following formula to distance of each respondent i from the mean of policy issue j:
+
+$$
+\text{Policy Polarization}_i = \frac{|\bar{x}_j -  x_i|}{\sigma_j}
+$$
 ## Results
 
 ## Discussion
