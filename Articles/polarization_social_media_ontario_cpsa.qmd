@@ -10,7 +10,6 @@ bibliography: Polarization.bib
 
 ## Introduction
 
-
 ```{r}
 #| label: setup
 #| echo: false
@@ -28,34 +27,45 @@ opts_knit$set(root.dir=rprojroot::find_rstudio_root_file())
 #| cache: true
 source("Code/3_polarization.R")
 ```
+
 Will this work? We hope so.
 
 ```{r}
 #| label: primary-media-interest-policy
-primary_media_interest_policy
+#primary_media_interest_policy
 ```
 
 ## Social Media And Polarization
 
-- Define polarization, affective and policy
-- Summary state of knowledge from big papers
-  - Against [@boxellInternetCausingPolitical2017] and [@bakshyExposureIdeologicallyDiverse2015]
-  - Try to review [@tuckerSocialMediaPolitical2018, @bavelHowSocialMedia2021,@kubinRoleSocialMedia2021]
-- Summary of existing knowledge in Canada
-  - Summarize [@duboisEchoChamberOverstated2018]
-  - Others? 
+-   Define polarization, affective and policy
+-   Summary state of knowledge from big papers
+    -   Against [@boxellInternetCausingPolitical2017] and [@bakshyExposureIdeologicallyDiverse2015]
+    -   Try to review [@tuckerSocialMediaPolitical2018, @bavelHowSocialMedia2021,@kubinRoleSocialMedia2021]
+
+### The relationship between social media usage and polarization
+
+|       It is often considered a forgone conclusion that social media usage is linked to increased levels of affective and policy polarization. Proponents of this idea argue that social media platforms create "echo chambers" or "filter bubbles" where users will only encounter ideas and policies that they already agree with @terrenEchoChambersSocial2021. Since the internet is a high choice media environment individuals can either choose to be exposed to diverse information or select media that reinforce their pre-existing opinions [@duboisEchoChamberOverstated2018]. On social media echo chambers occur because users shown ideologically agreeable materials as a result of these platforms' algorithms that show users content based on their past behaviour (Raynauld & Grennberg 2014). However, the empirical evidence supporting the existence of eco-chambers on social media has been mixed. Most studies in the United States find that Republicans and Democrats have similar media diets, both online and offline. Additionally, studies have found that there is some evidence that echo chambers exist on Twitter (now known as X) but not on Facebook. Notably, Terren et al. @terrenEchoChambersSocial2021 found that studies that used digital trace evidence found more evidence of echo-chambers and polarization than studies that used self-reported data. For example, using Facebook trace evidence @bakshyExposureIdeologicallyDiverse2015 find that most users have Facebook friends who belong to the other party and that individuals are exposed to cross cutting content. They also find that individual choices, not algorithms, are what determine if an individual engages with opposing viewpoints. Using self reported social media usage, @duboisEchoChamberOverstated2018 find that the majority of social media users, encounter information they disagree with, use multiple sources, and often attempt to confirm the information they are presented.
+
+|      The evidence linking the presences of echo chambers to increased polarization is also unclear [@kubinRoleSocialMedia2021]. Some studies find that increased social media usage predicts increased polarization [@choInfluencingMyselfSelfReinforcement2018; @tuckerLiberationTurmoilSocial2017]. This relationship is also re-enforced by posting more on social media and sharing politically relevant content. However, other studies have found that social media usage has a small or no effect on polarization. Through a review of recent studies on the relationship between social media usage and polarization, @bavelHowSocialMedia2021 posit that social media usage is unlikely to be the main driver of polarization but is often a key facilitator. A recent experimental evidence has found that individuals who de-activated their Facebook accounts became less polarized due to less exposure to political news and opinions. Other studies have demonstrated that the "echo chamber" aspect of social media is not what drives polarization. Instead, exposure to hyper-partisan messages from the opposing party leads to a significant increase in polarization among Republicans but not democrats. @boxellInternetCausingPolitical2017 observe that the individuals who are the most polarized are those who are the least likely to use social media. Specifically, they found that adults over 75 are becoming polarized at a faster rate than those under 40, while also being far less likely to use social media. Therefore, any account that links social media usage to increased polarization must also account for why individuals who do not use social media are becoming more polarized than social media users.
+
+|       The evidence that social media usage leads to increased polarization in Canada is even more limited. There is evidence that affective polarization has been increasing in Canada [@johnstonAffectivePolarizationCanadian2019]. Additionally, there is some evidence that ideological polarization has been increasing since the 2019 Canadian election [@merkleyPolarizationEhIdeological2022]. However, none of these studies investigate the factors that have been contributing to the rise of both affective and ideological polarization in Canada. 
 
 ## Ontario 2018 Summary
 
 ## Summary of OPES, Methods
 
-- Sampling strategy
-- Questions used to construct variables
+-   Sampling strategy
+-   Questions used to construct variables
 
 ### Measuring Polarization
 
-- Affective polarization
-- Policy polarization
+#### Affective polarization 
+We measure affective polarization using the Weighted Affective Polarization (WAP) developed by @wagnerAffectivePolarizationMultiparty2021. The WAP equation for parties j and voters i is: $$
+    Spread_i = \sqrt{\sum^{P}_{p=1}v_p(like_{ip} - \overline{like_i})^2}
+    $$ where $v_p$ is the vote share of each party measured as proportion with a range of 0 to 1, and the mean affect scores weighted by party using the following equation: $$
+    \overline{like_i} = \sum^P_{p=1}(v_p * like_{ip})
+    $$
+-   Policy polarization
 
 ## Results
 
@@ -63,6 +73,6 @@ primary_media_interest_policy
 
 ## Conclusion
 
----
+------------------------------------------------------------------------
 
 # References

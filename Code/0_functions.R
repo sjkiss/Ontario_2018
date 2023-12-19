@@ -57,3 +57,9 @@ r <- r %>% select(-SE, -statistic, - p.value)
 ggplot(r, aes(x = Variable, y = Coefficient)) +  geom_hline(yintercept = 0, color = gray(1/2), lty =2) + geom_point()+
   geom_linerange(aes(x = Variable, ymin = conf.low_95, ymax = conf.high_95)) + theme_bw() + coord_flip()
 }
+
+# library(calculus)
+# 
+# f <- function(x, y){ abs(rnorm(x, 0, 1) - rnorm(y, 2.3, 5.4))}
+# int2(f, c(1,2), c(2,4))
+# integral(f(100,100), bounds = list(x = c(-Inf, Inf)))
