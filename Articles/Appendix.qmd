@@ -1,0 +1,53 @@
+---
+title: "Appendix"
+format: pdf
+---
+
+## Coding Decisions
+
+### Ideological Polarization Measure
+
+Help Racial Minorities
+
+ - Strongly Agree (0), Agree, Disagree, Strongly Disagree (1); else NA
+ 
+ Help Women
+ 
+ - Strongly Agree (0), Agree, Disagree, Strongly Disagree (1); else NA
+ 
+ Corporate Tax should be Increased
+ 
+ - Strongly Agree (0), Agree, Disagree, Strongly Disagree (1); else NA
+ 
+ Personal Tax should be increased
+ 
+  - Strongly Agree (0), Agree, Disagree, Strongly Disagree (1); else NA
+  
+  Private Healthcare should be availible 
+  
+  - Strongly Agree (1), Agree, Disagree, Strongly Disagree (0); else NA
+  
+  Increased minimum wage will lead to higher prices
+  
+  - Strongly Agree (1), Agree, Disagree, Strongly Disagree (0); else NA
+  
+  Income inequality is a problem in Ontario 
+  
+  - Strongly Agree (0), Agree, Disagree, Strongly Disagree (1); else NA
+  
+  When businesses make a lot of money every benefits
+  
+  - Strongly Agree (1), Agree, Disagree, Strongly Disagree (0); else NA
+  
+  The Ontario government should pay for prescription drugs for all residents under 25 years of age.
+
+ - Strongly Agree (0), Agree, Disagree, Strongly Disagree (1); else NA
+ 
+ Post secondary education should be free for all Ontario residents
+ 
+  - Strongly Agree (0), Agree, Disagree, Strongly Disagree (1); else NA
+  
+  The new sex education curriculum is not appropriate 
+  
+   - Strongly Agree (1), Agree, Disagree, Strongly Disagree (0); else NA
+   

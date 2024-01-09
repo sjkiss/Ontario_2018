@@ -15,13 +15,13 @@ on18 %>%
     
   ))->on18
 
-# on18 %>%
-#   mutate(Primary_media2=case_when(
-#     (primarynews_7 == 1 | primarynews_6 == 1 | primarynews_4 == 1 | primarynews_5 == 1) & (primarynews_3 == 0 & primarynews_2 == 0 & primarynews_1 == 0) ~ "Online",
-#     (primarynews_3 == 1 | primarynews_2 == 1 | primarynews_1 == 1) & (primarynews_5 == 0 & primarynews_4 == 0 & primarynews_6 == 0 & primarynews_7 == 0) ~ "Legacy",
-#     TRUE ~ "Mixed"
-#     
-#   ))->on18
+ # on18 %>%
+ #   mutate(Primary_media2=case_when(
+ #     (primarynews_7 == 1 | primarynews_6 == 1 | primarynews_4 == 1 | primarynews_5 == 1) & (primarynews_3 == 0 & primarynews_2 == 0 & primarynews_1 == 0) ~ "Online",
+ #     (primarynews_3 == 1 | primarynews_2 == 1 | primarynews_1 == 1) & (primarynews_5 == 0 & primarynews_4 == 0 & primarynews_6 == 0 & primarynews_7 == 0) ~ "Legacy",
+ #     TRUE ~ "Mixed"
+ #     
+ #   ))->on18
 
 table(on18$Primary_media)
 #### Political Knowledge #### 
@@ -122,6 +122,11 @@ names(policies)<-policy_names
 policies <- mutate_all(policies, function(x) as.numeric(as.character(x)))
 range01 <- function(x, ...){(x-min(x, ...))/(max(x, ...)-min(x, ...))} 
 policies <- range01(policies, na.rm = T)
+
+on18 <- policies %>%  
+  bind_cols(., on18)
+
+#Create a separate data set for descriptive statistics
 
 policies %>%  
   bind_cols(., on18$Social_Use2)->policies_social_use
@@ -594,13 +599,194 @@ graph_interaction() -> interact_free_post_secondary
 extract_model(11) %>% 
   graph_interaction() -> interact_inappropriate_sex_ed
 
+#### MEASURING AFFECTIVE POLARIZATION ####
 
-# Tasks for July 28
-# did means of interest by primary media
-# fit three OLS models for each policy variable with 
-# SD of policy variable as DV
-# Model 1 only legacy media
-# Model 2 only interest
-# Model 3 legacy media plus interest
-# https://r4ds.had.co.nz/many-models.html
-# check to see if anyone has ever used SD as a DV. 
+on18$help_women
+
+on18 <- on18 %>% 
+  mutate(
+    
+  )
+  
+#### BIMODALITY COEFFICENT ####
+  
+library(mousetrap)
+
+### Create distributions by primary media 
+
+policy_legacy <- on18 %>% 
+  filter(Primary_media == "Legacy") %>% 
+  select(policy_polarization)
+
+policy_online <- on18 %>% 
+  filter(Primary_media == "Online") %>% 
+  select(policy_polarization)
+
+policy_social_media <- on18 %>% 
+  filter(Primary_media == "Social_Media") %>% 
+  select(policy_polarization)
+
+policy_mixed <- on18 %>% 
+  filter(Primary_media == "Mixed") %>% 
+  select(policy_polarization)
+
+bimodality_coefficient(policy_legacy, na.rm = T)
+bimodality_coefficient(policy_online, na.rm = T)
+bimodality_coefficient(policy_social_media, na.rm = T)
+bimodality_coefficient(policy_mixed, na.rm = T)
+
+### Create distributions for social use 
+
+policy_often <- on18 %>% 
+  filter((Social_Use2 == "Several times a day" | Social_Use2 == "About once a day" |  Social_Use2 == "Several times a week" | Social_Use2 == "About once a week"  |  Social_Use2 == "Several times a month")) %>% 
+  select(policy_polarization) 
+
+
+policy_rarely <- on18 %>% 
+  filter((Social_Use2 == "Several times in a year" | Social_Use2 == "Never" | Social_Use2 == "About once a month")) %>% 
+  select(policy_polarization)
+
+bimodality_coefficient(policy_often, na.rm = T)
+bimodality_coefficient(policy_rarely, na.rm = T)
+
+#### DISTINCTIVENESS COEFFICIENT ####
+
+#Recode all policy issues so that left wing position is 1 and right wing position is 0
+
+  on18$inappropriate_sex_ed
+
+on18 <- on18 %>% 
+  mutate(
+    lr_help_racial_minorities = case_match(help_racial_minorities, 0 ~ 1, 0.25 ~ 0.75, 0.5 ~ 0.5, 0.75 ~ 0.25, 1 ~ 0, NA ~ NA),
+    lr_help_women = case_match(help_women, 0 ~ 1, 0.25 ~ 0.75, 0.5 ~ 0.5, 0.75 ~ 0.25, 1 ~ 0, NA ~ NA),
+    lr_more_coporate_tax = case_match(more_coporate_tax, 0 ~ 1, 0.25 ~ 0.75, 0.5 ~ 0.5, 0.75 ~ 0.25, 1 ~ 0, NA ~ NA), 
+    lr_more_personal_tax = case_match(more_personal_tax, 0 ~ 1, 0.25 ~ 0.75, 0.5 ~ 0.5, 0.75 ~ 0.25, 1 ~ 0, NA ~ NA),
+    lr_income_inequality = case_match(income_inequality, 0 ~ 1, 0.25 ~ 0.75, 0.5 ~ 0.5, 0.75 ~ 0.25, 1 ~ 0, NA ~ NA),
+    lr_drug_benefit_u25 = case_match(drug_benefit_u25, 0 ~ 1, 0.25 ~ 0.75, 0.5 ~ 0.5, 0.75 ~ 0.25, 1 ~ 0, NA ~ NA),
+    lr_free_post_secondary = case_match(free_post_secondary, 0 ~ 1, 0.25 ~ 0.75, 0.5 ~ 0.5, 0.75 ~ 0.25, 1 ~ 0, NA ~ NA)
+  )
+
+library(psych)
+
+cor_policies <- on18 %>% 
+  dplyr::select(c(lr_help_racial_minorities:lr_free_post_secondary,
+                  private_health_care, minimum_wage_to_high_prices, business_benefits_everyone, 
+                  inappropriate_sex_ed
+                  )) %>% 
+  cor(., use = "complete.obs") 
+
+
+eigen(cor_policies)$values
+psych::fa(cor_policies, nfactors = 3)
+
+on18 <- on18 %>%  
+mutate(policy_polarization = (lr_help_racial_minorities + lr_help_women + lr_more_coporate_tax +
+                               lr_more_personal_tax + lr_income_inequality + lr_drug_benefit_u25 + lr_free_post_secondary +
+                               private_health_care + minimum_wage_to_high_prices + business_benefits_everyone + 
+                               inappropriate_sex_ed))
+on18$partyvote2018
+
+policy_left_legacy <- on18 %>% 
+  filter(Primary_media == "Legacy" & (partyvote2018 == 1 | partyvote2018 == 3)) %>% 
+ select(policy_polarization)
+
+policy_left_online <- on18 %>% 
+  filter(Primary_media == "Online" & (partyvote2018 == 1 | partyvote2018 == 3)) %>% 
+  select(policy_polarization)
+
+policy_left_social_media <- on18 %>% 
+  filter(Primary_media == "Social_Media" & (partyvote2018 == 1 | partyvote2018 == 3)) %>% 
+  select(policy_polarization)
+
+policy_left_mixed <- on18 %>% 
+  filter(Primary_media == "Mixed" & (partyvote2018 == 1 | partyvote2018 == 3)) %>% 
+  select(policy_polarization)
+
+on18$partyvote2018
+
+policy_conservatives_legacy <- on18 %>% 
+  filter(Primary_media == "Legacy" & partyvote2018 == 2) %>% 
+  select(policy_polarization)
+
+policy_conservatives_online <- on18 %>% 
+  filter(Primary_media == "Online" & partyvote2018 == 2) %>% 
+  select(policy_polarization)
+
+policy_conservatives_media <- on18 %>% 
+  filter(Primary_media == "Social_Media" & partyvote2018 == 2) %>% 
+  select(policy_polarization)
+
+policy_conservatives_mixed <- on18 %>% 
+  filter(Primary_media == "Mixed" & partyvote2018 == 2) %>% 
+  select(policy_polarization)
+
+
+overlap(policy_left_legacy, policy_conservatives_legacy)
+
+overlap_legacy <- ggplot() + geom_density(aes(policy_polarization), data = policy_left_legacy, col = "red", fill = "red", alpha = 0.4) + 
+  geom_density(aes(policy_polarization), data = policy_conservatives_legacy, col = "blue", fill = "blue", alpha = 0.4) + theme_bw()
+
+
+overlap(policy_left_online, policy_conservatives_online)
+
+overlap_online <- ggplot() + geom_density(aes(policy_polarization), data = policy_left_online, col = "red", fill = "red", alpha = 0.4) + 
+  geom_density(aes(policy_polarization), data = policy_conservatives_online, col = "blue", fill = "blue", alpha = 0.4) + theme_bw()
+
+
+overlap(policy_left_social_media, policy_conservatives_media)
+
+overlap_smedia <- ggplot() + geom_density(aes(policy_polarization), data = policy_left_social_media, col = "red", fill = "red", alpha = 0.4) + 
+  geom_density(aes(policy_polarization), data = policy_conservatives_media, col = "blue", fill = "blue", alpha = 0.4) + theme_bw()
+
+
+
+overlap(policy_left_mixed, policy_conservatives_mixed)
+
+overlap_mixed <- ggplot() + geom_density(aes(policy_polarization), data = policy_left_mixed, col = "red", fill = "red", alpha = 0.4) + 
+  geom_density(aes(policy_polarization), data = policy_conservatives_mixed, col = "blue", fill = "blue", alpha = 0.4) + theme_bw()
+
+ggpubr::ggarrange(overlap_legacy, overlap_online, overlap_smedia, overlap_mixed)
+
+#### OVERLAP FOR SOCIAL USE ####
+
+unique(on18$Social_Use)
+
+policy_left_often <- on18 %>% 
+  filter((Social_Use2 == "Several times a day" | Social_Use2 == "About once a day" |  Social_Use2 == "Several times a week" | Social_Use2 == "About once a week"  |  Social_Use2 == "Several times a month") & (partyvote2018 == 1 | partyvote2018 == 3)) %>% 
+  select(policy_polarization) 
+
+
+policy_left_rarely <- on18 %>% 
+  filter((Social_Use2 == "Several times in a year" | Social_Use2 == "Never" | Social_Use2 == "About once a month") & (partyvote2018 == 1 | partyvote2018 == 3)) %>% 
+  select(policy_polarization)
+
+on18$partyvote2018
+
+policy_conservative_often <- on18 %>% 
+  filter((Social_Use2 == "Several times a day" | Social_Use2 == "About once a day" |  Social_Use2 == "Several times a week" |
+            Social_Use2 == "About once a week" |  Social_Use2 == "Several times a month") & partyvote2018 == 2) %>% 
+  select(policy_polarization)
+
+
+policy_conservative_social_rarely <- on18 %>% 
+  filter((Social_Use2 == "Several times in a year" | Social_Use2 == "Never" | Social_Use2 == "About once a month" ) & partyvote2018 == 2) %>% 
+  select(policy_polarization)
+
+overlap(policy_left_often, policy_conservative_often)
+
+overlap_often <- ggplot() + geom_density(aes(policy_polarization), data = policy_left_often, col = "red", fill = "red", alpha = 0.4) + 
+  geom_density(aes(policy_polarization), data = policy_conservative_often, col = "blue", fill = "blue", alpha = 0.4) +
+  labs(title = "Uses Social Media Often", subtitle = "Overlap Coefficent (0.53)", x = "Policy Positions", y = NULL) + theme_bw()
+
+
+overlap(policy_left_rarely, policy_conservative_social_rarely)
+
+overlap_rarely <- ggplot() + geom_density(aes(policy_polarization), data = policy_left_rarely, col = "red", fill = "red", alpha = 0.4) + 
+  geom_density(aes(policy_polarization), data = policy_conservative_social_rarely, col = "blue", fill = "blue", alpha = 0.4) +
+  labs(title = "Uses Social Media Rarely", subtitle = "Overlap Coefficent (0.70)", x = "Policy Positions", y = NULL) + theme_bw()
+
+
+ggpubr::ggarrange(overlap_often, overlap_rarely, ncol = 1)
+
+
+

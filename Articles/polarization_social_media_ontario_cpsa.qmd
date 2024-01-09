@@ -37,7 +37,8 @@ Will this work? We hope so.
 
 ## Social Media And Polarization
 
--   Define polarization, affective and policy
+### What is Polarization
+|  In the literature on polarization there has been much debate on the relationship between ideology and partisanship. Scholars studying polarization, particularly in the United States, have contrasting views on the nature of modern political polarization. Some scholars argue that ideological or policy polarization has been increasing for both political elites and the electorate more broadly. Another group argues that partisan sorting has led parties to become more ideologically homogeneous, while party elites have become more polarized, which leads to the perception that the electorate is becoming more polarized. Finally, a third group argues
 -   Summary state of knowledge from big papers
     -   Against [@boxellInternetCausingPolitical2017] and [@bakshyExposureIdeologicallyDiverse2015]
     -   Try to review [@tuckerSocialMediaPolitical2018, @bavelHowSocialMedia2021,@kubinRoleSocialMedia2021]
@@ -48,7 +49,7 @@ Will this work? We hope so.
 
 |      The evidence linking the presences of echo chambers to increased polarization is also unclear [@kubinRoleSocialMedia2021]. Some studies find that increased social media usage predicts increased polarization [@choInfluencingMyselfSelfReinforcement2018; @tuckerLiberationTurmoilSocial2017]. This relationship is also re-enforced by posting more on social media and sharing politically relevant content. However, other studies have found that social media usage has a small or no effect on polarization. Through a review of recent studies on the relationship between social media usage and polarization, @bavelHowSocialMedia2021 posit that social media usage is unlikely to be the main driver of polarization but is often a key facilitator. A recent experimental evidence has found that individuals who de-activated their Facebook accounts became less polarized due to less exposure to political news and opinions. Other studies have demonstrated that the "echo chamber" aspect of social media is not what drives polarization. Instead, exposure to hyper-partisan messages from the opposing party leads to a significant increase in polarization among Republicans but not democrats. @boxellInternetCausingPolitical2017 observe that the individuals who are the most polarized are those who are the least likely to use social media. Specifically, they found that adults over 75 are becoming polarized at a faster rate than those under 40, while also being far less likely to use social media. Therefore, any account that links social media usage to increased polarization must also account for why individuals who do not use social media are becoming more polarized than social media users.
 
-|       The evidence that social media usage leads to increased polarization in Canada is even more limited. There is evidence that affective polarization has been increasing in Canada [@johnstonAffectivePolarizationCanadian2019]. Additionally, there is some evidence that ideological polarization has been increasing since the 2019 Canadian election [@merkleyPolarizationEhIdeological2022]. However, none of these studies investigate the factors that have been contributing to the rise of both affective and ideological polarization in Canada. 
+|       The evidence that social media usage leads to increased polarization in Canada is even more limited. There is evidence that affective polarization has been increasing in Canada [@johnstonAffectivePolarizationCanadian2019]. Additionally, there is are mixed conclusions with regards to policy polarization in Canada. One study that measured polarization using preferences towards redistributive policies found that Canada experienced a surge in partisan sorting between 1992 and 2015 [@kevinsGrowingApartPartisan2018]. However, another study that measured polarization using distribution based measures only found evidence of ideological polarization increasing after the 2019 Canadian election [@merkleyPolarizationEhIdeological2022]. Futhermore, none of these studies investigate the factors that have contributed to the rise of both affective and ideological polarization in Canada. 
 
 ## Ontario 2018 Summary
 
@@ -75,6 +76,10 @@ We used a number of common strategies to measure policy/ideological polarization
 $$
 \text{Policy Polarization}_i = \frac{|\bar{x}_j -  x_i|}{\sigma_j}
 $$
+$$
+
+$$
+
 ## Results
 
 ## Discussion
