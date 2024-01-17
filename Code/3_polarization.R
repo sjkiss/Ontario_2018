@@ -1,9 +1,14 @@
-##Load needed scripts to complete analyses
-source("Code/1_load_on18.R")
-source("Code/0_functions.R")
-#Check the variables in the dataset.
+#### LOAD SCRIPTS ####
+source("Code/1_load_on18.R") #clean and load dataset
+source("Code/0_functions.R") #load custom functions and packages needed for these analyses
+
+#### CHECK THE DATASET ####
+head(on18)
 names(on18)
 glimpse(on18)
+
+#### CREATE VARIABLES FOR POLARIZATION ANALYSIS ####
+
 #### Primary News Source ####
 #Create a variable that classifies individuals based on the primary media type they use
 on18 %>%
@@ -15,17 +20,11 @@ on18 %>%
     
   ))->on18
 
- # on18 %>%
- #   mutate(Primary_media2=case_when(
- #     (primarynews_7 == 1 | primarynews_6 == 1 | primarynews_4 == 1 | primarynews_5 == 1) & (primarynews_3 == 0 & primarynews_2 == 0 & primarynews_1 == 0) ~ "Online",
- #     (primarynews_3 == 1 | primarynews_2 == 1 | primarynews_1 == 1) & (primarynews_5 == 0 & primarynews_4 == 0 & primarynews_6 == 0 & primarynews_7 == 0) ~ "Legacy",
- #     TRUE ~ "Mixed"
- #     
- #   ))->on18
-
 table(on18$Primary_media)
+
 #### Political Knowledge #### 
-#Create one political knowledge variable using the variables on political knowledge.
+
+#Create a political knowledge using three political knowledge questions.
 # R gets 1 if they got each response right
 # sum to 3 divide by 3 to get one variable indicating their knowledge
 
@@ -40,47 +39,30 @@ on18 %>%
 on18 %>% 
   select(unsg:nhse) %>% 
   val_labels()
-#Interesting, in this one it looks like the survey team coded some 
-# close responses. A person who responds with Bill Morneau (even though wrong)
-# Might know more than someone who just flat out doesn't know. 
-# For know let's keep it the way you have it. Responses are correct only if 1
 
-#### Automatic way to recode several variables####
-# I'm going to show you how to recode several variables the same way at the same time.
-
-# Always start with the data frame
 on18 %>% 
-  #We are transforming variables so we use mutate
-  # We are going to be applying a function across several columns, so we use
-  # across()
-  #Importantly, we can use the same select() semantics inside across()
-  #in this case we can select the variables from unsg to nhse, including the ones in between
-  #We only know this really through poking and actually looking at the data columns. Even in SPSS if necessary.
   mutate(
     across(.cols=unsg:nhse, 
-           #Now add in the function we are going to apply.
-           #Note that if_else is just a dplyr version of ifelse()
-           binaryrecode, 
-           # A cool feature of across() is that you can add a suffix or a prefix
-           #This will paste the name of the column with _correct
-           #Exactly like you did above.
+           binaryrecode, #recode function from 0_functions
            .names="{.col}_correct")
   )->on18
-#Now you can quickly check that it worked
+
 on18 %>% 
   select(ends_with("_correct"))
 
 
 lookfor(on18, "seats in the House of Commons")
-#This is great
-on18$pol_knowledge <- (on18$unsg_correct + on18$financename_correct + on18$ggname_correct + on18$nhse_correct)/4
+
+#political knowledge variable
+on18$pol_knowledge <- (on18$unsg_correct + on18$financename_correct +
+                         on18$ggname_correct + on18$nhse_correct)/4
+table(on18$pol_knowledge)
 
 
-
-# Add in a check
+# Defensive coding for political knowledge variable
 on18 %>% 
   ggplot(., aes(x=pol_knowledge))+geom_histogram()
-#But we should also check the math.
+
 on18 %>% 
   select(ends_with("correct")| "pol_knowledge") %>% 
   View()
@@ -89,38 +71,27 @@ on18 %>%
   group_by(Social_Use2) %>%
   summarise(mean = mean(pol_knowledge, na.rm = T), sd = sd(pol_knowledge, na.rm = T)) 
 stopifnot((isTRUE(all.equal(on18$pol_knowledge, 
-                            ((on18$unsg_correct + on18$financename_correct + on18$ggname_correct + on18$nhse_correct)/4))))) #Check to ensure the math is correct
-
-table(on18$Social_Use2, on18$pol_knowledge)
-
-on18 %>%
-  group_by(Primary_media) %>%
-  summarise(mean = mean(pol_knowledge, na.rm = T), sd = sd(pol_knowledge, na.rm = T)) 
+                            ((on18$unsg_correct + on18$financename_correct +
+                                on18$ggname_correct + on18$nhse_correct)/4))))) #Check to ensure the math is correct
 
 
-#### Policy polarization ####
-# R social media users frothing at the mouth extremists
-# Pick good policy measures from data 
-# Use pre-recoded climate change questions
-# Use batteries on policy items
-# Rename each agreement item with a useful variable name. 
-# new_names<-c("help_racial_minorities")
-#climate change
-
+#### POLARIZATION MEASURES ####
+#### policy polarization ####
 on18$climate_views <- (on18$climate_bin + on18$paris_bin)/2
 
 
-
+#create a dataframe with all the policies
 on18 %>% 
   select(starts_with("agreement_"))-> policies 
 
+#rename policies with more descriptive names
 policy_names <- c("help_racial_minorities", "help_women", "more_coporate_tax", "more_personal_tax", "private_health_care", 
                   "minimum_wage_to_high_prices", "income_inequality", "business_benefits_everyone", 
                   "drug_benefit_u25", "free_post_secondary", "inappropriate_sex_ed")
 names(policies)<-policy_names
+
 #recombine
-policies <- mutate_all(policies, function(x) as.numeric(as.character(x)))
-range01 <- function(x, ...){(x-min(x, ...))/(max(x, ...)-min(x, ...))} 
+policies <- mutate_all(policies, \(x) as.numeric(as.character(x)))
 policies <- range01(policies, na.rm = T)
 
 on18 <- policies %>%  
@@ -133,151 +104,173 @@ policies %>%
 
 names(policies_social_use)<-c(policy_names, "Social_Use2")
 
-policies_social_use %>%
-  group_by(Social_Use2) %>%
-  summarise(across(everything(), sd, na.rm = T), .groups = "drop") -> policies_sd_social_use
+#### POLICY DISTRIBUTIONS ####
+
+#Create Policy Polarization Distribution
+on18$agreement_1
+
+#Recode policy polarization variables so that 0 represents the most left-wing position and 1 represents the most right-wing position
+on18 <- on18 %>% 
+  mutate(
+    lr_private_health_care = case_match(private_health_care,
+                                        0 ~ 1, 0.25 ~ 0.75, 0.5 ~ 0.5, 0.75 ~ 0.25, 1 ~ 0, NA ~ NA),
+    Lr_minimum_wage_to_high_prices = case_match(minimum_wage_to_high_prices,
+                                                0 ~ 1, 0.25 ~ 0.75, 0.5 ~ 0.5, 0.75 ~ 0.25, 1 ~ 0, NA ~ NA),
+    lr_business_benefits_everyone = case_match(business_benefits_everyone,
+                                               0 ~ 1, 0.25 ~ 0.75, 0.5 ~ 0.5, 0.75 ~ 0.25, 1 ~ 0, NA ~ NA), 
+    lr_inappropriate_sex_ed = case_match(inappropriate_sex_ed, 
+                                         0 ~ 1, 0.25 ~ 0.75, 0.5 ~ 0.5, 0.75 ~ 0.25, 1 ~ 0, NA ~ NA)
+    
+  )
+
+#Create a variable for the policy positions of all individuals 
+on18 <- on18 %>%  
+  mutate(policy_polarization = (help_racial_minorities + help_women + more_coporate_tax +
+                                  more_personal_tax + income_inequality + drug_benefit_u25 + free_post_secondary +
+                                 lr_private_health_care + Lr_minimum_wage_to_high_prices + lr_business_benefits_everyone + 
+                                  lr_inappropriate_sex_ed))  
 
 
-#Calculate standard deviation for each. 
-# Take on18
-# pivot down the agreement variables after rename
-policies_sd_social_use_down <- policies_sd_social_use %>%
-  pivot_longer(cols = !Social_Use2,
-               names_to = "Policy_Issue", 
-               values_to = "Standard_Deviation")
-#This is what we have now
-# social_use | agreement_1 | agreement_2 |
-# Heavy | 4 | 3|
-#What we want is 
+#### Distributions for distinctiveness coefficients ####
 
-# social_use | Variable | Value |
-# Heavy | agreement_1 | 4|
-# Heavy | agreement_2 | 3 |
+# Primary Media
 
-# Wide (current) versus (tidy or long ) data
-
-# https://towardsdatascience.com/coding-in-r-pivot-painlessly-32e40a0b6c3d
-
-# Then Group by Social_Use and variable
-# Summarize by sd()
+on18$partyvote2018
 
 
-#View(policies_sd_down)
+#legacy primary media - left-wing
+policy_left_legacy <- on18 %>% 
+  filter(Primary_media == "Legacy" & (partyvote2018 == 1 | partyvote2018 == 3)) %>% 
+  select(policy_polarization)
 
-policies_sd_social_use_down$Policy_Issue <- factor(policies_sd_social_use_down$Policy_Issue, levels = c(policy_names, "climate_views"), 
-                                        labels = c("The Government Should Help Racial Minorities", "The Government Should Help Women", 
-                                                   "Higher Corporate Taxes are Good", "Higher Personal Taxes are Good",  "Health Care Should be Privatized", 
-                                                   "Increasing Minimum Wage Increases Prices", "The Government Should Reduce Income Inequality", "More Business Benefits Everyone", 
-                                                   "Youth Should Receive Drug Benefits", "Post Secondary Education Should be Free", "Sex-Ed Curriculum is Inappropriate", "Climate Change"))
+#online primary media - left-wing
+policy_left_online <- on18 %>% 
+  filter(Primary_media == "Online" & (partyvote2018 == 1 | partyvote2018 == 3)) %>% 
+  select(policy_polarization)
 
-policies %>%  
-  bind_cols(., on18$Primary_media)->policies_media
+#social media primary media - left-wing
+policy_left_social_media <- on18 %>% 
+  filter(Primary_media == "Social_Media" & (partyvote2018 == 1 | partyvote2018 == 3)) %>% 
+  select(policy_polarization)
 
-names(policies_media)<-c(policy_names, "Primary_media")
+#mixed primary media - left-wing
+policy_left_mixed <- on18 %>% 
+  filter(Primary_media == "Mixed" & (partyvote2018 == 1 | partyvote2018 == 3)) %>% 
+  select(policy_polarization)
 
-policies_media %>%
-  group_by(Primary_media) %>%
-  summarise(across(everything(), sd, na.rm = T), .groups = "drop") -> policies_sd_media
+#on18$partyvote2018
+
+#legacy primary media - right-wing
+policy_conservatives_legacy <- on18 %>% 
+  filter(Primary_media == "Legacy" & partyvote2018 == 2) %>% 
+  select(policy_polarization)
+
+#online primary media - right-wing
+policy_conservatives_online <- on18 %>% 
+  filter(Primary_media == "Online" & partyvote2018 == 2) %>% 
+  select(policy_polarization)
+
+#social media primary media - right-wing
+policy_conservatives_media <- on18 %>% 
+  filter(Primary_media == "Social_Media" & partyvote2018 == 2) %>% 
+  select(policy_polarization)
+
+# mixed primary media - right-wing
+policy_conservatives_mixed <- on18 %>% 
+  filter(Primary_media == "Mixed" & partyvote2018 == 2) %>% 
+  select(policy_polarization)
+
+# Social Media Use
+
+unique(on18$Social_Use)
+
+# High social use - left-wing
+policy_left_often <- on18 %>% 
+  filter((Social_Use2 == "Several times a day" | 
+            Social_Use2 == "About once a day" | 
+            Social_Use2 == "Several times a week" | 
+            Social_Use2 == "About once a week"  | 
+            Social_Use2 == "Several times a month") &
+           (partyvote2018 == 1 | partyvote2018 == 3)) %>% 
+  select(policy_polarization) 
+
+# low social use - left-wing
+policy_left_rarely <- on18 %>% 
+  filter((Social_Use2 == "Several times in a year" |
+            Social_Use2 == "Never" | 
+            Social_Use2 == "About once a month") &
+           (partyvote2018 == 1 | partyvote2018 == 3)) %>% 
+  select(policy_polarization)
+
+on18$partyvote2018
+
+# high social use - right-wing
+policy_conservative_often <- on18 %>% 
+  filter((Social_Use2 == "Several times a day" |
+            Social_Use2 == "About once a day" |
+            Social_Use2 == "Several times a week" |
+            Social_Use2 == "About once a week" | 
+            Social_Use2 == "Several times a month") & partyvote2018 == 2) %>% 
+  select(policy_polarization)
+
+# low social use - right-wing
+policy_conservative_social_rarely <- on18 %>% 
+  filter((Social_Use2 == "Several times in a year" | 
+            Social_Use2 == "Never" |
+            Social_Use2 == "About once a month" ) & partyvote2018 == 2) %>% 
+  select(policy_polarization)
+
+#### Distributions for bimodality coefficients ####
+
+### Primary media 
+bimodalities <- on18 %>% 
+  select(c(Primary_media, policy_polarization)) %>% 
+  rename("mt_id" = "policy_polarization", "Condition" = "Primary_media") %>% 
+  list(data = .)
+# primary media legacy
+policy_legacy <- on18 %>% 
+  filter(Primary_media == "Legacy") %>% 
+  select(policy_polarization)
+
+# primary media online
+policy_online <- on18 %>% 
+  filter(Primary_media == "Online") %>% 
+  select(policy_polarization)
+
+#primary media social media 
+policy_social_media <- on18 %>% 
+  filter(Primary_media == "Social_Media") %>% 
+  select(policy_polarization)
+
+#primary media mixed
+policy_mixed <- on18 %>% 
+  filter(Primary_media == "Mixed") %>% 
+  select(policy_polarization)
 
 
-#Calculate standard deviation for each. 
-# Take on18
-# pivot down the agreement variables after rename
-policies_media_down <- policies_sd_media %>%
-  pivot_longer(cols = !Primary_media,
-               names_to = "Policy_Issue", 
-               values_to = "Standard_Deviation")
+### Social Use
 
-#This is what we have now
-# social_use | agreement_1 | agreement_2 |
-# Heavy | 4 | 3|
-#What we want is 
+#high social use
+policy_often <- on18 %>% 
+  filter((Social_Use2 == "Several times a day" |
+            Social_Use2 == "About once a day" |
+            Social_Use2 == "Several times a week" |
+            Social_Use2 == "About once a week"  | 
+            Social_Use2 == "Several times a month")) %>% 
+  select(policy_polarization) 
 
-# social_use | Variable | Value |
-# Heavy | agreement_1 | 4|
-# Heavy | agreement_2 | 3 |
+# low social use
+policy_rarely <- on18 %>% 
+  filter((Social_Use2 == "Several times in a year" |
+            Social_Use2 == "Never" | Social_Use2 == "About once a month")) %>% 
+  select(policy_polarization)
 
-# Wide (current) versus (tidy or long ) data
+bimodality_coefficient(policy_often, na.rm = T)
+bimodality_coefficient(policy_rarely, na.rm = T)
 
-# https://towardsdatascience.com/coding-in-r-pivot-painlessly-32e40a0b6c3d
+#### Affective Polarization Wagner (2021) ####
 
-# Then Group by Social_Use and variable
-# Summarize by sd()
-
-
-#View(policies_sd_down)
-
-policies_media_down$Policy_Issue <- factor(policies_media_down$Policy_Issue, levels = c(policy_names, "climate_views"), 
-                                                   labels = c("The Government Should Help Racial Minorities", "The Government Should Help Women", 
-                                                              "Higher Coporate Taxes are Good", "Higher Personal Taxes are Good",  "Health Care Should be Privatized", 
-                                                              "Increasing Minimum Wage Increases Prices", "The Government Should Reduce Income Inequality", "More Business Benefits Everyone", 
-                                                              "Youth Should Receive Drug Benefits", "Post Secondary Education Should be Free", "Sex-Ed Curriculum is Inappropriate", "Climate Change"))
-
-
-#### GRAPH STANDARD DEVIATIONS BY POLICY ISSUE ####
-
-# I am trying to understand why you are excluding these rows
-#policies_sd_down [-c(97:108), ]
-#policies_sd_down[97:108,]
-#OK, these seme to come from respondents who did not respond to their social media use
-#So we can exclude them. 
-#Here is a quicker way to exclude them
-policies_sd_social_use_down
-policies_sd_social_use_down %>% 
-  filter(complete.cases(.)) %>% 
-  #instead of setting x to be zero I want x to be the Standard Deviation
-  ggplot(., aes(x = Standard_Deviation, 
-                #And I want y to be the Social Media Use
-                #You did this lower down with coord_flip()
-                #Which is an old way of switching x and y. 
-                #Now, however, ggplot() lets you just specify whichever
-                # one you want to be horizontal and vertical with x and y
-                y = Social_Use2, 
-                colour = Social_Use2)) + 
-  geom_point()+
-  # geom_errorbar(aes (ymin = 0 - Standard_Deviation, ymax = 0 + Standard_Deviation), width =.2, 
-  #position = position_dodge(.8)) + 
-  facet_wrap(~Policy_Issue, labeller = label_wrap_gen(width=30)) +
-  labs(x = "Standard Deviation", y= "Social Media Use") + 
-  theme_bw()  + 
-  theme(axis.text.y=element_blank(),
-        axis.ticks.y = element_blank(), 
-        #I actually don't like the legend on the bottom for this reason.
-        # We actually have a categorical variable (Social_Use2)
-        # That has an intuitive order to it, never to a lot
-        # I would like to capture that order in a legend that goes from low tohigh
-        #But I am going to uncomment poutting the legend in the bottom.
-        # legend.position ="bottom", 
-        strip.text = element_text(size=8))+
-  # guides(colour = guide_legend(nrow = 3, byrow = T, title.position = "top", hjust = 0.5, reverse = T), linetype = guide_legend(nrow = 3, byrow = T, title.position = "top", hjust = 0.5, reverse = T)) +
-  #But this introduces a new problem which is that the 
-  # Category "never" is at the top of the legend
-  #Try making the graph, stopping the code at line 176
-  # by deleting the +
-  #Then add it back in and see the difference
-  guides(color=guide_legend(reverse=T))->policy_issue_sd_graph
-#scale_colour_manual(guide=guide_legend(reverse=T))
-# scale_linetype_manual(values = c("twodash","twodash","longdash", "longdash", "dashed", "dashed", "solid", "solid")) -> policy_issue_sd_graph
-ggsave(plot = policy_issue_sd_graph, "Plots/policy_issues_sd.png", width = 12, height = 7)
-
-
-policies_media_down %>% 
-  filter(complete.cases(.)) %>% 
-  ggplot(., aes(x = Standard_Deviation, 
-                y = Primary_media, 
-                colour = Primary_media)) + 
-  geom_point()+
-  facet_wrap(~Policy_Issue, labeller = label_wrap_gen(width=30)) +
-  labs(x = "Standard Deviation", y= "Primary Media Source") + 
-  theme_bw()  + 
-  theme(axis.text.y=element_blank(),
-        axis.ticks.y = element_blank(), 
-        strip.text = element_text(size=8))+
-  guides(color=guide_legend(reverse=T))
-
-#### Affective Polarization ####
-# We need the party feeling scores
-
+#Extract feelings towards parties scores
 on18 %>% 
   select(starts_with("partyeval")) %>% 
   glimpse()
@@ -294,21 +287,26 @@ on18 %>%
 on18 %>% 
   select(starts_with("partyeval")) %>% 
   var_label()
-#Looks like 4 is Green
+#Party Numbers
+#4 is Green
 # 1 is Liberal
 # 3 is NDP
-# 2 isPC
-# 0 is Really dislike and 5 is really like. 
+# 2 is OPC
+# 0 (0) is Really dislike and 5 (1) is really like. 
 
-#Let's use the _out ones.
+#Extract _out and create a new dataset to calculate affective polarization scores
 
 on18 %>% 
   select(id,starts_with("partyeval")&ends_with("out"))->affect
+
 names(affect)
+
 affect %>% 
   rename(Green_Like=2, Liberal_Like=3, NDP_Like=4, PC_Like=5)->affect
 
+#Create a new dataset for the weighted score
 affect_wt <- affect
+
 #For each respondent, we will need an average like for the parties
 # This is mean(like)_i
 #So we need to effectively calculate a mean for each row. 
@@ -319,21 +317,15 @@ affect %>%
 
 #Now we need to take each R's like score for each party
 # And subtract the mean from it. 
-#my guit is that we should pivot this down
-#Could you:
-# 1) pivot down the party like scores (not the respondent id)
-# and not the mean like
+
 affect_pol_cal <- affect %>%
   pivot_longer(cols = !c(id, mean_like),
                names_to = "Party", 
                values_to = "Party_like_score")
-# 2) Then, in my mind's eye, we will have a column
-# of party like scores and a column of mean like values
-# It should be easy to just subtract the mean like column
+
 affect_pol_cal
 affect_pol_cal$like_mean <- (affect_pol_cal$Party_like_score - affect_pol_cal$mean_like)^2
-# From the party like scores. 
-# 3) Then squre that last column
+
 
 affect_pol_cal %>%
   group_by(id) %>%
@@ -341,34 +333,9 @@ affect_pol_cal %>%
 
 Soc_dis_scores$Soc_dis <- sqrt(Soc_dis_scores$Soc_dis/4)
 
-# 4) Then we should just sum those up for each respondent.
 
 full_join(on18, Soc_dis_scores, by = join_by(id)) -> on18
 
-#Check this out
-
-on18 %>%
-  group_by(Social_Use2) %>%
-  summarise(mean = mean(Soc_dis, na.rm = T), sd = sd(Soc_dis, na.rm = T), n=n(), se=sd/sqrt(n))->mean_affect_scores 
-
-mean_affect_scores %>% 
-  filter(complete.cases(.)) %>% 
-  ggplot(., aes(x = mean, 
-                y = Social_Use2, 
-                colour = Social_Use2)) + 
-  geom_point()+
-  geom_errorbar(aes (xmin = mean - (1.96*se), xmax = mean + (1.96*se)), width =.2) + 
-  labs(x = "Mean", y= "Social Media Use") + 
-  theme_bw()  + 
-  theme(axis.text.y=element_blank(),
-        axis.ticks.y = element_blank(), 
-        strip.text = element_text(size=8))+
-  guides(color=guide_legend(reverse=T))+xlim(c(0,0.5)) -> affect_scores_social_use
-affect_scores_social_use
-
-on18 %>%
-  group_by(Primary_media) %>%
-  summarise(mean = mean(Soc_dis, na.rm = T), sd = sd(Soc_dis, na.rm = T))
 
 #### Weighted Affective Polarization (WAP) Scores ####
 
@@ -413,6 +380,65 @@ on18 %>%
   group_by(Social_Use2) %>%
   summarise(mean = mean(WAP, na.rm = T), sd = sd(WAP, na.rm = T))
 
+#### CPC AFFECT POLARIZATION ####
+on18$partyeval_4_out
+
+on18 <- on18 %>% 
+  mutate(
+    Liberal_Like_wt = partyeval_1_out * 0.196,
+    NDP_Like_wt = partyeval_3_out * 0.336,
+    Green_Like_wt = partyeval_4_out * 0.046,
+    Con_Like_wt = partyeval_2_out * 0.405
+  )
+
+cpc_high <- on18 %>% 
+  filter((Social_Use2 == "Several times a day" | Social_Use2 == "About once a day" |  Social_Use2 == "Several times a week" | Social_Use2 == "About once a week"  |  Social_Use2 == "Several times a month")) %>% 
+ select(c(Liberal_Like_wt,NDP_Like_wt,Green_Like_wt ,  Con_Like_wt)) %>% 
+  as.matrix()
+
+cpclow <- on18 %>% 
+  filter((Social_Use2 == "Several times in a year" | Social_Use2 == "Never" | Social_Use2 == "About once a month")) %>% 
+  select(c(Liberal_Like_wt,NDP_Like_wt,Green_Like_wt ,  Con_Like_wt)) %>% 
+  as.matrix()
+
+  
+  cpc_legacy <- on18 %>% 
+    filter(Primary_media == "Legacy") %>% 
+    select(c(Liberal_Like_wt,NDP_Like_wt,Green_Like_wt ,  Con_Like_wt)) %>% 
+    as.matrix()
+  
+  cpc_social <- on18 %>% 
+    filter(Primary_media == "Social_Media") %>% 
+    select(c(Liberal_Like_wt,NDP_Like_wt,Green_Like_wt ,  Con_Like_wt)) %>% 
+    as.matrix()
+  
+  cpc_online <- on18 %>% 
+    filter(Primary_media == "Online") %>% 
+    select(c(Liberal_Like_wt,NDP_Like_wt,Green_Like_wt ,  Con_Like_wt)) %>% 
+    na.omit() %>% 
+    as.matrix()
+  
+  cpc_mixed <- on18 %>% 
+    filter(Primary_media == "Mixed") %>% 
+    select(c(Liberal_Like_wt,NDP_Like_wt,Green_Like_wt ,  Con_Like_wt)) %>% 
+    as.matrix()
+
+set.seed(178)
+CPC(cpc_high, k = 4, type = "kmeans")
+set.seed(178)
+CPC(cpclow, k = 4, type = "kmeans")
+set.seed(178)
+CPC(cpc_legacy, k = 4, type = "kmeans")
+set.seed(178)
+CPC(cpc_social, k = 4, type = "kmeans")
+set.seed(178)
+CPC(cpc_online, k = 4, type = "kmeans")
+set.seed(178)
+CPC(cpc_mixed, k = 4, type = "kmeans")
+
+
+#### POLACKO POLICY POLARIZATION ####
+
 #create number of standard deviations from mean variable
 policies_social_use
 policies_social_use_sd_dis <- do.call(cbind, lapply(policies_social_use[, 1:11], sd_mean, na.rm = T)) 
@@ -422,38 +448,6 @@ policies_social_use_sd_dis %>%
   bind_cols(., on18$Social_Use2)->policies_social_use_sd_dis
 names(policies_social_use_sd_dis)<-c(policy_names, "Social_Use2")
 
-
-policies_social_use_sd_dis %>%
-  group_by(Social_Use2) %>%
-  summarise( across(everything(), list(.mean = mean, .se = se), na.rm = T )) -> policies_social_use_sd_dis_mean
-policies_social_use_sd_dis_mean
-on18 <- cbind(on18, policies_social_use_sd_dis)
-
-policies_sd_social_dis_down <- policies_social_use_sd_dis_mean %>%
-  pivot_longer(cols = !Social_Use2,
-               names_to = c("Policy_Issue", ".value"), 
-              names_sep = "\\." )
-policies_sd_social_dis_down
-policies_sd_social_dis_down %>% 
-  filter(complete.cases(.)) %>%
-  ggplot(., aes(x = mean, 
-                y = Social_Use2, 
-                colour = Social_Use2)) + 
-  geom_point()+ facet_wrap(~Policy_Issue, labeller = label_wrap_gen(width=30)) +
-  geom_errorbar(aes (xmin = mean - (1.96*se), xmax = mean + (1.96*se)), width =.2) + 
-  labs(x = "Mean", y= "Social Media Use") + 
-  theme_bw()  + 
-  theme(axis.text.y=element_blank(),
-        axis.ticks.y = element_blank(), 
-        strip.text = element_text(size=8))+
-  guides(color=guide_legend(reverse=T))
-# Note no pattern
-
-
-
-policies_social_use_sd_dis %>%
-  bind_cols(., on18$Primary_media) %>%
-  bind_cols(., on18$Interest) ->policies_social_use_sd_dis2
 
 #check to make sure function worked properly
 mean(policies$help_racial_minorities, na.rm = T)
@@ -472,7 +466,99 @@ policies_social_use_sd_dis2 %>%
   pivot_longer(cols = 1:11, names_to = "Policy_Issue", values_to = "distance") -> policies_social_use_sd_dis2_down
 policies_social_use_sd_dis2_down
 
+#### DESCRIPTIVE STATISTICS ####
+
+
+#### Primary Media ####
+
+#Descriptive Statistics for political knowledge by Primary media
+table(on18$Social_Use2, on18$pol_knowledge)
+on18 %>%
+  group_by(Primary_media) %>%
+  summarise(mean = mean(pol_knowledge, na.rm = T), sd = sd(pol_knowledge, na.rm = T)) 
+
+#### Primary Media and Media source ####
+
+on18$HuffingtonPostonline
+
+media_Sources_by_primarymedia <- on18 %>% 
+  group_by(Primary_media) %>% 
+  summarise(across(CBCTV:HuffingtonPostonline, \(x)mean(x))) %>% 
+  filter(Primary_media == "Online") %>% 
+  pivot_longer(cols = 2:22)
+
+
+#see the most read soucrces for online news users
+media_Sources_by_primarymedia %>% 
+  ggplot(aes(y = name, x = value)) + geom_point() 
+  
+
+
+#### Affective Polarization ####
+
+
+on18 %>%
+  group_by(Social_Use2) %>%
+  summarise(mean = mean(Soc_dis, na.rm = T), sd = sd(Soc_dis, na.rm = T), n=n(), se=sd/sqrt(n))->mean_affect_scores 
+
+mean_affect_scores %>% 
+  filter(complete.cases(.)) %>% 
+  ggplot(., aes(x = mean, 
+                y = Social_Use2, 
+                colour = Social_Use2)) + 
+  geom_point()+
+  geom_errorbar(aes (xmin = mean - (1.96*se), xmax = mean + (1.96*se)), width =.2) + 
+  labs(x = "Mean", y= "Social Media Use") + 
+  theme_bw()  + 
+  theme(axis.text.y=element_blank(),
+        axis.ticks.y = element_blank(), 
+        strip.text = element_text(size=8))+
+  guides(color=guide_legend(reverse=T))+xlim(c(0,0.5)) -> affect_scores_social_use
+affect_scores_social_use
+
+on18 %>%
+  group_by(Primary_media) %>%
+  summarise(mean = mean(Soc_dis, na.rm = T), sd = sd(Soc_dis, na.rm = T))
+
+#### Policy Polarization ####
+
+policies_social_use_sd_dis %>%
+  group_by(Social_Use2) %>%
+  summarise( across(everything(), list(.mean = mean, .se = se), na.rm = T )) -> policies_social_use_sd_dis_mean
+policies_social_use_sd_dis_mean
+
+#on18 <- cbind(on18, policies_social_use_sd_dis)
+
+policies_social_use_sd_dis %>%
+  bind_cols(., on18$Primary_media) %>%
+  bind_cols(., on18$Interest) ->policies_social_use_sd_dis2
+
+#### Policy Position Distribution ####
+
+#Exploratory factor analysis
+cor_policies <- on18 %>% 
+  dplyr::select(c(help_racial_minorities, help_women, more_coporate_tax,
+                    more_personal_tax, income_inequality, drug_benefit_u25, free_post_secondary,
+                    lr_private_health_care, Lr_minimum_wage_to_high_prices, lr_business_benefits_everyone, 
+                    lr_inappropriate_sex_ed
+  )) %>% 
+  cor(., use = "complete.obs") 
+
+
+eigen(cor_policies)$values
+psych::fa(cor_policies, nfactors = 3)
+
+policy_issues <- 'policy =~ help_racial_minorities + help_women + more_coporate_tax +
+                                  more_personal_tax + income_inequality + drug_benefit_u25 + free_post_secondary +
+                                 lr_private_health_care + Lr_minimum_wage_to_high_prices + lr_business_benefits_everyone + 
+                                  lr_inappropriate_sex_ed'
+cfa_policies <- cfa(policy_issues, data = on18)
+summary(cfa_policies, fit.measures = T, standardized = T)
+
+#### REGRESION MODELS ####
+
 #Create regression models for affective polarization using the weighted affective polarization (WAP) measure
+#**** Start thinking about control variables 
 WAP_primarymedia <- lm(WAP ~ Primary_media, data = on18, na.action = na.omit);summary(WAP_primarymedia) 
 
 WAP_primarymedia_graph <- graph_regression(WAP_primarymedia); WAP_primarymedia_graph
@@ -575,202 +661,114 @@ ggsave("Plots/interaction_models.png", plot = interaction_models)
 
 
 #Create graphs of the marginal effects of the interaction models using the functions defined in "0_functions.R"
+marginaleffects::plot_slopes(mods_interact[[2]][[1]], variables = "Interest", condition = "Primary_Media") + geom_hline(yintercept  = 0, lty = "dashed", col = "forestgreen") + theme_bw()
+marginaleffects::plot_slopes(mods_interact[[2]][[2]], variables = "Interest", condition = "Primary_Media") + geom_hline(yintercept  = 0, lty = "dashed", col = "forestgreen") + theme_bw()
+marginaleffects::plot_slopes(mods_interact[[2]][[3]], variables = "Interest", condition = "Primary_Media") + geom_hline(yintercept  = 0, lty = "dashed", col = "forestgreen") + theme_bw()
+marginaleffects::plot_slopes(mods_interact[[2]][[4]], variables = "Interest", condition = "Primary_Media") + geom_hline(yintercept  = 0, lty = "dashed", col = "forestgreen") + theme_bw()
+marginaleffects::plot_slopes(mods_interact[[2]][[5]], variables = "Interest", condition = "Primary_Media") + geom_hline(yintercept  = 0, lty = "dashed", col = "forestgreen") + theme_bw()
+marginaleffects::plot_slopes(mods_interact[[2]][[6]], variables = "Interest", condition = "Primary_Media") + geom_hline(yintercept  = 0, lty = "dashed", col = "forestgreen") + theme_bw()
+marginaleffects::plot_slopes(mods_interact[[2]][[7]], variables = "Interest", condition = "Primary_Media") + geom_hline(yintercept  = 0, lty = "dashed", col = "forestgreen") + theme_bw()
+marginaleffects::plot_slopes(mods_interact[[2]][[8]], variables = "Interest", condition = "Primary_Media") + geom_hline(yintercept  = 0, lty = "dashed", col = "forestgreen") + theme_bw()
+marginaleffects::plot_slopes(mods_interact[[2]][[9]], variables = "Interest", condition = "Primary_Media") + geom_hline(yintercept  = 0, lty = "dashed", col = "forestgreen") + theme_bw()
+marginaleffects::plot_slopes(mods_interact[[2]][[10]], variables = "Interest", condition = "Primary_Media") + geom_hline(yintercept  = 0, lty = "dashed", col = "forestgreen") + theme_bw()
+marginaleffects::plot_slopes(mods_interact[[2]][[11]], variables = "Interest", condition = "Primary_Media") + geom_hline(yintercept  = 0, lty = "dashed", col = "forestgreen") + theme_bw()
 
-extract_model(1) %>% 
-  graph_interaction() -> interact_help_racial_minorities
-extract_model(2) %>% 
-  graph_interaction() -> interact_help_women
-extract_model(3) %>% 
-  graph_interaction() -> interact_more_coporate_tax
-extract_model(4) %>% 
-  graph_interaction() -> interact_more_personal_tax
-extract_model(5) %>% 
-  graph_interaction() -> interact_private_health_care
-extract_model(6) %>% 
-  graph_interaction() -> interact_minimum_wage_to_high_prices
-extract_model(7) %>% 
-  graph_interaction() -> interact_income_inequality
-extract_model(8) %>% 
-  graph_interaction() -> interact_business_benefits_everyone
-extract_model(9) %>% 
-  graph_interaction() -> interact_drug_benefit_u25
-extract_model(10) %>% 
-graph_interaction() -> interact_free_post_secondary
-extract_model(11) %>% 
-  graph_interaction() -> interact_inappropriate_sex_ed
+#### Affective polarization models ####
+affect_models <- list()
+affect_models[[1]] <- lm(WAP ~ Interest, data = on18, na.action = na.omit)
 
-#### MEASURING AFFECTIVE POLARIZATION ####
+affect_models[[2]] <- lm(WAP ~ Primary_media, data = on18, na.action = na.omit)
 
-on18$help_women
+affect_models[[3]] <- lm(WAP ~ Interest + Primary_media, data = on18, na.action = na.omit)
 
-on18 <- on18 %>% 
-  mutate(
-    
-  )
-  
+affect_models[[4]] <- lm(WAP ~ Interest * Primary_media, data = on18, na.action = na.omit)
+modelsummary(affect_models, stars = T)
+marginaleffects::plot_slopes(affect_models[[4]], variables = "Interest", condition = "Primary_media") + geom_hline(yintercept  = 0, lty = "dashed", col = "forestgreen") + theme_bw()
+
 #### BIMODALITY COEFFICENT ####
   
-library(mousetrap)
-
-### Create distributions by primary media 
-
-policy_legacy <- on18 %>% 
-  filter(Primary_media == "Legacy") %>% 
-  select(policy_polarization)
-
-policy_online <- on18 %>% 
-  filter(Primary_media == "Online") %>% 
-  select(policy_polarization)
-
-policy_social_media <- on18 %>% 
-  filter(Primary_media == "Social_Media") %>% 
-  select(policy_polarization)
-
-policy_mixed <- on18 %>% 
-  filter(Primary_media == "Mixed") %>% 
-  select(policy_polarization)
-
-bimodality_coefficient(policy_legacy, na.rm = T)
+#### Primary Media ####
+bimod_online <- bimodality_coefficient(policy_online, na.rm = T)
+bimod_leacgy <- bimodality_coefficient(policy_legacy, na.rm = T)
 bimodality_coefficient(policy_online, na.rm = T)
 bimodality_coefficient(policy_social_media, na.rm = T)
 bimodality_coefficient(policy_mixed, na.rm = T)
 
-### Create distributions for social use 
+bimod_legacy <- policy_legacy %>% 
+  ggplot() + geom_density(aes(policy_polarization), col = "seagreen", fill = "seagreen", alpha = 0.4) + 
+  labs(title = "Legacy Media", subtitle = "Bimodality Coefficent (0.29)", x = "Policy Positions", y = NULL) +
+ theme_bw()
 
-policy_often <- on18 %>% 
-  filter((Social_Use2 == "Several times a day" | Social_Use2 == "About once a day" |  Social_Use2 == "Several times a week" | Social_Use2 == "About once a week"  |  Social_Use2 == "Several times a month")) %>% 
-  select(policy_polarization) 
+bimod_online <- policy_online %>% 
+  ggplot() + geom_density(aes(policy_polarization), col = "seagreen", fill = "seagreen", alpha = 0.4) + 
+  labs(title = "Online Media", subtitle = "Bimodality Coefficent (0.36)", x = "Policy Positions", y = NULL) +
+  theme_bw()
 
+bimod_social <- policy_social_media %>% 
+  ggplot() + geom_density(aes(policy_polarization), col = "seagreen", fill = "seagreen", alpha = 0.4) + 
+  labs(title = "Social Media", subtitle = "Bimodality Coefficent (0.31)", x = "Policy Positions", y = NULL) +
+  theme_bw()
 
-policy_rarely <- on18 %>% 
-  filter((Social_Use2 == "Several times in a year" | Social_Use2 == "Never" | Social_Use2 == "About once a month")) %>% 
-  select(policy_polarization)
+bimod_mixed <- policy_mixed %>% 
+  ggplot() + geom_density(aes(policy_polarization), col = "seagreen", fill = "seagreen", alpha = 0.4) + 
+  labs(title = "Mixed media", subtitle = "Bimodality Coefficent (0.32)", x = "Policy Positions", y = NULL) +
+  theme_bw()
+
+gridExtra::grid.arrange(bimod_legacy, bimod_online, bimod_social, bimod_mixed)
+
+#### Social Use ####
 
 bimodality_coefficient(policy_often, na.rm = T)
 bimodality_coefficient(policy_rarely, na.rm = T)
 
-#### DISTINCTIVENESS COEFFICIENT ####
+bimod_often <- policy_often %>% 
+  ggplot() + geom_density(aes(policy_polarization), col = "seagreen", fill = "seagreen", alpha = 0.4) + 
+  labs(title = "Uses Social Media Often", subtitle = "Bimodality Coefficent (0.29)", x = "Policy Positions", y = NULL) +
+  theme_bw()
 
-#Recode all policy issues so that left wing position is 1 and right wing position is 0
+bimod_rarely <- policy_rarely %>% 
+  ggplot() + geom_density(aes(policy_polarization), col = "seagreen", fill = "seagreen", alpha = 0.4) + 
+  labs(title = "Uses Social Media Rarely", subtitle = "Bimodality Coefficent (0.33)", x = "Policy Positions", y = NULL) +
+  theme_bw()
 
-  on18$inappropriate_sex_ed
+gridExtra::grid.arrange(bimod_often, bimod_rarely)
 
-on18 <- on18 %>% 
-  mutate(
-    lr_help_racial_minorities = case_match(help_racial_minorities, 0 ~ 1, 0.25 ~ 0.75, 0.5 ~ 0.5, 0.75 ~ 0.25, 1 ~ 0, NA ~ NA),
-    lr_help_women = case_match(help_women, 0 ~ 1, 0.25 ~ 0.75, 0.5 ~ 0.5, 0.75 ~ 0.25, 1 ~ 0, NA ~ NA),
-    lr_more_coporate_tax = case_match(more_coporate_tax, 0 ~ 1, 0.25 ~ 0.75, 0.5 ~ 0.5, 0.75 ~ 0.25, 1 ~ 0, NA ~ NA), 
-    lr_more_personal_tax = case_match(more_personal_tax, 0 ~ 1, 0.25 ~ 0.75, 0.5 ~ 0.5, 0.75 ~ 0.25, 1 ~ 0, NA ~ NA),
-    lr_income_inequality = case_match(income_inequality, 0 ~ 1, 0.25 ~ 0.75, 0.5 ~ 0.5, 0.75 ~ 0.25, 1 ~ 0, NA ~ NA),
-    lr_drug_benefit_u25 = case_match(drug_benefit_u25, 0 ~ 1, 0.25 ~ 0.75, 0.5 ~ 0.5, 0.75 ~ 0.25, 1 ~ 0, NA ~ NA),
-    lr_free_post_secondary = case_match(free_post_secondary, 0 ~ 1, 0.25 ~ 0.75, 0.5 ~ 0.5, 0.75 ~ 0.25, 1 ~ 0, NA ~ NA)
-  )
-
-library(psych)
-
-cor_policies <- on18 %>% 
-  dplyr::select(c(lr_help_racial_minorities:lr_free_post_secondary,
-                  private_health_care, minimum_wage_to_high_prices, business_benefits_everyone, 
-                  inappropriate_sex_ed
-                  )) %>% 
-  cor(., use = "complete.obs") 
-
-
-eigen(cor_policies)$values
-psych::fa(cor_policies, nfactors = 3)
-
-on18 <- on18 %>%  
-mutate(policy_polarization = (lr_help_racial_minorities + lr_help_women + lr_more_coporate_tax +
-                               lr_more_personal_tax + lr_income_inequality + lr_drug_benefit_u25 + lr_free_post_secondary +
-                               private_health_care + minimum_wage_to_high_prices + business_benefits_everyone + 
-                               inappropriate_sex_ed))
-on18$partyvote2018
-
-policy_left_legacy <- on18 %>% 
-  filter(Primary_media == "Legacy" & (partyvote2018 == 1 | partyvote2018 == 3)) %>% 
- select(policy_polarization)
-
-policy_left_online <- on18 %>% 
-  filter(Primary_media == "Online" & (partyvote2018 == 1 | partyvote2018 == 3)) %>% 
-  select(policy_polarization)
-
-policy_left_social_media <- on18 %>% 
-  filter(Primary_media == "Social_Media" & (partyvote2018 == 1 | partyvote2018 == 3)) %>% 
-  select(policy_polarization)
-
-policy_left_mixed <- on18 %>% 
-  filter(Primary_media == "Mixed" & (partyvote2018 == 1 | partyvote2018 == 3)) %>% 
-  select(policy_polarization)
-
-on18$partyvote2018
-
-policy_conservatives_legacy <- on18 %>% 
-  filter(Primary_media == "Legacy" & partyvote2018 == 2) %>% 
-  select(policy_polarization)
-
-policy_conservatives_online <- on18 %>% 
-  filter(Primary_media == "Online" & partyvote2018 == 2) %>% 
-  select(policy_polarization)
-
-policy_conservatives_media <- on18 %>% 
-  filter(Primary_media == "Social_Media" & partyvote2018 == 2) %>% 
-  select(policy_polarization)
-
-policy_conservatives_mixed <- on18 %>% 
-  filter(Primary_media == "Mixed" & partyvote2018 == 2) %>% 
-  select(policy_polarization)
-
+#### OVERLAP COEFFICENTS GRAPHS ####
 
 overlap(policy_left_legacy, policy_conservatives_legacy)
 
+#legacy_overlap <- data.frame(as.vector(policy_left_legacy), as.vector(policy_conservatives_legacy))
+
 overlap_legacy <- ggplot() + geom_density(aes(policy_polarization), data = policy_left_legacy, col = "red", fill = "red", alpha = 0.4) + 
+  labs(title = "Legacy Media", subtitle = "Overlap Coefficent (0.66)", x = "Policy Positions", y = NULL) +
   geom_density(aes(policy_polarization), data = policy_conservatives_legacy, col = "blue", fill = "blue", alpha = 0.4) + theme_bw()
 
 
 overlap(policy_left_online, policy_conservatives_online)
 
 overlap_online <- ggplot() + geom_density(aes(policy_polarization), data = policy_left_online, col = "red", fill = "red", alpha = 0.4) + 
+  labs(title = "Online Media", subtitle = "Overlap Coefficent (0.59)", x = "Policy Positions", y = NULL) +
   geom_density(aes(policy_polarization), data = policy_conservatives_online, col = "blue", fill = "blue", alpha = 0.4) + theme_bw()
 
 
 overlap(policy_left_social_media, policy_conservatives_media)
 
 overlap_smedia <- ggplot() + geom_density(aes(policy_polarization), data = policy_left_social_media, col = "red", fill = "red", alpha = 0.4) + 
+  labs(title = "Online Media", subtitle = "Overlap Coefficent (0.74)", x = "Policy Positions", y = NULL) +
   geom_density(aes(policy_polarization), data = policy_conservatives_media, col = "blue", fill = "blue", alpha = 0.4) + theme_bw()
 
 
 
 overlap(policy_left_mixed, policy_conservatives_mixed)
 
-overlap_mixed <- ggplot() + geom_density(aes(policy_polarization), data = policy_left_mixed, col = "red", fill = "red", alpha = 0.4) + 
+overlap_mixed <- ggplot() + geom_density(aes(policy_polarization), data = policy_left_mixed, col = "red", fill = "red", alpha = 0.4) +
+  labs(title = "Mixed Media", subtitle = "Overlap Coefficent (0.70)", x = "Policy Positions", y = NULL) +
   geom_density(aes(policy_polarization), data = policy_conservatives_mixed, col = "blue", fill = "blue", alpha = 0.4) + theme_bw()
 
 ggpubr::ggarrange(overlap_legacy, overlap_online, overlap_smedia, overlap_mixed)
 
 #### OVERLAP FOR SOCIAL USE ####
 
-unique(on18$Social_Use)
-
-policy_left_often <- on18 %>% 
-  filter((Social_Use2 == "Several times a day" | Social_Use2 == "About once a day" |  Social_Use2 == "Several times a week" | Social_Use2 == "About once a week"  |  Social_Use2 == "Several times a month") & (partyvote2018 == 1 | partyvote2018 == 3)) %>% 
-  select(policy_polarization) 
-
-
-policy_left_rarely <- on18 %>% 
-  filter((Social_Use2 == "Several times in a year" | Social_Use2 == "Never" | Social_Use2 == "About once a month") & (partyvote2018 == 1 | partyvote2018 == 3)) %>% 
-  select(policy_polarization)
-
-on18$partyvote2018
-
-policy_conservative_often <- on18 %>% 
-  filter((Social_Use2 == "Several times a day" | Social_Use2 == "About once a day" |  Social_Use2 == "Several times a week" |
-            Social_Use2 == "About once a week" |  Social_Use2 == "Several times a month") & partyvote2018 == 2) %>% 
-  select(policy_polarization)
-
-
-policy_conservative_social_rarely <- on18 %>% 
-  filter((Social_Use2 == "Several times in a year" | Social_Use2 == "Never" | Social_Use2 == "About once a month" ) & partyvote2018 == 2) %>% 
-  select(policy_polarization)
 
 overlap(policy_left_often, policy_conservative_often)
 
@@ -787,6 +785,12 @@ overlap_rarely <- ggplot() + geom_density(aes(policy_polarization), data = polic
 
 
 ggpubr::ggarrange(overlap_often, overlap_rarely, ncol = 1)
+
+
+#report the null of the social media use
+#make the positive finding more interesting
+#statistical tests with Overlap coefficients 
+
 
 
 

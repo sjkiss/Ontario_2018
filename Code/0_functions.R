@@ -1,9 +1,18 @@
 #### FUNCTIONS FOR POLARIZATION DATA ANALYSIS ####
-
-# Binary recode function
+pacman::p_load("tidyverse",
+               "bayestestR",
+               "mousetrap",
+               "lavaan",
+               "psych",
+               "CPC")
+# Binary recode function for political knowledge
 binaryrecode <-  function(x){
   if_else(x==1, 1, 0)
 }
+
+#rescale from 0 to 1
+
+range01 <- function(x, ...){(x-min(x, ...))/(max(x, ...)-min(x, ...))} 
 
 # Standard Error
 
@@ -44,7 +53,7 @@ graph_interaction <- function(df){
 graph_regression <- function(model, graphname){
   require(tidyverse)
  r <- tidy(model)
-ci <- confint(model, level = 0.95) %>% 
+ci <- confint(model, level = 0.95, HC_type = "HC0")%>% 
   data.frame() %>% 
   rename("conf.low_95" = "X2.5..", "conf.high_95" = "X97.5..")
 r <- bind_cols(r, ci) %>% 

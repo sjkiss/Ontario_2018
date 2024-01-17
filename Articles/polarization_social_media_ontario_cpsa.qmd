@@ -1,14 +1,33 @@
 ---
 title: "Social Media Use And Polarization In Ontario: 2018 Case Study"
-format: pdf
+format: 
+  pdf:
+    number-sections: true
+    colorlinks: true
+    keeptex: true
+    include-in-header: 
+      text: |
+          \usepackage{booktabs}
+          \usepackage{siunitx}
+          \usepackage{setspace}\doublespacing
+          \newcolumntype{d}{S[
+              input-open-uncertainty=,
+              input-close-uncertainty=,
+              parse-numbers = false,
+              table-align-text-pre=false,
+              table-align-text-post=false
+           ]}
 author: 
   - Rafael Campos-Gottardo
   - Simon Kiss
 editor: visual
 bibliography: Polarization.bib
+link-citations: true
+csl: apa.csl
 ---
 
-## Introduction
+
+# Introduction
 
 ```{r}
 #| label: setup
@@ -35,50 +54,64 @@ Will this work? We hope so.
 #primary_media_interest_policy
 ```
 
-## Social Media And Polarization
+# Social Media And Polarization
 
-### What is Polarization
-|  In the literature on polarization there has been much debate on the relationship between ideology and partisanship. Scholars studying polarization, particularly in the United States, have contrasting views on the nature of modern political polarization. Some scholars argue that ideological or policy polarization has been increasing for both political elites and the electorate more broadly. Another group argues that partisan sorting has led parties to become more ideologically homogeneous, while party elites have become more polarized, which leads to the perception that the electorate is becoming more polarized. Finally, a third group argues
+## What is Polarization
+|     In the literature on polarization there has been much debate on the relationship between ideology and partisanship. Scholars studying polarization, particularly in the United States, have contrasting views on the nature of modern political polarization. Some scholars argue that ideological or policy polarization has been increasing for both political elites and the electorate more broadly. Another group argues that partisan sorting has led parties to become more ideologically homogeneous, while party elites have become more polarized, which leads to the perception that the electorate is becoming more polarized. Finally, a third group argues
 -   Summary state of knowledge from big papers
     -   Against [@boxellInternetCausingPolitical2017] and [@bakshyExposureIdeologicallyDiverse2015]
     -   Try to review [@tuckerSocialMediaPolitical2018, @bavelHowSocialMedia2021,@kubinRoleSocialMedia2021]
 
-### The relationship between social media usage and polarization
+## The relationship between social media usage and polarization
 
 |       It is often considered a forgone conclusion that social media usage is linked to increased levels of affective and policy polarization. Proponents of this idea argue that social media platforms create "echo chambers" or "filter bubbles" where users will only encounter ideas and policies that they already agree with @terrenEchoChambersSocial2021. Since the internet is a high choice media environment individuals can either choose to be exposed to diverse information or select media that reinforce their pre-existing opinions [@duboisEchoChamberOverstated2018]. On social media echo chambers occur because users shown ideologically agreeable materials as a result of these platforms' algorithms that show users content based on their past behaviour (Raynauld & Grennberg 2014). However, the empirical evidence supporting the existence of eco-chambers on social media has been mixed. Most studies in the United States find that Republicans and Democrats have similar media diets, both online and offline. Additionally, studies have found that there is some evidence that echo chambers exist on Twitter (now known as X) but not on Facebook. Notably, Terren et al. @terrenEchoChambersSocial2021 found that studies that used digital trace evidence found more evidence of echo-chambers and polarization than studies that used self-reported data. For example, using Facebook trace evidence @bakshyExposureIdeologicallyDiverse2015 find that most users have Facebook friends who belong to the other party and that individuals are exposed to cross cutting content. They also find that individual choices, not algorithms, are what determine if an individual engages with opposing viewpoints. Using self reported social media usage, @duboisEchoChamberOverstated2018 find that the majority of social media users, encounter information they disagree with, use multiple sources, and often attempt to confirm the information they are presented.
 
-|      The evidence linking the presences of echo chambers to increased polarization is also unclear [@kubinRoleSocialMedia2021]. Some studies find that increased social media usage predicts increased polarization [@choInfluencingMyselfSelfReinforcement2018; @tuckerLiberationTurmoilSocial2017]. This relationship is also re-enforced by posting more on social media and sharing politically relevant content. However, other studies have found that social media usage has a small or no effect on polarization. Through a review of recent studies on the relationship between social media usage and polarization, @bavelHowSocialMedia2021 posit that social media usage is unlikely to be the main driver of polarization but is often a key facilitator. A recent experimental evidence has found that individuals who de-activated their Facebook accounts became less polarized due to less exposure to political news and opinions. Other studies have demonstrated that the "echo chamber" aspect of social media is not what drives polarization. Instead, exposure to hyper-partisan messages from the opposing party leads to a significant increase in polarization among Republicans but not democrats. @boxellInternetCausingPolitical2017 observe that the individuals who are the most polarized are those who are the least likely to use social media. Specifically, they found that adults over 75 are becoming polarized at a faster rate than those under 40, while also being far less likely to use social media. Therefore, any account that links social media usage to increased polarization must also account for why individuals who do not use social media are becoming more polarized than social media users.
+|      The evidence linking the presences of echo chambers to increased polarization is also unclear [@kubinRoleSocialMedia2021]. Some studies find that increased social media usage predicts increased polarization [@choInfluencingMyselfSelfReinforcement2018; @tuckerLiberationTurmoilSocial2017]. This relationship is also re-enforced by posting more on social media and sharing politically relevant content. However, other studies have found that social media usage has a small or no effect on polarization. Through a review of recent studies on the relationship between social media usage and polarization, @bavelHowSocialMedia2021 posit that although social media usage is unlikely to be the main driver of polarization but is often a key facilitator. A recent experimental evidence has found that individuals who de-activated their Facebook accounts became less polarized due to less exposure to political news and opinions. Other studies have demonstrated that the "echo chamber" aspect of social media is not what drives polarization. Instead, exposure to hyper-partisan messages from the opposing party leads to a significant increase in polarization among Republicans but not democrats. @boxellInternetCausingPolitical2017 observe that the individuals who are the most polarized are those who are the least likely to use social media. Specifically, they found that adults over 75 are becoming polarized at a faster rate than those under 40, while also being far less likely to use social media. Therefore, any account that links social media usage to increased polarization must also account for why individuals who do not use social media are becoming more polarized than social media users.
 
-|       The evidence that social media usage leads to increased polarization in Canada is even more limited. There is evidence that affective polarization has been increasing in Canada [@johnstonAffectivePolarizationCanadian2019]. Additionally, there is are mixed conclusions with regards to policy polarization in Canada. One study that measured polarization using preferences towards redistributive policies found that Canada experienced a surge in partisan sorting between 1992 and 2015 [@kevinsGrowingApartPartisan2018]. However, another study that measured polarization using distribution based measures only found evidence of ideological polarization increasing after the 2019 Canadian election [@merkleyPolarizationEhIdeological2022]. Futhermore, none of these studies investigate the factors that have contributed to the rise of both affective and ideological polarization in Canada. 
+|       The evidence that social media usage leads to increased polarization in Canada is even more limited. There is evidence that affective polarization has been increasing in Canada [@johnstonAffectivePolarizationCanadian2019]. Additionally, there is are mixed conclusions with regards to policy polarization in Canada. One study that measured polarization using preferences towards redistributive policies found that Canada experienced a surge in partisan sorting between 1992 and 2015 [@kevinsGrowingApartPartisan2018]. However, another study that measured polarization using distribution based measures only found evidence of ideological polarization increasing after the 2019 Canadian election [@merkleyPolarizationEhIdeological2022]. Furthermore, none of these studies investigate the factors that have contributed to the rise of both affective and ideological polarization in Canada. 
 
-## Ontario 2018 Summary
+## Polarization and Online News Consumption
 
-## Summary of OPES, Methods
+|      In contrast to the contested relationship between polarization and social media usage their is clearer evidence that increased online news consumption is linked to increased polarization. Early studies of online news media found that partisan online sources engage in greater partisan filtering of content than traditional news wires [@baumNewMediaPolarization2008]. Additionally, studies have found that individuals who consume news online are often more polarized than those who only use offline "legacy" news sources [@fletcherHowPolarizedAre2020]. @garimellaPoliticalPolarizationOnline2021 find that both the structure of news sites and the behaviour of online news consumers contributes to users only consuming news that reinforces their ideological priors. Specifically, they find that the online news environment allows users actively seek out news sources that are ideologically aligned with their prior beliefs.    
 
+# Ontario 2018 Summary
+
+# Data and Methods
+
+## The 2018 Ontario Post Election Study 
 -   Sampling strategy
 -   Questions used to construct variables
+## Indenpedent Variables 
 
-### Measuring Polarization
+## Polarization Varaibles
 
-#### Affective polarization 
-We measure affective polarization using the Weighted Affective Polarization (WAP) equation developed by @wagnerAffectivePolarizationMultiparty2021. The WAP equation for parties j and voters i is: 
+### Affective polarization 
+We observe affective polarization using two commonly used measured to measure affective polarization in multiple party systems. The first first measure, developed by @wagnerAffectivePolarizationMultiparty2021, creates an individual affective polarization score for each respondent based on the *spread* party like scores for each of Ontario's four major political parties. Like scores for the parties are drawn from feelings thermometers that ask respondents to rate the parties on a scale from 0 to 5 (See the Supplemental Materials for full question wordings).  
+For formally the Weighted Affective Polarization (WAP) equation measured spread for parties j and voters i: 
 $$
     Spread_i = \sqrt{\sum^{P}_{p=1}v_p(like_{ip} - \overline{like_i})^2}
-    $$ 
+$$ 
 where $v_p$ is the vote share of each party measured as proportion with a range of 0 to 1, and the mean affect scores weighted by party using the following equation: 
+
 $$
     \overline{like_i} = \sum^P_{p=1}(v_p * like_{ip})
-    $$
--   Policy polarization
+$$
+The WAP scores are then used in OLS regression with the independent variables discussed above to determine understand the relationship between social media usage, political interest and affective polarization. 
+We also calculate affective polarization using the Cluster-Polarization Coefficient (CPC) developed by @mehlhaffGroupBasedApproachMeasuring2023 using the "CPC" package in R. This measure of polarization accounts for intergroup heterogeneity and in-group homogeneity by decomposing the total variance of the clustered data (TSS) into the variance accounted for between the clusters (BSS; intergroup heterogeneity) and the variance within the clusters (WSS; in-group variation). The CPC is a proportion ranging from 0 to 1 calculated by diving by *TSS* and solving for the *BSS* term in the following equation:
+\begin{align*}
+TSS = BSS + WSS, \\
+CPC = 1 - \frac{WSS}{TSS} = \frac{BSS}{TSS}
+\end{align*}
+We calculated the CPC from distributions of the weighted like scores scores, calculated above using the following formula: $v_p * like_{ip}$. Individuals were then grouped by either their social use (low and high) or the primary media source from which they received election news during the 2018 Ontario election. 
+
+### Policy polarization
 
 We used a number of common strategies to measure policy/ideological polarization. The first measure was adapted for individuals from @polackoInequalityPolicyPolarization2022 and uses the following formula to distance of each respondent i from the mean of policy issue j:
 
 $$
 \text{Policy Polarization}_i = \frac{|\bar{x}_j -  x_i|}{\sigma_j}
 $$
-$$
 
-$$
 
 ## Results
 
@@ -86,6 +119,6 @@ $$
 
 ## Conclusion
 
-------------------------------------------------------------------------
+\newpage
 
 # References
