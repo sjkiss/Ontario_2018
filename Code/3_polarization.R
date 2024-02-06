@@ -23,10 +23,10 @@ on18 %>%
 
 table(on18$Primary_media)
 
-on18 <- on18 %>% 
-  mutate(
-    Primary_media = relevel(as.factor(Primary_media), ref = "Mixed")
-  )
+# on18 <- on18 %>% 
+#   mutate(
+#     Primary_media = relevel(as.factor(Primary_media), ref = "Mixed")
+#   )
 
 #### Political Knowledge #### 
 
