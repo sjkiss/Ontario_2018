@@ -4,7 +4,7 @@ pacman::p_load("tidyverse",
                "mousetrap",
                "lavaan",
                "psych",
-               "CPC")
+               "OVL.CI")
 # Binary recode function for political knowledge
 binaryrecode <-  function(x){
   if_else(x==1, 1, 0)
@@ -53,7 +53,7 @@ graph_interaction <- function(df){
 graph_regression <- function(model, graphname){
   require(tidyverse)
  r <- tidy(model)
-ci <- confint(model, level = 0.95, HC_type = "HC0")%>% 
+ci <- confint(model, level = 0.95, HC_type = "HC0") %>% 
   data.frame() %>% 
   rename("conf.low_95" = "X2.5..", "conf.high_95" = "X97.5..")
 r <- bind_cols(r, ci) %>% 
@@ -72,3 +72,9 @@ ggplot(r, aes(x = Variable, y = Coefficient)) +  geom_hline(yintercept = 0, colo
 # f <- function(x, y){ abs(rnorm(x, 0, 1) - rnorm(y, 2.3, 5.4))}
 # int2(f, c(1,2), c(2,4))
 # integral(f(100,100), bounds = list(x = c(-Inf, Inf)))
+
+
+#Calculate WAP score
+
+
+

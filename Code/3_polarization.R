@@ -20,7 +20,13 @@ on18 %>%
     
   ))->on18
 
+
 table(on18$Primary_media)
+
+on18 <- on18 %>% 
+  mutate(
+    Primary_media = relevel(as.factor(Primary_media), ref = "Mixed")
+  )
 
 #### Political Knowledge #### 
 
@@ -64,8 +70,8 @@ on18 %>%
   ggplot(., aes(x=pol_knowledge))+geom_histogram()
 
 on18 %>% 
-  select(ends_with("correct")| "pol_knowledge") %>% 
-  View()
+  select(ends_with("correct")| "pol_knowledge") #%>% 
+  #View()
 on18$pol_knowledge
 on18 %>%
   group_by(Social_Use2) %>%
@@ -371,6 +377,11 @@ WAP_scores$WAP <- sqrt(WAP_scores$WAP)
 
 full_join(on18, WAP_scores, by = join_by(id)) -> on18
 
+on18 <- on18 %>% 
+  mutate(
+    WAP_sd = as.numeric(scale(WAP))
+  )
+
 on18 %>%
   group_by(Primary_media) %>%
   summarise(mean = mean(pointerst_ONint, na.rm = T), sd = sd(pointerst_ONint, na.rm = T))
@@ -380,91 +391,59 @@ on18 %>%
   group_by(Social_Use2) %>%
   summarise(mean = mean(WAP, na.rm = T), sd = sd(WAP, na.rm = T))
 
-#### CPC AFFECT POLARIZATION ####
-on18$partyeval_4_out
+#### WAP Leaders ####
+
+#leader 1 Ford, leader 2 Horwath, leader 3 Schreiner, leader 4 Wynne
+
+leader_affect <- on18 %>% 
+  select(c(id, leadereval_1_out:leadereval_4_out)) %>% 
+  rename(
+    Ford = leadereval_1_out,
+    Horwath = leadereval_2_out,
+    Schreiner = leadereval_3_out,
+    Wynne = leadereval_4_out
+  )
+
+leader_affect$Schreiner_Like_wt <- (leader_affect$Schreiner * 0.046)
+leader_affect$Ford_Like_wt <- (leader_affect$Ford * 0.405)
+leader_affect$Wynne_Like_wt <- (leader_affect$Wynne * 0.196)
+leader_affect$Horwath_Like_wt <- (leader_affect$Horwath * 0.336)
+
+leader_affect %>% 
+  rowwise() %>% 
+  mutate(mean_like=mean(c_across(6:9), na.rm=T))->leader_affect
+
+leader_affect <- leader_affect %>%
+  select(., !(6:9)) %>%
+  pivot_longer(cols = !c(id, mean_like),
+               names_to = "Leader", 
+               values_to = "Leader_like_score")
+
+leader_affect %>%
+  mutate(vote_share=case_when(Leader == "Schreiner" ~ 0.046, Leader == "Wynne" ~ 0.196, Leader == "Horwath" ~ 0.336, 
+                              Leader == "Ford" ~ 0.405
+                              
+  )) -> leader_affect
+
+leader_affect$like_mean <- (leader_affect$Leader_like_score - leader_affect$mean_like)^2
+leader_affect$like_mean_wt <- (leader_affect$like_mean * leader_affect$vote_share)
+
+leader_affect %>%
+  group_by(id) %>%
+  summarise(WAP_lead = sum(like_mean_wt)) -> leader_affect
+
+leader_affect$WAP_lead <- sqrt(leader_affect$WAP_lead)
+
+full_join(on18, leader_affect, by = join_by(id)) -> on18
+
+on18$wap_difference <- on18$WAP - on18$WAP_lead
 
 on18 <- on18 %>% 
   mutate(
-    Liberal_Like_wt = partyeval_1_out * 0.196,
-    NDP_Like_wt = partyeval_3_out * 0.336,
-    Green_Like_wt = partyeval_4_out * 0.046,
-    Con_Like_wt = partyeval_2_out * 0.405
+    WAP_lead_sd = as.numeric(scale(WAP_lead))
   )
 
-cpc_high <- on18 %>% 
-  filter((Social_Use2 == "Several times a day" | Social_Use2 == "About once a day" |  Social_Use2 == "Several times a week" | Social_Use2 == "About once a week"  |  Social_Use2 == "Several times a month")) %>% 
- select(c(Liberal_Like_wt,NDP_Like_wt,Green_Like_wt ,  Con_Like_wt)) %>% 
-  as.matrix()
 
-cpclow <- on18 %>% 
-  filter((Social_Use2 == "Several times in a year" | Social_Use2 == "Never" | Social_Use2 == "About once a month")) %>% 
-  select(c(Liberal_Like_wt,NDP_Like_wt,Green_Like_wt ,  Con_Like_wt)) %>% 
-  as.matrix()
-
-  
-  cpc_legacy <- on18 %>% 
-    filter(Primary_media == "Legacy") %>% 
-    select(c(Liberal_Like_wt,NDP_Like_wt,Green_Like_wt ,  Con_Like_wt)) %>% 
-    as.matrix()
-  
-  cpc_social <- on18 %>% 
-    filter(Primary_media == "Social_Media") %>% 
-    select(c(Liberal_Like_wt,NDP_Like_wt,Green_Like_wt ,  Con_Like_wt)) %>% 
-    as.matrix()
-  
-  cpc_online <- on18 %>% 
-    filter(Primary_media == "Online") %>% 
-    select(c(Liberal_Like_wt,NDP_Like_wt,Green_Like_wt ,  Con_Like_wt)) %>% 
-    na.omit() %>% 
-    as.matrix()
-  
-  cpc_mixed <- on18 %>% 
-    filter(Primary_media == "Mixed") %>% 
-    select(c(Liberal_Like_wt,NDP_Like_wt,Green_Like_wt ,  Con_Like_wt)) %>% 
-    as.matrix()
-
-set.seed(178)
-CPC(cpc_high, k = 4, type = "kmeans")
-set.seed(178)
-CPC(cpclow, k = 4, type = "kmeans")
-set.seed(178)
-CPC(cpc_legacy, k = 4, type = "kmeans")
-set.seed(178)
-CPC(cpc_social, k = 4, type = "kmeans")
-set.seed(178)
-CPC(cpc_online, k = 4, type = "kmeans")
-set.seed(178)
-CPC(cpc_mixed, k = 4, type = "kmeans")
-
-
-#### POLACKO POLICY POLARIZATION ####
-
-#create number of standard deviations from mean variable
-policies_social_use
-policies_social_use_sd_dis <- do.call(cbind, lapply(policies_social_use[, 1:11], sd_mean, na.rm = T)) 
-#Policies_social_use_sd_dis is now each R's distance from the mean in SD. 
-head(policies_social_use_sd_dis)
-policies_social_use_sd_dis %>%
-  bind_cols(., on18$Social_Use2)->policies_social_use_sd_dis
-names(policies_social_use_sd_dis)<-c(policy_names, "Social_Use2")
-
-
-#check to make sure function worked properly
-mean(policies$help_racial_minorities, na.rm = T)
-sd(policies$help_racial_minorities, na.rm = T)
-#observation #1
-# 0.95 = (x-x̄)/σ
-# 0.95 = (0.75-0.481)/0.282 
-# 0.95 = 0.95
-stopifnot(round(policies_social_use_sd_dis2[1 , 1], 3) == round(((0.75-0.4809809)/ 0.2815165), 3)) 
-#stop if function did not work properly 
-on18$Primary_media
-
-names(policies_social_use_sd_dis2)<-c(policy_names, "Social_Use2", "Primary_Media", "Interest")
-
-policies_social_use_sd_dis2 %>%
-  pivot_longer(cols = 1:11, names_to = "Policy_Issue", values_to = "distance") -> policies_social_use_sd_dis2_down
-policies_social_use_sd_dis2_down
 
 #### DESCRIPTIVE STATISTICS ####
 
@@ -559,138 +538,98 @@ summary(cfa_policies, fit.measures = T, standardized = T)
 
 #Create regression models for affective polarization using the weighted affective polarization (WAP) measure
 #**** Start thinking about control variables 
-WAP_primarymedia <- lm(WAP ~ Primary_media, data = on18, na.action = na.omit);summary(WAP_primarymedia) 
+WAP_reg <- list()
+WAP_graph <- list()
 
-WAP_primarymedia_graph <- graph_regression(WAP_primarymedia); WAP_primarymedia_graph
+WAP_reg[[1]] <- lm(WAP_sd ~ Primary_media, data = on18, na.action = na.omit);summary(WAP_reg[[1]]) 
+WAP_graph[[1]] <- graph_regression(WAP_reg[[1]]); WAP_graph[[1]]
 
-WAP_Interest <- lm(WAP ~ Interest, data = on18, na.action = na.omit); summary(WAP_Interest) 
-WAP_Interest_Graph <- graph_regression(WAP_Interest); WAP_Interest_Graph
+WAP_reg[[2]] <- lm(WAP_sd ~ Interest, data = on18, na.action = na.omit); summary(WAP_reg[[2]]) 
+WAP_graph[[2]] <- graph_regression(WAP_reg[[2]]); WAP_graph[[2]]
 
-WAP_Interact <- lm(WAP ~ Primary_media*Interest, data = on18, na.action = na.omit)
+
+WAP_reg[[3]] <- lm(WAP_sd ~ Interest + Primary_media, data = on18, na.action = na.omit); summary(WAP_reg[[3]]) 
+WAP_graph[[3]] <- graph_regression(WAP_reg[[3]]); WAP_graph[[3]]
+
+WAP_reg[[4]] <- lm(WAP_sd ~ Interest + Primary_media + age3, data = on18, na.action = na.omit); summary(WAP_reg[[4]]) 
+WAP_graph[[4]] <- graph_regression(WAP_reg[[4]]); WAP_graph[[4]]
+
+WAP_reg[[5]] <- lm(WAP_sd ~ Interest + Primary_media + age3 + degree, data = on18, na.action = na.omit); summary(WAP_reg[[5]]) 
+WAP_graph[[5]] <- graph_regression(WAP_reg[[5]]); WAP_graph[[5]]
+
+WAP_reg[[6]] <- lm(WAP_sd ~ Interest + Primary_media + age3 + degree + income3, data = on18, na.action = na.omit); summary(WAP_reg[[6]]) 
+WAP_graph[[6]] <- graph_regression(WAP_reg[[6]]); WAP_graph[[6]]
+
+WAP_reg[[7]] <- lm(WAP_sd ~ Interest + Primary_media + age3 + degree + income3 + pol_knowledge, data = on18, na.action = na.omit); summary(WAP_reg[[7]]) 
+WAP_graph[[7]] <- graph_regression(WAP_reg[[7]]); WAP_graph[[7]]
+
+
+WAP_Interact <- lm(WAP_sd ~ Primary_media*Interest, data = on18, na.action = na.omit)
 summary(WAP_Interact)
 
-#Visualize the marginal effects from the interaction effects
-WAP_Interact %>% 
-ggeffect(c("Interest", "Primary_media")) %>% 
-  graph_interaction() -> WAP_Interact_graph
+WAP_Interact2 <- lm(WAP_sd ~ Primary_media*Interest  + age3 + degree + income3 + pol_knowledge, data = on18, na.action = na.omit)
+summary(WAP_Interact2)
 
+#Visualize the marginal effects from the interaction effects
+marginaleffects::plot_slopes(WAP_Interact, variables = "Interest", condition = "Primary_media") + geom_hline(yintercept  = 0, lty = "dashed", col = "forestgreen") + theme_bw()
+marginaleffects::plot_slopes(WAP_Interact2, variables = "Interest", condition = "Primary_media") + geom_hline(yintercept  = 0, lty = "dashed", col = "forestgreen") + theme_bw()
 
 #Display Models
-modelsummary(list(WAP_primarymedia, WAP_Interest, WAP_Interact), stars = T) #As numbers
+modelsummary(WAP_reg, stars = T, vcov = "HC0") #As numbers
+
+
 ggarrange(plotlist = list(WAP_primarymedia_graph, WAP_Interest_Graph, WAP_Interact_graph))
 
-#Create regression models for policy polarization
-
-
-
-mods_Interest <- policies_social_use_sd_dis2_down %>%
-  group_by(Policy_Issue) %>%
-  summarise(lm_mod = list(lm(distance ~ Interest))) %>% 
-  mutate(tidied = map(lm_mod, tidy, conf.int = T)) 
-
-mods_Interest
-modelsummary(mods_Interest$lm_mod, stars=T)
-
-#Make graph
-mods_Interest %>% 
-  unnest(tidied) %>% 
-  filter(term!="(Intercept)") %>% 
-  ggplot(., aes(x=estimate, y=fct_reorder(Policy_Issue, estimate)))+
-  geom_pointrange(aes(xmin=estimate-(1.96*std.error), xmax=estimate+(1.96*std.error)))
-
-table(on18$Primary_media)
-mods_media <- policies_social_use_sd_dis2_down %>%
-  group_by(Policy_Issue) %>%
-  summarise(lm_mod = list(lm(distance ~ Primary_Media))) %>% 
-  mutate(tidied = map(lm_mod, tidy, conf.int = T))
-
-modelsummary(mods_media$lm_mod, stars=T)
-mods_media$lm_mod
-mods_media %>% 
-  unnest(tidied) %>% 
-  filter(term!="(Intercept)") %>% 
-  ggplot(., aes(x=estimate, y=fct_reorder(Policy_Issue, estimate), col=term))+
-  geom_pointrange(position="jitter", aes(xmin=estimate-(1.96*std.error), xmax=estimate+(1.96*std.error)))
-
-
-mods_all <- policies_social_use_sd_dis2_down %>%
-  group_by(Policy_Issue) %>%
-  summarise(lm_mod = list(lm(distance ~ Interest + Primary_Media))) %>% 
-  mutate(tidied = map(lm_mod, tidy, conf.int = T)) 
-
-modelsummary(mods_all$lm_mod, stars=T)
-
-mods_interact <- policies_social_use_sd_dis2_down %>%
-  group_by(Policy_Issue) %>%
-  summarise(lm_mod = list(lm(distance ~ Interest*Primary_Media))) %>% 
-  mutate(tidied = map(lm_mod, tidy, conf.int = T)) 
-
-modelsummary(mods_interact$lm_mod, stars=T)
-str(policies_social_use_sd_dis2_down)
-#graph models
-
-mods_Interest %>%
-  unnest(tidied) %>% 
-  filter(term!="(Intercept)") %>% 
-  ggplot(aes(x = estimate, y = term)) + geom_point() + 
-  geom_linerange(aes(xmin=conf.low, xmax = conf.high), position = position_dodge(width=.75)) +
-  facet_wrap(~Policy_Issue, labeller = label_wrap_gen(width=30)) + geom_vline(xintercept = 0) + theme_bw()
-
-mods_media %>% 
-  unnest(tidied) %>% 
-  filter(term!="(Intercept)") %>% 
-  ggplot(aes(x = estimate, y = term)) + geom_point() + 
-  geom_linerange(aes(xmin=conf.low, xmax = conf.high), position = position_dodge(width=.75)) +
-  facet_wrap(~Policy_Issue, labeller = label_wrap_gen(width=30)) + geom_vline(xintercept = 0) + theme_bw()
-
-mods_all %>% 
-  unnest(tidied) %>% 
-  filter(term!="(Intercept)") %>% 
-  ggplot(aes(x = estimate, y = term)) + geom_point() + 
-  geom_linerange(aes(xmin=conf.low, xmax = conf.high), position = position_dodge(width=.75)) +
-  facet_wrap(~Policy_Issue, labeller = label_wrap_gen(width=30)) + geom_vline(xintercept = 0) + theme_bw()
-
-
-mods_interact %>% 
-  unnest(tidied) %>% 
-  filter(term!="(Intercept)") %>% 
-  ggplot(aes(x = estimate, y = term)) + geom_point() + 
-  geom_linerange(aes(xmin=conf.low, xmax = conf.high), position = position_dodge(width=.75)) +
-  facet_wrap(~Policy_Issue, labeller = label_wrap_gen(width=30)) + geom_vline(xintercept = 0) + theme_bw() -> interaction_models
-ggsave("Plots/interaction_models.png", plot = interaction_models)
-
-
-#Create graphs of the marginal effects of the interaction models using the functions defined in "0_functions.R"
-marginaleffects::plot_slopes(mods_interact[[2]][[1]], variables = "Interest", condition = "Primary_Media") + geom_hline(yintercept  = 0, lty = "dashed", col = "forestgreen") + theme_bw()
-marginaleffects::plot_slopes(mods_interact[[2]][[2]], variables = "Interest", condition = "Primary_Media") + geom_hline(yintercept  = 0, lty = "dashed", col = "forestgreen") + theme_bw()
-marginaleffects::plot_slopes(mods_interact[[2]][[3]], variables = "Interest", condition = "Primary_Media") + geom_hline(yintercept  = 0, lty = "dashed", col = "forestgreen") + theme_bw()
-marginaleffects::plot_slopes(mods_interact[[2]][[4]], variables = "Interest", condition = "Primary_Media") + geom_hline(yintercept  = 0, lty = "dashed", col = "forestgreen") + theme_bw()
-marginaleffects::plot_slopes(mods_interact[[2]][[5]], variables = "Interest", condition = "Primary_Media") + geom_hline(yintercept  = 0, lty = "dashed", col = "forestgreen") + theme_bw()
-marginaleffects::plot_slopes(mods_interact[[2]][[6]], variables = "Interest", condition = "Primary_Media") + geom_hline(yintercept  = 0, lty = "dashed", col = "forestgreen") + theme_bw()
-marginaleffects::plot_slopes(mods_interact[[2]][[7]], variables = "Interest", condition = "Primary_Media") + geom_hline(yintercept  = 0, lty = "dashed", col = "forestgreen") + theme_bw()
-marginaleffects::plot_slopes(mods_interact[[2]][[8]], variables = "Interest", condition = "Primary_Media") + geom_hline(yintercept  = 0, lty = "dashed", col = "forestgreen") + theme_bw()
-marginaleffects::plot_slopes(mods_interact[[2]][[9]], variables = "Interest", condition = "Primary_Media") + geom_hline(yintercept  = 0, lty = "dashed", col = "forestgreen") + theme_bw()
-marginaleffects::plot_slopes(mods_interact[[2]][[10]], variables = "Interest", condition = "Primary_Media") + geom_hline(yintercept  = 0, lty = "dashed", col = "forestgreen") + theme_bw()
-marginaleffects::plot_slopes(mods_interact[[2]][[11]], variables = "Interest", condition = "Primary_Media") + geom_hline(yintercept  = 0, lty = "dashed", col = "forestgreen") + theme_bw()
-
 #### Affective polarization models ####
-affect_models <- list()
-affect_models[[1]] <- lm(WAP ~ Interest, data = on18, na.action = na.omit)
 
-affect_models[[2]] <- lm(WAP ~ Primary_media, data = on18, na.action = na.omit)
+#Create regression models for affective polarization using the weighted affective polarization (WAP) measure
+WAP_lead_reg <- list()
+WAP_lead_graph <- list()
 
-affect_models[[3]] <- lm(WAP ~ Interest + Primary_media, data = on18, na.action = na.omit)
+WAP_lead_reg[[1]] <- lm(WAP_lead_sd ~ Primary_media, data = on18, na.action = na.omit);summary(WAP_lead_reg[[1]]) 
 
-affect_models[[4]] <- lm(WAP ~ Interest * Primary_media, data = on18, na.action = na.omit)
-modelsummary(affect_models, stars = T)
-marginaleffects::plot_slopes(affect_models[[4]], variables = "Interest", condition = "Primary_media") + geom_hline(yintercept  = 0, lty = "dashed", col = "forestgreen") + theme_bw()
+WAP_lead_graph[[1]] <- graph_regression(WAP_lead_reg[[1]]); WAP_lead_graph[[1]]
+
+WAP_lead_reg[[2]] <- lm(WAP_lead_sd ~ Interest, data = on18, na.action = na.omit); summary(WAP_lead_reg[[2]]) 
+WAP_lead_graph[[2]] <- graph_regression(WAP_lead_reg[[2]]); WAP_lead_graph[[2]]
+
+
+WAP_lead_reg[[3]] <- lm(WAP_lead_sd ~ Interest + Primary_media, data = on18, na.action = na.omit); summary(WAP_lead_reg[[3]]) 
+WAP_lead_graph[[3]] <- graph_regression(WAP_lead_reg[[3]]); WAP_lead_graph[[3]]
+
+WAP_lead_reg[[4]] <- lm(WAP_lead_sd ~ Interest + Primary_media + age3, data = on18, na.action = na.omit); summary(WAP_lead_reg[[4]]) 
+WAP_lead_graph[[4]] <- graph_regression(WAP_lead_reg[[4]]); WAP_lead_graph[[4]]
+
+WAP_lead_reg[[5]] <- lm(WAP_lead_sd ~ Interest + Primary_media + age3 + degree, data = on18, na.action = na.omit); summary(WAP_lead_reg[[5]]) 
+WAP_lead_graph[[5]] <- graph_regression(WAP_lead_reg[[5]]); WAP_lead_graph[[5]]
+
+WAP_lead_reg[[6]] <- lm(WAP_lead_sd ~ Interest + Primary_media + age3 + degree + income3, data = on18, na.action = na.omit); summary(WAP_lead_reg[[6]]) 
+WAP_lead_graph[[6]] <- graph_regression(WAP_lead_reg[[6]]); WAP_lead_graph[[6]]
+
+WAP_lead_reg[[7]] <- lm(WAP_lead_sd ~ Interest + Primary_media + age3 + degree + income3 + pol_knowledge, data = on18, na.action = na.omit); summary(WAP_lead_reg[[7]]) 
+WAP_lead_graph[[7]] <- graph_regression(WAP_lead_reg[[7]]); WAP_lead_graph[[7]]
+
+WAP_lead_Interact <- lm(WAP_lead_sd ~ Primary_media*Interest, data = on18, na.action = na.omit)
+summary(WAP_lead_Interact)
+
+WAP_lead_Interact2 <- lm(WAP_lead_sd ~ Primary_media*Interest + age3 + degree + income3 + pol_knowledge, data = on18, na.action = na.omit)
+summary(WAP_lead_Interact2)
+
+#Visualize the marginal effects from the interaction effects
+marginaleffects::plot_slopes(WAP_lead_Interact, variables = "Interest", condition = "Primary_media") +
+  geom_hline(yintercept  = 0, lty = "dashed", col = "forestgreen") + coord_flip() + theme_bw()
+marginaleffects::plot_slopes(WAP_lead_Interact2, variables = "Interest", condition = "Primary_media") +
+  geom_hline(yintercept  = 0, lty = "dashed", col = "forestgreen") + coord_flip() + theme_bw()
+
+#Display Models
+modelsummary(WAP_lead_reg, stars = T, vcov = "HC0") #As numbers
+
 
 #### BIMODALITY COEFFICENT ####
   
 #### Primary Media ####
-bimod_online <- bimodality_coefficient(policy_online, na.rm = T)
-bimod_leacgy <- bimodality_coefficient(policy_legacy, na.rm = T)
-bimodality_coefficient(policy_online, na.rm = T)
+bimod_online <- bimodality_coefficient(policy_online, na.rm = T); bimod_online
+bimod_leacgy <- bimodality_coefficient(policy_legacy, na.rm = T); bimod_leacgy
 bimodality_coefficient(policy_social_media, na.rm = T)
 bimodality_coefficient(policy_mixed, na.rm = T)
 
@@ -714,7 +653,8 @@ bimod_mixed <- policy_mixed %>%
   labs(title = "Mixed media", subtitle = "Bimodality Coefficent (0.32)", x = "Policy Positions", y = NULL) +
   theme_bw()
 
-gridExtra::grid.arrange(bimod_legacy, bimod_online, bimod_social, bimod_mixed)
+gridExtra::grid.arrange(bimod_legacy, bimod_online, bimod_social, bimod_mixed) 
+
 
 #### Social Use ####
 
@@ -731,35 +671,67 @@ bimod_rarely <- policy_rarely %>%
   labs(title = "Uses Social Media Rarely", subtitle = "Bimodality Coefficent (0.33)", x = "Policy Positions", y = NULL) +
   theme_bw()
 
-gridExtra::grid.arrange(bimod_often, bimod_rarely)
+gridExtra::grid.arrange(bimod_often, bimod_rarely) 
+
 
 #### OVERLAP COEFFICENTS GRAPHS ####
 
-overlap(policy_left_legacy, policy_conservatives_legacy)
+policy_left_legacy_vector <- as.double(policy_left_legacy$policy_polarization) %>% 
+  na.omit() 
+policy_conservatives_legacy_vector <- as.double(policy_conservatives_legacy$policy_polarization) %>% 
+  na.omit() 
 
-#legacy_overlap <- data.frame(as.vector(policy_left_legacy), as.vector(policy_conservatives_legacy))
+
+overlapping::overlap(list(policy_left_legacy_vector, policy_conservatives_legacy_vector))
+overlapping::boot.overlap(list(policy_left_legacy_vector, policy_conservatives_legacy_vector), B = 1000)
+
+
+#bayestestR::overlap(policy_left_legacy_vector, policy_conservatives_legacy_vector)
+
 
 overlap_legacy <- ggplot() + geom_density(aes(policy_polarization), data = policy_left_legacy, col = "red", fill = "red", alpha = 0.4) + 
   labs(title = "Legacy Media", subtitle = "Overlap Coefficent (0.66)", x = "Policy Positions", y = NULL) +
   geom_density(aes(policy_polarization), data = policy_conservatives_legacy, col = "blue", fill = "blue", alpha = 0.4) + theme_bw()
 
 
-overlap(policy_left_online, policy_conservatives_online)
+policy_left_online_vector <- as.double(policy_left_online$policy_polarization) %>% 
+  na.omit() 
+policy_conservatives_online_vector <- as.double(policy_conservatives_online$policy_polarization) %>% 
+  na.omit() 
+
+overlapping::overlap(list(policy_left_online_vector, policy_conservatives_online_vector))
+overlapping::boot.overlap(list(policy_left_online_vector, policy_conservatives_online_vector), B = 1000)
+
+#bayestestR::overlap(policy_left_online, policy_conservatives_online)
 
 overlap_online <- ggplot() + geom_density(aes(policy_polarization), data = policy_left_online, col = "red", fill = "red", alpha = 0.4) + 
   labs(title = "Online Media", subtitle = "Overlap Coefficent (0.59)", x = "Policy Positions", y = NULL) +
   geom_density(aes(policy_polarization), data = policy_conservatives_online, col = "blue", fill = "blue", alpha = 0.4) + theme_bw()
 
+policy_left_media_vector <- as.double(policy_left_social_media$policy_polarization) %>% 
+  na.omit() 
+policy_conservatives_media_vector <- as.double(policy_conservatives_media$policy_polarization) %>% 
+  na.omit() 
 
-overlap(policy_left_social_media, policy_conservatives_media)
+overlapping::overlap(list(policy_left_media_vector, policy_conservatives_media_vector))
+overlapping::boot.overlap(list(policy_left_media_vector, policy_conservatives_media_vector), B = 1000)
+
+#bayestestR::overlap(policy_left_social_media, policy_conservatives_media)
 
 overlap_smedia <- ggplot() + geom_density(aes(policy_polarization), data = policy_left_social_media, col = "red", fill = "red", alpha = 0.4) + 
   labs(title = "Online Media", subtitle = "Overlap Coefficent (0.74)", x = "Policy Positions", y = NULL) +
   geom_density(aes(policy_polarization), data = policy_conservatives_media, col = "blue", fill = "blue", alpha = 0.4) + theme_bw()
 
+policy_left_mixed_vector <- as.double(policy_left_mixed$policy_polarization) %>% 
+  na.omit() 
+policy_conservatives_mixed_vector <- as.double(policy_conservatives_mixed$policy_polarization) %>% 
+  na.omit() 
 
 
-overlap(policy_left_mixed, policy_conservatives_mixed)
+
+overlapping::overlap(list(policy_left_mixed_vector, policy_conservatives_mixed_vector))
+overlapping::boot.overlap(list(policy_left_mixed_vector, policy_conservatives_mixed_vector), B = 1000)
+#bayestestR::overlap(policy_left_mixed, policy_conservatives_mixed)
 
 overlap_mixed <- ggplot() + geom_density(aes(policy_polarization), data = policy_left_mixed, col = "red", fill = "red", alpha = 0.4) +
   labs(title = "Mixed Media", subtitle = "Overlap Coefficent (0.70)", x = "Policy Positions", y = NULL) +
@@ -769,15 +741,31 @@ ggpubr::ggarrange(overlap_legacy, overlap_online, overlap_smedia, overlap_mixed)
 
 #### OVERLAP FOR SOCIAL USE ####
 
+policy_left_often_vector <- as.double(policy_left_often$policy_polarization) %>% 
+  na.omit() 
+policy_conservative_often_vector <- as.double(policy_conservative_often$policy_polarization) %>% 
+  na.omit() 
 
-overlap(policy_left_often, policy_conservative_often)
+
+overlapping::overlap(list(policy_left_often_vector, policy_conservative_often_vector))
+overlapping::boot.overlap(list(policy_left_often_vector, policy_conservative_often_vector), B = 1000)
+
+#bayestestR::overlap(policy_left_often, policy_conservative_often)
 
 overlap_often <- ggplot() + geom_density(aes(policy_polarization), data = policy_left_often, col = "red", fill = "red", alpha = 0.4) + 
   geom_density(aes(policy_polarization), data = policy_conservative_often, col = "blue", fill = "blue", alpha = 0.4) +
   labs(title = "Uses Social Media Often", subtitle = "Overlap Coefficent (0.53)", x = "Policy Positions", y = NULL) + theme_bw()
 
+policy_left_rarely_vector <- as.double(policy_left_rarely$policy_polarization) %>% 
+  na.omit() 
+policy_conservative_social_rarely_vector <- as.double(policy_conservative_social_rarely$policy_polarization) %>% 
+  na.omit() 
 
-overlap(policy_left_rarely, policy_conservative_social_rarely)
+
+
+overlapping::overlap(list(policy_left_rarely_vector, policy_conservative_social_rarely_vector))
+overlapping::boot.overlap(list(policy_left_rarely_vector, policy_conservative_social_rarely_vector), B = 1000)
+#bayestestR::overlap(policy_left_rarely_vector, policy_conservative_social_rarely_vector)
 
 overlap_rarely <- ggplot() + geom_density(aes(policy_polarization), data = policy_left_rarely, col = "red", fill = "red", alpha = 0.4) + 
   geom_density(aes(policy_polarization), data = policy_conservative_social_rarely, col = "blue", fill = "blue", alpha = 0.4) +
@@ -790,6 +778,7 @@ ggpubr::ggarrange(overlap_often, overlap_rarely, ncol = 1)
 #report the null of the social media use
 #make the positive finding more interesting
 #statistical tests with Overlap coefficients 
+
 
 
 

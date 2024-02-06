@@ -23,7 +23,7 @@ Help Racial Minorities
  
   - Strongly Agree (0), Agree, Disagree, Strongly Disagree (1); else NA
   
-  Private Healthcare should be availible 
+  Private Healthcare should be available 
   
   - Strongly Agree (1), Agree, Disagree, Strongly Disagree (0); else NA
   
