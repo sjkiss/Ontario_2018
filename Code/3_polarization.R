@@ -492,25 +492,13 @@ mean_affect_scores %>%
   theme(axis.text.y=element_blank(),
         axis.ticks.y = element_blank(), 
         strip.text = element_text(size=8))+
-  guides(color=guide_legend(reverse=T))+xlim(c(0,0.5)) -> affect_scores_social_use
-affect_scores_social_use
+  guides(color=guide_legend(reverse=T))+xlim(c(0,0.5)) -> affect_scores_social_use; affect_scores_social_use
 
 on18 %>%
   group_by(Primary_media) %>%
   summarise(mean = mean(Soc_dis, na.rm = T), sd = sd(Soc_dis, na.rm = T))
 
-#### Policy Polarization ####
 
-policies_social_use_sd_dis %>%
-  group_by(Social_Use2) %>%
-  summarise( across(everything(), list(.mean = mean, .se = se), na.rm = T )) -> policies_social_use_sd_dis_mean
-policies_social_use_sd_dis_mean
-
-#on18 <- cbind(on18, policies_social_use_sd_dis)
-
-policies_social_use_sd_dis %>%
-  bind_cols(., on18$Primary_media) %>%
-  bind_cols(., on18$Interest) ->policies_social_use_sd_dis2
 
 #### Policy Position Distribution ####
 
@@ -541,7 +529,7 @@ summary(cfa_policies, fit.measures = T, standardized = T)
 WAP_reg <- list()
 WAP_graph <- list()
 
-WAP_reg[[1]] <- lm(WAP_sd ~ Primary_media, data = on18, na.action = na.omit);summary(WAP_reg[[1]]) 
+WAP_reg[[1]] <- lm(WAP ~ Primary_media, data = on18, na.action = na.omit);summary(WAP_reg[[1]]) 
 WAP_graph[[1]] <- graph_regression(WAP_reg[[1]]); WAP_graph[[1]]
 
 WAP_reg[[2]] <- lm(WAP_sd ~ Interest, data = on18, na.action = na.omit); summary(WAP_reg[[2]]) 
@@ -551,8 +539,49 @@ WAP_graph[[2]] <- graph_regression(WAP_reg[[2]]); WAP_graph[[2]]
 WAP_reg[[3]] <- lm(WAP_sd ~ Interest + Primary_media, data = on18, na.action = na.omit); summary(WAP_reg[[3]]) 
 WAP_graph[[3]] <- graph_regression(WAP_reg[[3]]); WAP_graph[[3]]
 
-WAP_reg[[4]] <- lm(WAP_sd ~ Interest + Primary_media + age3, data = on18, na.action = na.omit); summary(WAP_reg[[4]]) 
+WAP_reg[[4]] <- lm(WAP_sd ~ Interest + Primary_media + age3 + I(age3^2), data = on18, na.action = na.omit); summary(WAP_reg[[4]]) 
 WAP_graph[[4]] <- graph_regression(WAP_reg[[4]]); WAP_graph[[4]]
+
+
+on18$Primary_media
+predict_legacy <- data.frame(age3 = seq(0.18, 1, 0.01), 
+           Primary_media = rep("Legacy", 83), 
+           Interest = mean(on18$Interest, na.rm = T)
+           )
+
+predict_legacy[ , c("predicted_values", 
+                    "predicted_lower",
+                    "predicted_upper")] <- predict(WAP_reg[[4]], predict_legacy, interval = "confidence")
+
+
+predict_online <- data.frame(age3 = seq(0.18, 1, 0.01), 
+                             Primary_media = rep("Online", 83), 
+                             Interest = mean(on18$Interest, na.rm = T)
+)
+
+
+predict_online[ , c("predicted_values", 
+                    "predicted_lower",
+                    "predicted_upper")] <- predict(WAP_reg[[4]], predict_online, interval = "confidence")
+
+
+predict_social <- data.frame(age3 = seq(0.18, 1, 0.01), 
+                             Primary_media = rep("Social_Media", 83), 
+                             Interest = mean(on18$Interest, na.rm = T)
+)
+
+
+predict_social[ , c("predicted_values", 
+                    "predicted_lower",
+                    "predicted_upper")] <- predict(WAP_reg[[4]], predict_social, interval = "confidence")
+
+
+ggplot() + geom_line(aes(y = predicted_values, x = age3), predict_legacy, col = "blue") + 
+  geom_ribbon(aes(x = age3, ymin = predicted_lower, ymax = predicted_upper), predict_legacy, alpha = 0.1, fill = "blue" , col = "blue", lty = "dashed") + 
+  geom_line(aes(y = predicted_values, x = age3), predict_online, col = "forestgreen") + 
+  geom_ribbon(aes(x = age3, ymin = predicted_lower, ymax = predicted_upper), predict_online, alpha = 0.1, col = "forestgreen", lty = "dotted", fill = "forestgreen") + 
+  geom_line(aes(y = predicted_values, x = age3), predict_social, col = "darkred") + 
+geom_ribbon(aes(x = age3, ymin = predicted_lower, ymax = predicted_upper), predict_social, alpha = 0.1, col = "darkred", fill = "darkred") + theme_bw()
 
 WAP_reg[[5]] <- lm(WAP_sd ~ Interest + Primary_media + age3 + degree, data = on18, na.action = na.omit); summary(WAP_reg[[5]]) 
 WAP_graph[[5]] <- graph_regression(WAP_reg[[5]]); WAP_graph[[5]]
@@ -562,6 +591,8 @@ WAP_graph[[6]] <- graph_regression(WAP_reg[[6]]); WAP_graph[[6]]
 
 WAP_reg[[7]] <- lm(WAP_sd ~ Interest + Primary_media + age3 + degree + income3 + pol_knowledge, data = on18, na.action = na.omit); summary(WAP_reg[[7]]) 
 WAP_graph[[7]] <- graph_regression(WAP_reg[[7]]); WAP_graph[[7]]
+
+summary(lm(WAP_sd ~ age2, data = on18))
 
 
 WAP_Interact <- lm(WAP_sd ~ Primary_media*Interest, data = on18, na.action = na.omit)
@@ -578,7 +609,7 @@ marginaleffects::plot_slopes(WAP_Interact2, variables = "Interest", condition = 
 modelsummary(WAP_reg, stars = T, vcov = "HC0") #As numbers
 
 
-ggarrange(plotlist = list(WAP_primarymedia_graph, WAP_Interest_Graph, WAP_Interact_graph))
+#ggarrange(plotlist = list(WAP_primarymedia_graph, WAP_Interest_Graph, WAP_Interact_graph))
 
 #### Affective polarization models ####
 
@@ -676,6 +707,21 @@ gridExtra::grid.arrange(bimod_often, bimod_rarely)
 
 #### OVERLAP COEFFICENTS GRAPHS ####
 
+on18$partyvote2018
+left_wing <- on18 %>% 
+  filter(partyvote2018 == 1 | partyvote2018 == 3) %>% 
+  select(policy_polarization) %>% 
+  na.omit() 
+
+right_wing <- on18 %>% 
+  filter(partyvote2018 == 2) %>% 
+  select(policy_polarization) %>% 
+  na.omit()  
+
+
+overlapping::overlap(list(as.double(left_wing$policy_polarization), 
+                          as.double(right_wing$policy_polarization)))
+
 policy_left_legacy_vector <- as.double(policy_left_legacy$policy_polarization) %>% 
   na.omit() 
 policy_conservatives_legacy_vector <- as.double(policy_conservatives_legacy$policy_polarization) %>% 
@@ -719,7 +765,7 @@ overlapping::boot.overlap(list(policy_left_media_vector, policy_conservatives_me
 #bayestestR::overlap(policy_left_social_media, policy_conservatives_media)
 
 overlap_smedia <- ggplot() + geom_density(aes(policy_polarization), data = policy_left_social_media, col = "red", fill = "red", alpha = 0.4) + 
-  labs(title = "Online Media", subtitle = "Overlap Coefficent (0.74)", x = "Policy Positions", y = NULL) +
+  labs(title = "Social Media", subtitle = "Overlap Coefficent (0.74)", x = "Policy Positions", y = NULL) +
   geom_density(aes(policy_polarization), data = policy_conservatives_media, col = "blue", fill = "blue", alpha = 0.4) + theme_bw()
 
 policy_left_mixed_vector <- as.double(policy_left_mixed$policy_polarization) %>% 
@@ -764,7 +810,8 @@ policy_conservative_social_rarely_vector <- as.double(policy_conservative_social
 
 
 overlapping::overlap(list(policy_left_rarely_vector, policy_conservative_social_rarely_vector))
-overlapping::boot.overlap(list(policy_left_rarely_vector, policy_conservative_social_rarely_vector), B = 1000)
+overlapping::boot.overlap(list(policy_left_rarely_vector,
+                               policy_conservative_social_rarely_vector), B = 1000)
 #bayestestR::overlap(policy_left_rarely_vector, policy_conservative_social_rarely_vector)
 
 overlap_rarely <- ggplot() + geom_density(aes(policy_polarization), data = policy_left_rarely, col = "red", fill = "red", alpha = 0.4) + 

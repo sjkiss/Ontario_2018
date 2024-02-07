@@ -4,7 +4,7 @@ pacman::p_load("tidyverse",
                "mousetrap",
                "lavaan",
                "psych",
-               "OVL.CI")
+               "overlapping")
 # Binary recode function for political knowledge
 binaryrecode <-  function(x){
   if_else(x==1, 1, 0)

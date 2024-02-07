@@ -94,13 +94,17 @@ source("Code/3_polarization.R")
 ### Affective polarization
 
 We observe affective polarization using two commonly used measured to measure affective polarization in multiple party systems. The first first measure, developed by @wagnerAffectivePolarizationMultiparty2021, creates an individual affective polarization score for each respondent based on the *spread* party like scores for each of Ontario's four major political parties. Like scores for the parties are drawn from feelings thermometers that ask respondents to rate the parties on a scale from 0 to 5 (See the Supplemental Materials for full question wordings).\
-For formally the Weighted Affective Polarization (WAP) equation measured spread for parties j and voters i: $$
+For formally the Weighted Affective Polarization (WAP) equation measured spread for parties j and voters i: 
+$$
     Spread_i = \sqrt{\sum^{P}_{p=1}v_p(like_{ip} - \overline{like_i})^2}
-$$ where $v_p$ is the vote share of each party measured as proportion with a range of 0 to 1, and the mean affect scores weighted by party using the following equation:
+$$ 
+where $v_p$ is the vote share of each party measured as proportion with a range of 0 to 1, and the mean affect scores weighted by party using the following equation:
 
 $$
     \overline{like_i} = \sum^P_{p=1}(v_p * like_{ip})
-$$ The WAP scores are then used in OLS regression with the independent variables discussed above to determine understand the relationship between social media usage, political interest and affective polarization.
+$$ 
+
+The WAP scores are then used in OLS regression with the independent variables discussed above to determine understand the relationship between social media usage, political interest and affective polarization.
 
 ### Policy polarization
 
@@ -121,7 +125,7 @@ We also use the distinctiveness coefficient first used to measure levels of pola
 $$
 OVL = \int^{+\infty}_{-\infty}|f(x) - g(x)|dx
 $$ 
-where $f(x)$ is the probability density function (PDF) of one ideological distribution and $g(x)$ is the PDF of another. We calculate the the OVL using the `overlap` function from the `bayestestR` package in `R`. We compare the distributions of those who voted for the Liberal and NDP parties (left-leaning parties) to those who voted for the Conservative Party (right-leaning party) for those primarily receive news from legacy media, online media sources, social media, and those who primarily use a mix of the three and for those who use social media regularly and those who do not. In order to compare
+where $f(x)$ is the probability density function (PDF) of one ideological distribution and $g(x)$ is the PDF of another. We calculate the the OVL using the `overlap` function from the `bayestestR` package in `R` ##fix. We compare the distributions of those who voted for the Liberal and NDP parties (left-leaning parties) to those who voted for the Conservative Party (right-leaning party) for those primarily receive news from legacy media, online media sources, social media, and those who primarily use a mix of the three and for those who use social media regularly and those who do not. In order to compare
 
 ## Results
 

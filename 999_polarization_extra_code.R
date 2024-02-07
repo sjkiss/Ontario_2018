@@ -412,3 +412,16 @@ names(policies_social_use_sd_dis2)<-c(policy_names, "Social_Use2", "Primary_Medi
 policies_social_use_sd_dis2 %>%
   pivot_longer(cols = 1:11, names_to = "Policy_Issue", values_to = "distance") -> policies_social_use_sd_dis2_down
 policies_social_use_sd_dis2_down
+
+#### Policy Polarization ####
+
+policies_social_use_sd_dis %>%
+  group_by(Social_Use2) %>%
+  summarise( across(everything(), list(.mean = mean, .se = se), na.rm = T )) -> policies_social_use_sd_dis_mean
+policies_social_use_sd_dis_mean
+
+#on18 <- cbind(on18, policies_social_use_sd_dis)
+
+policies_social_use_sd_dis %>%
+  bind_cols(., on18$Primary_media) %>%
+  bind_cols(., on18$Interest) ->policies_social_use_sd_dis2
