@@ -10,7 +10,7 @@ library(ggpubr)
 #### Import Data####
 on18<-read_sav(file=here("Data/Ontario ES 2018 LISPOP.sav"))
 names(on18)
-
+table(on18$`filter_$`)
 library(car)
 #### Individual Finanical Situation Questions ####
 #Recode $50 stress question, 1 disagree, 0 disagree
@@ -488,8 +488,9 @@ on18$Social_Use2<-car::Recode(on18$Social_Use, "'Never'='Never' ;
 'About once a day', 
 'Several times a day'))
 table(on18$Social_Use2)
+
 #### Export to SPSS File ####
 names(on18)
-write_sav(on18, path=here("data/on18_with_emotion_responses.sav"))
+#write_sav(on18, path=here("data/on18_with_emotion_responses.sav"))
 
 
