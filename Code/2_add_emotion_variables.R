@@ -1,3 +1,4 @@
+library(here)
 source(here("Code/1_load_on18.R"))
 
 #Now read in the spellchecked emotions file. 
