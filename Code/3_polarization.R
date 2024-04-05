@@ -21,6 +21,7 @@ on18 %>%
   ))->on18
 
 
+
 table(on18$Primary_)
 
 # on18 <- on18 %>% 
@@ -603,7 +604,7 @@ modelsummary(WAP_reg, stars = T, vcov = "HC0") #As numbers
 #Investigating the age coefficient
 summary(lm(WAP_sd ~ age, data = on18))
 summary(lm(WAP_sd ~ age + I(age^2), data = on18))
-age_poly <- lm(WAP_sd ~ Interest + Primary_media + age + I(age^2), data = on18, na.action = na.omit); summary(age_poly)
+age_poly <- lm(WAP_sd ~ Interest + Primary_media * (age + I(age^2)), data = on18, na.action = na.omit); summary(age_poly)
 summary(lm(WAP_sd ~ Interest + Primary_media + age + I(age^2) + degree + income3 + pol_knowledge, data = on18, na.action = na.omit))
 
 
