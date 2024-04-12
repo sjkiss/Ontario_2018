@@ -3,7 +3,7 @@ title: "Appendix"
 format: pdf
 ---
 
-## Coding Decisions
+## Question Wordings
 
 ### Ideological Polarization Measure
 

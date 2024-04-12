@@ -444,6 +444,7 @@ on18 <- on18 %>%
     WAP_lead_sd = as.numeric(scale(WAP_lead))
   )
 
+mean(on18$wap_difference, na.rm = T)
 
 
 #### DESCRIPTIVE STATISTICS ####
@@ -601,17 +602,44 @@ marginaleffects::plot_slopes(WAP_Interact2, variables = "Interest", condition = 
 #Display Models
 modelsummary(WAP_reg, stars = T, vcov = "HC0") #As numbers
 
+WAP_reg_df <- map(WAP_reg, tidy) 
+WAP_reg_df_ci <- map(WAP_reg, confint, level = 0.95, HC_type = "HC0")
+WAP_reg_df_ci <- map(WAP_reg_df_ci, as_tibble)
+WAP_reg_df <- bind_rows(WAP_reg_df, .id = "model_num")  
+WAP_reg_df_ci <- bind_rows(WAP_reg_df_ci) %>% 
+  rename("conf.low" = "2.5 %", "conf.high" = "97.5 %")
+WAP_reg_df <- bind_cols(WAP_reg_df, WAP_reg_df_ci)
+
+model_names <- list(
+  "1" = "Model 1",
+  "2" = "Model 2",
+  "3" = "Model 3",
+  "4" = "Model 4",
+  "5" = "Model 5",
+  "6" = "Model 6",
+  "7" = "Model 7"
+)
+model_labeller <- function(variable, value){
+  return(model_names[value])
+}
+
+WAP_reg_df %>% 
+  filter(!term == "(Intercept)") %>% 
+  ggplot(aes(x = estimate, y = term, xmax = conf.high, xmin = conf.low)) + geom_point() +
+  geom_linerange() + geom_vline(xintercept = 0, lty = 4) + 
+  facet_wrap(~model_num, ncol = 4, labeller = model_labeller) + theme_bw()
+
 #Investigating the age coefficient
 summary(lm(WAP_sd ~ age, data = on18))
 summary(lm(WAP_sd ~ age + I(age^2), data = on18))
-age_poly <- lm(WAP_sd ~ Interest + Primary_media * (age + I(age^2)), data = on18, na.action = na.omit); summary(age_poly)
+age_poly <- lm(WAP_sd ~ Interest + Primary_media  + age + I(age^2), data = on18, na.action = na.omit); summary(age_poly)
 summary(lm(WAP_sd ~ Interest + Primary_media + age + I(age^2) + degree + income3 + pol_knowledge, data = on18, na.action = na.omit))
 
 
 age_legacy <- data.frame(age = seq(18, 100, 1), 
            Primary_media = "Legacy",
            Interest = mean(on18$Interest, na.rm = T))
-age_legacy[, c("predicted_age",
+age_legacy[, c("predicted_WAP",
            "conf_up",
            "conf_low")] <- predict(age_poly, age_legacy, interval = "confidence")
 
@@ -620,7 +648,7 @@ age_legacy$media <- "Legacy"
 age_mixed <- data.frame(age = seq(18, 100, 1), 
                          Primary_media = "Mixed",
                          Interest = mean(on18$Interest, na.rm = T))
-age_mixed[, c("predicted_age",
+age_mixed[, c("predicted_WAP",
                "conf_up",
                "conf_low")] <- predict(age_poly, age_mixed, interval = "confidence")
 
@@ -629,7 +657,7 @@ age_mixed$media <- "Mixed"
 age_online <- data.frame(age = seq(18, 100, 1), 
                         Primary_media = "Online",
                         Interest = mean(on18$Interest, na.rm = T))
-age_online[, c("predicted_age",
+age_online[, c("predicted_WAP",
               "conf_up",
               "conf_low")] <- predict(age_poly, age_online, interval = "confidence")
 
@@ -638,24 +666,25 @@ age_online$media <- "Online"
 age_social_media <- data.frame(age = seq(18, 100, 1), 
                          Primary_media = "Social_Media",
                          Interest = mean(on18$Interest, na.rm = T))
-age_social_media[, c("predicted_age",
+age_social_media[, c("predicted_WAP",
                "conf_up",
                "conf_low")] <- predict(age_poly, age_social_media, interval = "confidence")
 
 age_social_media$media <- "Social Media"
 
 age_predicted <- rbind(age_legacy, age_mixed, age_online, age_social_media)
-
-age_predicted %>% 
-  ggplot(aes(x = age, y = predicted_age, ymin = conf_low, ymax = conf_up)) +
+age_predicted_graph <- age_predicted %>% 
+  ggplot(aes(x = age, y = predicted_WAP, ymin = conf_low, ymax = conf_up)) +
   geom_line(colour = "#008080") +  facet_wrap(~media) +
-  geom_ribbon(alpha = 0.2, fill = "aquamarine3") + theme_bw()
+  geom_ribbon(alpha = 0.2, fill = "aquamarine3") +
+  labs(x = "Age", y = "Predicted Level of Affective Polarization \n (WAP Score)") + 
+  theme_bw()
 
 #### Replicate models with the social use variable ####
 
 WAP_reg_soc_use <- list()
 
-WAP_reg_soc_use[[1]] <- lm(WAP ~ Social_Use2, data = on18, na.action = na.omit);summary(WAP_reg_soc_use[[1]]) 
+WAP_reg_soc_use[[1]] <- lm(WAP_sd ~ Social_Use2, data = on18, na.action = na.omit);summary(WAP_reg_soc_use[[1]]) 
 #WAP_graph[[1]] <- graph_regression(WAP_reg_soc_use[[1]]); WAP_graph[[1]]
 
 WAP_reg_soc_use[[2]] <- lm(WAP_sd ~ Interest, data = on18, na.action = na.omit); summary(WAP_reg_soc_use[[2]]) 
@@ -677,7 +706,7 @@ WAP_reg_soc_use[[6]] <- lm(WAP_sd ~ Interest + Social_Use2 + age3 + degree + inc
 
 WAP_reg_soc_use[[7]] <- lm(WAP_sd ~ Interest + Social_Use2 + age3 + degree + income3 + pol_knowledge, data = on18, na.action = na.omit); summary(WAP_reg_soc_use[[7]]) 
 #WAP_graph[[7]] <- graph_regression(WAP_reg_soc_use[[7]]); WAP_graph[[7]]
-
+modelsummary(WAP_reg_soc_use, stars = T, vcov = "HC0")
 #ggarrange(plotlist = list(WAP_primarymedia_graph, WAP_Interest_Graph, WAP_Interact_graph))
 
 #### Affective polarization models ####
@@ -897,7 +926,19 @@ ggpubr::ggarrange(overlap_often, overlap_rarely, ncol = 1)
 #make the positive finding more interesting
 #statistical tests with Overlap coefficients 
 
+#### POLITICAL INTEREST AND AFFECTIVE POLARIZATION ####
 
+Interest_pm <- lm(Interest ~ Primary_media, data = on18, na.action = na.omit); summary(Interest_pm)
+Interest_su <- lm(Interest ~ Social_Use2, data = on18, na.action = na.omit); summary(Interest_su)
 
+WAP_Interact <- lm(WAP_sd ~ Primary_media*Interest, data = on18, na.action = na.omit)
+summary(WAP_Interact)
+
+WAP_Interact2 <- lm(WAP_sd ~ Primary_media*Interest  + age3 + degree + income3 + pol_knowledge, data = on18, na.action = na.omit)
+summary(WAP_Interact2)
+
+#Visualize the marginal effects from the interaction effects
+marginaleffects::plot_slopes(WAP_Interact, variables = "Interest", condition = "Primary_media") + geom_hline(yintercept  = 0, lty = "dashed", col = "forestgreen") + theme_bw()
+marginaleffects::plot_slopes(WAP_Interact2, variables = "Interest", condition = "Primary_media") + geom_hline(yintercept  = 0, lty = "dashed", col = "forestgreen") + theme_bw()
 
 
