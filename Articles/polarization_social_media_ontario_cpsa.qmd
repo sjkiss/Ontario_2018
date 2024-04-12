@@ -80,12 +80,15 @@ source("Code/3_polarization.R")
 
 # Ontario 2018 Summary
 
+There are several reasons to think that the Ontario 2018 general election might feature some degrees of polarization. First, it was the fifth election since the Ontario Liberals were first elected in 2003. As with any government with such a long tenure, the government had endured the consequences of many decisions gone wrong. The provincial government's attempts to increase the role of renewable energy in the provincial electricity supply had lead to an increase in electricity rates. In 200X, the government suddenly cancelled the construction of two natural gas electricity plants in electorally-sensitive districts, incurring hundreds of millions of dollars in penalties. in 200X, it emerged that the provincial air transportation agency for patients had become embroiled in complicated contractual arrangements, incurring millions of dollars in liabilities. In 20015, a new provincial sex education curriculum was adopted, including some controversial material incurring the wrath of social conservatives. 
+
+Moreover, the two primary party leaders in the election campaign, Kathleen Wynne for the Liberals and Doug Ford for the PRogressive Conservatives were individuals with traits and backgrounds that might incur distinct enmity from out-partisans. Wynne was female and lesbian, contributing to some of the hostility by social conservatives. Even more notable, Ford 
+
 # Data and Methods
 
 ## The 2018 Ontario Post Election Study
 
--   Sampling strategy
--   Questions used to construct variables
+The Laurier Institute for the Study of Public Opinion and Policy commissioned an online consumer sample of voters from SSI with quotas established to match the sample to the population on age, education and gender. It was fielded between the dates of `r `
 
 ## Indenpedent Variables
 
