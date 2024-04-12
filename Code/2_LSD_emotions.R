@@ -33,7 +33,7 @@ on18 %>%
 
 on18 %>% 
   filter(str_detect(fin.y, pattern = " (N|n)ot much " )) %>% 
-  select(fin.y, fin.y.LSD3) %>% View()
+  select(fin.y, fin.y.LSD3)
 
 # 
 on18$fin.y.LSD4<-LSDprep_dict(on18$fin.y.LSD3)
@@ -42,7 +42,7 @@ on18$imm.y.LSD4<-LSDprep_dict(on18$imm.y.LSD3)
 #   select(ends_with("LSD4")) %>% 
 #   View()
 library(quanteda)
-?tokens_lookup
+
 tokens_lookup(tokens(on18$fin.y.LSD4), 
               dictionary=data_dictionary_LSD2015)
 tokens_lookup(tokens(on18$imm.y.LSD4), 

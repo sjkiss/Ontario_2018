@@ -1,6 +1,7 @@
 #### LOAD SCRIPTS ####
 source("Code/1_load_on18.R") #clean and load dataset
 source("Code/0_functions.R") #load custom functions and packages needed for these analyses
+source("Code/2_LSD_emotions.R")
 
 #### CHECK THE DATASET ####
 head(on18)
