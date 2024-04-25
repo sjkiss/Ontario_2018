@@ -109,7 +109,7 @@ on18 %>%
   summarize(Average=mean(value, na.rm=T)) %>% 
   filter(!is.na(Social_Use2)) %>% 
   ggplot(., aes(x=Social_Use2, y=Average))+geom_point()+facet_wrap(~name)
-  pivot_wider(., names_from = name, values_from=Average)
+ # pivot_wider(., names_from = name, values_from=Average)
 
   
 lm(fin_sentiment~Social_Use2, data=on18)
