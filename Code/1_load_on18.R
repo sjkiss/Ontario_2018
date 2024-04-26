@@ -7,7 +7,7 @@ library(broom)
 library(ggeffects)
 library(modelsummary)
 library(ggpubr)
-#### Import Data####
+#### Import Data#### 
 on18<-read_sav(file=here("Data/Ontario ES 2018 LISPOP.sav"))
 names(on18)
 table(on18$`filter_$`)
@@ -104,7 +104,7 @@ var_label(on18$indivfin)<-'An extra $50 a month would really make a difference'
 
 #### Set Vote Variable ####
 on18$Vote<-Recode(as.numeric(on18$partyvote2018), "1='Liberal' ; 2='PC' ; 3='NDP' ; 4='Green'", levels=c('Liberal', 'PC', 'NDP', 'Green', 'DK'), as.factor=T)
-on18$advvote2018
+on18$advote2018
 on18 %>%
   mutate(Vote=case_when(
     partyvote2018==1|advvote2018==1~1,

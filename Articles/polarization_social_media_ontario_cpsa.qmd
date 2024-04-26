@@ -94,19 +94,19 @@ source("Code/3_polarization.R", local = knitr::knit_global())
 
 # Ontario 2018 Summary
 
-There are several reasons to think that the Ontario 2018 general election might feature some degrees of polarization. First, it was the fifth election since the Ontario Liberals were first elected in 2003. As with any government with such a long tenure, the government had endured the consequences of many decisions gone wrong. The provincial government's attempts to increase the role of renewable energy in the provincial electricity supply had lead to an increase in electricity rates. In 200X, the government suddenly cancelled the construction of two natural gas electricity plants in electorally-sensitive districts, incurring hundreds of millions of dollars in penalties. in 200X, it emerged that the provincial air transportation agency for patients had become embroiled in complicated contractual arrangements, incurring millions of dollars in liabilities. In 20015, a new provincial sex education curriculum was adopted, including some controversial material incurring the wrath of social conservatives. 
+There are several reasons to think that the Ontario 2018 general election might feature some degrees of polarization. First, it was the fifth election since the Ontario Liberals were first elected in 2003. As with any government with such a long tenure, the government had endured the consequences of many decisions gone wrong. The provincial government's attempts to increase the role of renewable energy in the provincial electricity supply had lead to an increase in electricity rates. In 200X, the government suddenly cancelled the construction of two natural gas electricity plants in electorally-sensitive districts, incurring hundreds of millions of dollars in penalties. In 200X, it emerged that the provincial air transportation agency for patients had become embroiled in complicated contractual arrangements, incurring millions of dollars in liabilities. In 20015, a new provincial sex education curriculum was adopted, including some controversial material incurring the wrath of social conservatives. 
 
-Moreover, the two primary party leaders in the election campaign, Kathleen Wynne for the Liberals and Doug Ford for the Progressive Conservatives were individuals with traits and backgrounds that might incur distinct enmity from out-partisans [^1]
-
+Second, the two primary party leaders in the election campaign, Kathleen Wynne for the Liberals and Doug Ford for the Progressive Conservatives were individuals with traits and backgrounds that might incur distinct enmity from out-partisans.  Wynne was female and lesbian, contributing to some of the hostility by social conservatives.[^1] On the other side of the campaign, the PCs were led by leader Doug Ford, a new entrant to provincial politics, but a veteran of Toronto municipal politics. He was the brother of former Toronto mayor Rob Ford who had a tumultuous term of office featuring accusations of sexual assault, physical fights on the floor of city council, associations with purported gangsters and videotaped recordings of him consuming crack cocaine. All of this after having built a reputation as a populist politician whose profited from a reputation of being outside elite and regular circles of political participation. While Doug Ford lacked his brother's substance abuse and crudity, he very much represented the populist strain and railed against elites in politics as much as his brother did. 
 
 [^1]: Rana and Perrella provide an excellent summary of the online campaign that targetted Liberal leader Kathleen Wynne [-@ranaDeathMemeSocial2021].
-   Wynne was female and lesbian, contributing to some of the hostility by social conservatives. Even more notable, Ford 
+  
+All this is to say that the Ontario 2018 election featured an incumbent government that had built up many reasons for voters to harbor strong feelings against it with two political party leaders with unique sets of traits and ideologies that meant that it was a campaign likely to feature a polarized electorate with voters holding strong opinions about out-partisans.
 
 # Data and Methods
 
 ## The 2018 Ontario Post Election Study
 
-The Laurier Institute for the Study of Public Opinion and Policy commissioned an online consumer sample of voters from SSI with quotas established to match the sample to the population on age, education and gender. It was fielded between the dates of `r `
+The Laurier Institute for the Study of Public Opinion and Policy commissioned an online consumer sample of voters from SSI with quotas established to match the sample to the population on age, education and gender. It was fielded between the dates of `r paste(format(min(on18$datestamp),"%B %d"),format(max(on18$datestamp),"%B %d, %Y"), sep="-")`
 
 ## Indenpedent Variables
 
