@@ -172,6 +172,8 @@ val_labels(on18$degree)<-c("No degree"=0, "Degree"=1)
 lookfor(on18, 'year')
 on18$YOB
 summary(on18$age)
+on18 <- on18 %>% 
+  mutate(age = replace(age, age == 117, NA))
 on18$age2<-recode(on18$age, "45:100=1; 0:44=0; else=NA")
 on18$age3<-scales::rescale(on18$age, to=c(0,1))
 

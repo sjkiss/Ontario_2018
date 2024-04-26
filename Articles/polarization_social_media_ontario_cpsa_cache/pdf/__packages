@@ -1,10 +1,3 @@
-base
-methods
-datasets
-utils
-grDevices
-graphics
-stats
 knitr
 tidyverse
 ggplot2
@@ -25,3 +18,9 @@ modelsummary
 ggpubr
 carData
 car
+bayestestR
+mousetrap
+lavaan
+psych
+testthat
+overlapping

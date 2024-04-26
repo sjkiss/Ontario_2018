@@ -601,7 +601,6 @@ marginaleffects::plot_slopes(WAP_Interact2, variables = "Interest", condition = 
 
 #Display Models
 modelsummary(WAP_reg, stars = T, vcov = "HC0") #As numbers
-
 WAP_reg_df <- map(WAP_reg, tidy) 
 WAP_reg_df_ci <- map(WAP_reg, confint, level = 0.95, HC_type = "HC0")
 WAP_reg_df_ci <- map(WAP_reg_df_ci, as_tibble)
@@ -928,17 +927,19 @@ ggpubr::ggarrange(overlap_often, overlap_rarely, ncol = 1)
 
 #### POLITICAL INTEREST AND AFFECTIVE POLARIZATION ####
 
-Interest_pm <- lm(Interest ~ Primary_media, data = on18, na.action = na.omit); summary(Interest_pm)
+Interest_pm <- lm(Interest ~ Primary_media, data = on18, na.action = na.omit); summary(Interest_pm) 
 Interest_su <- lm(Interest ~ Social_Use2, data = on18, na.action = na.omit); summary(Interest_su)
 
 WAP_Interact <- lm(WAP_sd ~ Primary_media*Interest, data = on18, na.action = na.omit)
 summary(WAP_Interact)
 
-WAP_Interact2 <- lm(WAP_sd ~ Primary_media*Interest  + age3 + degree + income3 + pol_knowledge, data = on18, na.action = na.omit)
+WAP_Interact2 <- lm(WAP_sd ~ as.numeric(Social_Use2)*Interest  + age3 + degree + income3 + pol_knowledge, data = on18, na.action = na.omit)
 summary(WAP_Interact2)
 
 #Visualize the marginal effects from the interaction effects
-marginaleffects::plot_slopes(WAP_Interact, variables = "Interest", condition = "Primary_media") + geom_hline(yintercept  = 0, lty = "dashed", col = "forestgreen") + theme_bw()
-marginaleffects::plot_slopes(WAP_Interact2, variables = "Interest", condition = "Primary_media") + geom_hline(yintercept  = 0, lty = "dashed", col = "forestgreen") + theme_bw()
+marginaleffects::plot_slopes(WAP_Interact, variables = "Primary_media", condition = "Interest") + geom_hline(yintercept  = 0, lty = "dashed", col = "forestgreen") + labs(y = "Marginal Effect of Primary Media Variable") + theme_bw()
 
+marginaleffects::plot_slopes(WAP_Interact2, variables = "Social_Use2", condition = "Interest") + geom_hline(yintercept  = 0, lty = "dashed", col = "forestgreen") + theme_bw()
 
+gam_model <- mgcv::gam(WAP_sd ~ s(age) + Primary_media + Interest + degree + income3 + pol_knowledge, data = on18)
+draw(gam_model, residuals = T)
