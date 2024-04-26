@@ -34,7 +34,7 @@ on18 %>%
 
 on18 %>% 
   filter(str_detect(fin.y, pattern = " (N|n)ot much " )) %>% 
-  select(fin.y, fin.y.LSD3) %>% View()
+  select(fin.y, fin.y.LSD3)
 
 # 
 on18$fin.y.LSD4<-LSDprep_dict(on18$fin.y.LSD3)
@@ -43,6 +43,10 @@ on18$imm.y.LSD4<-LSDprep_dict(on18$imm.y.LSD3)
 #   select(ends_with("LSD4")) %>% 
 #   View()
 library(quanteda)
+<<<<<<< HEAD
+=======
+
+>>>>>>> 85b0a28075816087ea0a3851127dc2354717b2e9
 tokens_lookup(tokens(on18$fin.y.LSD4), 
               dictionary=data_dictionary_LSD2015)
 tokens_lookup(tokens(on18$imm.y.LSD4), 
@@ -131,8 +135,12 @@ on18 %>%
   summarize(Average=mean(value, na.rm=T)) %>% 
   filter(!is.na(Social_Use2)) %>% 
   ggplot(., aes(x=Social_Use2, y=Average))+geom_point()+facet_wrap(~name)
+<<<<<<< HEAD
   
 #pivot_wider(., names_from = name, values_from=Average)
+=======
+ # pivot_wider(., names_from = name, values_from=Average)
+>>>>>>> 85b0a28075816087ea0a3851127dc2354717b2e9
 
   
 lm(fin_sentiment~Social_Use2, data=on18)
