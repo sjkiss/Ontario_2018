@@ -1,12 +1,13 @@
 #### LOAD SCRIPTS ####
-source("Code/1_load_on18.R") #clean and load dataset
-source("Code/0_functions.R") #load custom functions and packages needed for these analyses
-source("Code/2_LSD_emotions.R")
-
+source(here("Code/1_load_on18.R")) #clean and load dataset
+source(here("Code/0_functions.R")) #load custom functions and packages needed for these analyses
+#source("Code/2_LSD_emotions.R")
+nrow(on18)
 #### CHECK THE DATASET ####
-head(on18)
-names(on18)
-glimpse(on18)
+# head(on18)
+# names(on18)
+# glimpse(on18)
+
 
 #### CREATE VARIABLES FOR POLARIZATION ANALYSIS ####
 
@@ -23,7 +24,7 @@ on18 %>%
 
 
 
-table(on18$Primary_)
+#table(on18$Primary_)
 
 # on18 <- on18 %>% 
 #   mutate(
@@ -190,7 +191,7 @@ policy_conservatives_mixed <- on18 %>%
 
 # Social Media Use
 
-unique(on18$Social_Use)
+#unique(on18$Social_Use)
 
 # High social use - left-wing
 policy_left_often <- on18 %>% 
@@ -210,7 +211,7 @@ policy_left_rarely <- on18 %>%
            (partyvote2018 == 1 | partyvote2018 == 3)) %>% 
   select(policy_polarization)
 
-on18$partyvote2018
+
 
 # high social use - right-wing
 policy_conservative_often <- on18 %>% 
@@ -253,7 +254,7 @@ policy_social_media <- on18 %>%
 #primary media mixed
 policy_mixed <- on18 %>% 
   filter(Primary_media == "Mixed") %>% 
-  select(policy_polarization)
+  select(policy_polarization) 
 
 
 ### Social Use
@@ -279,22 +280,22 @@ bimodality_coefficient(policy_rarely, na.rm = T)
 #### Affective Polarization Wagner (2021) ####
 
 #Extract feelings towards parties scores
-on18 %>% 
-  select(starts_with("partyeval")) %>% 
-  glimpse()
+# on18 %>% 
+#   select(starts_with("partyeval")) %>% 
+#   glimpse()
 # so it looks like I took the step sometime of 
 # scaling these variables to 0 and 1, and they end in 
 # _out.
-on18 %>% 
-  select(starts_with("partyeval")) %>% 
-  summary()
+# on18 %>% 
+#   select(starts_with("partyeval")) %>% 
+#   summary()
 #Looks like the originals run from 0 to 5
-on18 %>% 
-  select(starts_with("partyeval")) %>% 
-  val_labels()
-on18 %>% 
-  select(starts_with("partyeval")) %>% 
-  var_label()
+# on18 %>% 
+#   select(starts_with("partyeval")) %>% 
+#   val_labels()
+# on18 %>% 
+#   select(starts_with("partyeval")) %>% 
+#   var_label()
 #Party Numbers
 #4 is Green
 # 1 is Liberal
@@ -319,9 +320,14 @@ affect_wt <- affect
 # This is mean(like)_i
 #So we need to effectively calculate a mean for each row. 
 #Each row is one R. 
+
+# This is a billion times faster
+# Never use c_across(). Banish it. 
 affect %>% 
-  rowwise() %>% 
-  mutate(mean_like=mean(c_across(2:5), na.rm=T))->affect
+  mutate(mean_like=rowMeans(across(2:5), na.rm=T))->affect
+# affect %>% 
+#   rowwise() %>% 
+#   mutate(mean_like=mean(c_across(2:5), na.rm=T))->affect
 
 #Now we need to take each R's like score for each party
 # And subtract the mean from it. 
@@ -353,8 +359,10 @@ affect_wt$Liberal_Like_wt <- (affect$Liberal_Like * 0.196)
 affect_wt$NDP_Like_wt <- (affect$NDP_Like * 0.336)
 
 affect_wt %>% 
-  rowwise() %>% 
-  mutate(mean_like=mean(c_across(6:9), na.rm=T))->affect_wt
+  mutate(mean_like=rowMeans(across(6:9), na.rm=T))->affect_wt
+# affect_wt %>% 
+#   rowwise() %>% 
+#   mutate(mean_like=mean(c_across(6:9), na.rm=T))->affect_wt
 
 affect_pol_cal_wt <- affect_wt %>%
   select(., !(6:9)) %>%
@@ -384,9 +392,11 @@ on18 <- on18 %>%
     WAP_sd = as.numeric(scale(WAP))
   )
 
+#Get interest by media consunption
 on18 %>%
   group_by(Primary_media) %>%
   summarise(mean = mean(pointerst_ONint, na.rm = T), sd = sd(pointerst_ONint, na.rm = T))
+
 
 
 on18 %>%
@@ -411,9 +421,12 @@ leader_affect$Ford_Like_wt <- (leader_affect$Ford * 0.405)
 leader_affect$Wynne_Like_wt <- (leader_affect$Wynne * 0.196)
 leader_affect$Horwath_Like_wt <- (leader_affect$Horwath * 0.336)
 
+#
 leader_affect %>% 
-  rowwise() %>% 
-  mutate(mean_like=mean(c_across(6:9), na.rm=T))->leader_affect
+  mutate(mean_like=rowMeans(across(6:9), na.rm=T))->leader_affect
+# leader_affect %>% 
+#   rowwise() %>% 
+#   mutate(mean_like=mean(c_across(6:9), na.rm=T))->leader_affect
 
 leader_affect <- leader_affect %>%
   select(., !(6:9)) %>%
@@ -504,7 +517,7 @@ on18 %>%
   summarise(Mean = mean(WAP, na.rm = T), Standard_Deviation = sd(WAP, na.rm = T), Minimum = min(WAP, na.rm = T), Maximum = max(WAP, na.rm = T), N=n()) %>% 
   rename(Group = Social_Use2), affect_scores_party, affect_scores_primary_media)
 
-kableExtra::kable(descripts_WAP, format = "pipe", digits = 3)
+#kableExtra::kable(descripts_WAP, format = "pipe", digits = 3)
 
 tibble(Group = "Ontarians", Mean = mean(on18$WAP, na.rm = T),
        Standard_Deviation = sd(on18$WAP, na.rm = T),
@@ -679,7 +692,7 @@ age_predicted_graph <- age_predicted %>%
   geom_ribbon(alpha = 0.2, fill = "aquamarine3") +
   labs(x = "Age", y = "Predicted Level of Affective Polarization \n (WAP Score)") + 
   theme_bw()
-
+age_predicted_graph
 #### Replicate models with the social use variable ####
 
 WAP_reg_soc_use <- list()
@@ -938,9 +951,9 @@ WAP_Interact2 <- lm(WAP_sd ~ as.numeric(Social_Use2)*Interest  + age3 + degree +
 summary(WAP_Interact2)
 
 #Visualize the marginal effects from the interaction effects
-marginaleffects::plot_slopes(WAP_Interact, variables = "Primary_media", condition = "Interest") + geom_hline(yintercept  = 0, lty = "dashed", col = "forestgreen") + labs(y = "Marginal Effect of Primary Media Variable") + theme_bw()
-
-marginaleffects::plot_slopes(WAP_Interact2, variables = "Social_Use2", condition = "Interest") + geom_hline(yintercept  = 0, lty = "dashed", col = "forestgreen") + theme_bw()
-
-gam_model <- mgcv::gam(WAP_sd ~ s(age) + Primary_media + Interest + degree + income3 + pol_knowledge, data = on18)
-draw(gam_model, residuals = T)
+# marginaleffects::plot_slopes(WAP_Interact, variables = "Primary_media", condition = "Interest") + geom_hline(yintercept  = 0, lty = "dashed", col = "forestgreen") + labs(y = "Marginal Effect of Primary Media Variable") + theme_bw()
+# 
+# marginaleffects::plot_slopes(WAP_Interact2, variables = "Social_Use2", condition = "Interest") + geom_hline(yintercept  = 0, lty = "dashed", col = "forestgreen") + theme_bw()
+# 
+# gam_model <- mgcv::gam(WAP_sd ~ s(age) + Primary_media + Interest + degree + income3 + pol_knowledge, data = on18)
+#draw(gam_model, residuals = T)

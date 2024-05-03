@@ -11,10 +11,14 @@ library(ggpubr)
 on18<-read_sav(file=here("Data/Ontario ES 2018 LISPOP.sav"))
 
 #### Run straightliner ####
-source("Code/2_straightlining.r")
+source(here("Code/2_straightlining.r"))
+nrow(on18)
 #### Remove straighliners###
 on18 %>% 
-  filter(straightliner>0)->on18
+  filter(straightliner==1)->straightliners
+on18 %>% 
+  filter(straightliner==0)->on18
+nrow(on18)
 names(on18)
 table(on18$`filter_$`)
 library(car)
@@ -109,8 +113,9 @@ on18 %>%
 var_label(on18$indivfin)<-'An extra $50 a month would really make a difference'
 
 #### Set Vote Variable ####
+
 on18$Vote<-Recode(as.numeric(on18$partyvote2018), "1='Liberal' ; 2='PC' ; 3='NDP' ; 4='Green'", levels=c('Liberal', 'PC', 'NDP', 'Green', 'DK'), as.factor=T)
-on18$advote2018
+
 on18 %>%
   mutate(Vote=case_when(
     partyvote2018==1|advvote2018==1~1,
@@ -122,7 +127,7 @@ on18 %>%
 
 val_labels(on18$Vote)<-c(Liberal=1, Conservative=2, NDP=3, Green=4)
 on18$Vote<-as_factor(on18$Vote)
-on18$Vote
+table(on18$Vote)
 on18$pc<-recode(as.numeric(on18$partyvote2018), "5=NA ; 2=1; else=0")
 
 
@@ -470,10 +475,14 @@ on18$regions<-as_factor(on18$regions)
 on18$trustbiasnews2<-scales::rescale(as.numeric(on18$trustbiasnews))
 on18$trustfactnews2<-scales::rescale(as.numeric(on18$trustfactnews))
 on18$trustfactnews2
-# This calculates the average of the two. 
-on18 %>% rowwise() %>% mutate(trust_media= mean(c(trustbiasnews2,trustfactnews2), na.rm=T))->on18
 
-#### Create Social Media Users####
+# This calculates the average of the two. 
+# on18 %>% rowwise() %>% 
+#   mutate(trust_media= mean(c(trustbiasnews2,trustfactnews2), na.rm=T))->on18
+
+on18 %>% 
+mutate(trust_media=rowMeans(across(c(trustbiasnews2,trustfactnews)), na.rm=T))->on18
+  #### Create Social Media Users####
 
 on18 %>% 
   mutate(Social_Use=case_when(
