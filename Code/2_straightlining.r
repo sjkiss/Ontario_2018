@@ -1,6 +1,7 @@
 #source("Code/1_load_on18.R")
 #install.packages("careless")
 library(careless)
+library(estimatr)
 lookfor(on18, "feel")
 on18 %>% 
   select(matches("partyeval_[0-9]$")) %>% 
@@ -37,3 +38,18 @@ on18 %>%
     TRUE~0
   ))->on18
 table(on18$straightliner)
+
+#### RE-RUN MAIN ANALYSES WITHOUT STRAIGHT LINERS ####
+
+COVARS <- c("Interest", "age3", "degree", "income3", "pol_knowledge")
+on18$Pr
+WAP_primary_media <- list()
+for(i in 1:length(COVARS)){
+ data <- on18 |> filter(straightliner == 0)
+ WAP_primary_media[[i]] <-  lm_robust(reformulate(c("Primary_media", COVARS[1:i]),
+                                                  response = "WAP_sd"), data = data, se_type = "HC0")
+}
+lm_robust(reformulate(c("Primary_media"),
+                      response = "WAP_sd"), data = data, se_type = "HC0")
+modelsummary(WAP_primary_media, stars = T)
+

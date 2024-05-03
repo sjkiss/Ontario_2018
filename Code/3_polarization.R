@@ -11,6 +11,10 @@ nrow(on18)
 
 #### CREATE VARIABLES FOR POLARIZATION ANALYSIS ####
 
+
+
+table(on18$number_of_legacy_sources)
+
 #### Primary News Source ####
 #Create a variable that classifies individuals based on the primary media type they use
 on18 %>%
@@ -24,8 +28,11 @@ on18 %>%
 
 
 
+<<<<<<< HEAD
 #table(on18$Primary_)
 
+=======
+>>>>>>> origin/Rafaelbranch
 # on18 <- on18 %>% 
 #   mutate(
 #     Primary_media = relevel(as.factor(Primary_media), ref = "Mixed")
@@ -344,6 +351,7 @@ affect_pol_cal %>%
   group_by(id) %>%
   summarise(Soc_dis = sum(like_mean)) -> Soc_dis_scores
 
+
 Soc_dis_scores$Soc_dis <- sqrt(Soc_dis_scores$Soc_dis/4)
 
 
@@ -401,6 +409,7 @@ on18 %>%
 on18 %>%
   group_by(Social_Use2) %>%
   summarise(mean = mean(WAP, na.rm = T), sd = sd(WAP, na.rm = T))
+
 
 #### WAP Leaders ####
 
@@ -473,12 +482,21 @@ on18 %>%
 
 #### Primary Media and Media source ####
 
-on18$HuffingtonPostonline
 
+
+on18 <- on18 %>% 
+  mutate(number_of_legacy =  CBCTV + GlobalNews + CTVNewsToronto + CTVNewsotherlocalstation + 
+           OMNI +  CityTV + GlobeandMail + NationalPost + TorontoStar + TorontoSun + BramptonGuardian + 
+          HamiltonSpectator + MississaugaNews + KingstonWhigStandard + LondonFreePress + OttawaCitizen + WaterlooRecord + WindsorStar + Otherlocalnewspaper)
+
+
+legacy <- on18 %>% 
+  filter(Primary_media == "Legacy")
+
+table(legacy$number_of_legacy)
 media_Sources_by_primarymedia <- on18 %>% 
   group_by(Primary_media) %>% 
   summarise(across(CBCTV:HuffingtonPostonline, \(x)mean(x))) %>% 
-  filter(Primary_media == "Online") %>% 
   pivot_longer(cols = 2:22)
 
 
@@ -950,9 +968,11 @@ WAP_Interact2 <- lm(WAP_sd ~ as.numeric(Social_Use2)*Interest  + age3 + degree +
 summary(WAP_Interact2)
 
 #Visualize the marginal effects from the interaction effects
-# marginaleffects::plot_slopes(WAP_Interact, variables = "Primary_media", condition = "Interest") + geom_hline(yintercept  = 0, lty = "dashed", col = "forestgreen") + labs(y = "Marginal Effect of Primary Media Variable") + theme_bw()
-# 
-# marginaleffects::plot_slopes(WAP_Interact2, variables = "Social_Use2", condition = "Interest") + geom_hline(yintercept  = 0, lty = "dashed", col = "forestgreen") + theme_bw()
-# 
-# gam_model <- mgcv::gam(WAP_sd ~ s(age) + Primary_media + Interest + degree + income3 + pol_knowledge, data = on18)
-#draw(gam_model, residuals = T)
+
+marginaleffects::plot_slopes(WAP_Interact, variables = "Primary_media", condition = "Interest") + geom_hline(yintercept  = 0, lty = "dashed", col = "forestgreen") + labs(y = "Marginal Effect of Primary Media Variable") + theme_bw()
+
+marginaleffects::plot_slopes(WAP_Interact2, variables = "Social_Use2", condition = "Interest") + geom_hline(yintercept  = 0, lty = "dashed", col = "forestgreen") + theme_bw()
+
+gam_model <- mgcv::gam(WAP_sd ~ s(age) + Primary_media + Interest + degree + income3 + pol_knowledge, data = on18)
+draw(gam_model, residuals = T)
+
