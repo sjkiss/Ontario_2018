@@ -139,7 +139,6 @@ on18 <- on18 %>%
                                  lr_private_health_care + Lr_minimum_wage_to_high_prices + lr_business_benefits_everyone + 
                                   lr_inappropriate_sex_ed))  
 
-
 #### Distributions for distinctiveness coefficients ####
 
 # Primary Media
@@ -579,7 +578,7 @@ summary(cfa_policies, fit.measures = T, standardized = T)
 WAP_reg <- list()
 WAP_graph <- list()
 
-WAP_reg[[1]] <- lm(WAP ~ Primary_media, data = on18, na.action = na.omit);summary(WAP_reg[[1]]) 
+WAP_reg[[1]] <- lm(WAP_sd ~ Primary_media, data = on18, na.action = na.omit);summary(WAP_reg[[1]]) 
 WAP_graph[[1]] <- graph_regression(WAP_reg[[1]]); WAP_graph[[1]]
 
 WAP_reg[[2]] <- lm(WAP_sd ~ Interest, data = on18, na.action = na.omit); summary(WAP_reg[[2]]) 

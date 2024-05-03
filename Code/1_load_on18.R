@@ -18,9 +18,9 @@ on18 %>%
   filter(straightliner==1)->straightliners
 on18 %>% 
   filter(straightliner==0)->on18
-nrow(on18)
+nrow(straightliners)
 names(on18)
-table(on18$`filter_$`)
+
 library(car)
 #### Individual Finanical Situation Questions ####
 #Recode $50 stress question, 1 disagree, 0 disagree
@@ -505,6 +505,24 @@ on18$Social_Use2<-car::Recode(on18$Social_Use, "'Never'='Never' ;
 'About once a day', 
 'Several times a day'))
 table(on18$Social_Use2)
+on18$Social_Use2
+
+#### Warning this does not match up with the code to make 
+# the policy_often and policy_rarely objects in the other script
+# Double-check!
+on18 %>% 
+  mutate(Social_Use3=Recode(Social_Use, "
+                            'Several times a day'='Often';
+                            'About once a day'='Often';
+                            'Several times a week'='Often';
+                            'About once a week'='Rarely';
+                            'Several times a month'='Rarely';
+                            'Several times in a year'='Rarely';
+                            'Never'='Rarely';
+                            'About once a month'='Rarely'", levels=c("Rarely", "Often")))->on18
+on18$Social_Use3
+table(on18$Social_Use3, on18$Social_Use)
+
 
 #### Export to SPSS File ####
 names(on18)
