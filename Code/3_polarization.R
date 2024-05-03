@@ -10,6 +10,10 @@ glimpse(on18)
 
 #### CREATE VARIABLES FOR POLARIZATION ANALYSIS ####
 
+
+
+table(on18$number_of_legacy_sources)
+
 #### Primary News Source ####
 #Create a variable that classifies individuals based on the primary media type they use
 on18 %>%
@@ -22,8 +26,6 @@ on18 %>%
   ))->on18
 
 
-
-table(on18$Primary_)
 
 # on18 <- on18 %>% 
 #   mutate(
@@ -339,6 +341,7 @@ affect_pol_cal %>%
   group_by(id) %>%
   summarise(Soc_dis = sum(like_mean)) -> Soc_dis_scores
 
+
 Soc_dis_scores$Soc_dis <- sqrt(Soc_dis_scores$Soc_dis/4)
 
 
@@ -392,6 +395,7 @@ on18 %>%
 on18 %>%
   group_by(Social_Use2) %>%
   summarise(mean = mean(WAP, na.rm = T), sd = sd(WAP, na.rm = T))
+
 
 #### WAP Leaders ####
 
@@ -461,12 +465,21 @@ on18 %>%
 
 #### Primary Media and Media source ####
 
-on18$HuffingtonPostonline
 
+
+on18 <- on18 %>% 
+  mutate(number_of_legacy =  CBCTV + GlobalNews + CTVNewsToronto + CTVNewsotherlocalstation + 
+           OMNI +  CityTV + GlobeandMail + NationalPost + TorontoStar + TorontoSun + BramptonGuardian + 
+          HamiltonSpectator + MississaugaNews + KingstonWhigStandard + LondonFreePress + OttawaCitizen + WaterlooRecord + WindsorStar + Otherlocalnewspaper)
+
+
+legacy <- on18 %>% 
+  filter(Primary_media == "Legacy")
+
+table(legacy$number_of_legacy)
 media_Sources_by_primarymedia <- on18 %>% 
   group_by(Primary_media) %>% 
   summarise(across(CBCTV:HuffingtonPostonline, \(x)mean(x))) %>% 
-  filter(Primary_media == "Online") %>% 
   pivot_longer(cols = 2:22)
 
 
@@ -566,7 +579,7 @@ summary(cfa_policies, fit.measures = T, standardized = T)
 WAP_reg <- list()
 WAP_graph <- list()
 
-WAP_reg[[1]] <- lm(WAP ~ Primary_media, data = on18, na.action = na.omit);summary(WAP_reg[[1]]) 
+WAP_reg[[1]] <- lm(WAP_sd ~ Primary_media, data = on18, na.action = na.omit);summary(WAP_reg[[1]]) 
 WAP_graph[[1]] <- graph_regression(WAP_reg[[1]]); WAP_graph[[1]]
 
 WAP_reg[[2]] <- lm(WAP_sd ~ Interest, data = on18, na.action = na.omit); summary(WAP_reg[[2]]) 
@@ -944,3 +957,4 @@ marginaleffects::plot_slopes(WAP_Interact2, variables = "Social_Use2", condition
 
 gam_model <- mgcv::gam(WAP_sd ~ s(age) + Primary_media + Interest + degree + income3 + pol_knowledge, data = on18)
 draw(gam_model, residuals = T)
+
