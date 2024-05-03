@@ -240,7 +240,7 @@ bimodalities <- on18 %>%
 policy_legacy <- on18 %>% 
   filter(Primary_media == "Legacy") %>% 
   select(policy_polarization)
-
+bimodality_coefficient(policy_legacy, na.rm=T)
 # primary media online
 policy_online <- on18 %>% 
   filter(Primary_media == "Online") %>% 

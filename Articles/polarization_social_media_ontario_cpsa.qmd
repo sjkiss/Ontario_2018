@@ -225,7 +225,20 @@ age_predicted_graph
 
 ## Social Media Usage and Policy Polarization
 |       To investigate the relationship between social media usage and policy polarization we first calculate the mean policy positions of individuals by primary media source, social media usage, and vote choice in the 2018 election. 
-|       We then investigated the relationship between social media usage and policy polarization. First, we calculated bimodality coefficients for individuals who received news about the 2018 Ontario election exclusively from social media, online media sources, legacy media sources and a mix of media sources (See @fig-BC_PM). These results indicate that individuals who received news about the 2018 election from online news sources have the most bimodal distribution of policy positions ($BC = 0.36$) and individuals who received news exclusively from legacy media sources have the least bimodal distributions ($BC = 0.29$). However, none of these distributions surpass the threshold of 0.55 to be considered bimodal. These results indicate that individuals who receive news about elections from online media have the highest levels of policy polarization and those who receive news from legacy media sources have the lowest level of policy polarization. 
+|       We then investigated the relationship between social media usage and policy polarization. First, we calculated bimodality coefficients for individuals who received news about the 2018 Ontario election exclusively from social media, online media sources, legacy media sources and a mix of media sources (See @fig-BC_PM). 
+```{r}
+#| label: tbl-bimodality
+#| echo: false
+library(gt)
+on18 %>% 
+  group_by(Primary_media) %>% 
+  summarize(Bimodality=bimodality_coefficient(policy_polarization)) %>% 
+arrange(., desc(Bimodality)) %>% 
+  gt() 
+```
+
+
+These results indicate that individuals who received news about the 2018 election from online news sources have the most bimodal distribution of policy positions (`r bimodality_coefficient(policy_online, na.rm=T)`) and individuals who received news exclusively from legacy media sources have the least bimodal distributions (`r bimodality_coefficient(policy_legacy, na.rm=T)`). However, none of these distributions surpass the threshold of 0.55 to be considered bimodal SOURCE. These results indicate that individuals who receive news about elections from online media have the highest levels of policy polarization and those who receive news from legacy media sources have the lowest level of policy polarization. 
 
 ```{r BC_PM, fig.align='center', fig.cap='Bimodality Coefficents and Policy Position Distributions by Primary Media Source'}
 #| echo: false
