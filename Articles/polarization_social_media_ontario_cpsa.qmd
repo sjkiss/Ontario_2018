@@ -40,6 +40,7 @@ execute:
 #| label: setup
 #| echo: false
 library(knitr)
+library(mousetrap)
 opts_knit$set(root.dir=rprojroot::find_rstudio_root_file())
 #opts_chunk$set(warning=F,message=F)
 ```
@@ -51,7 +52,7 @@ opts_knit$set(root.dir=rprojroot::find_rstudio_root_file())
 #| message: false
 #| results: 'hide'
 #| output: false
-
+library(here)
 source(here("Code/3_polarization.R"))
 #Cache needs to be turned off the render
 ```
@@ -225,11 +226,14 @@ age_predicted_graph
 
 ## Social Media Usage and Policy Polarization
 |       To investigate the relationship between social media usage and policy polarization we first calculate the mean policy positions of individuals by primary media source, social media usage, and vote choice in the 2018 election. 
-|       We then investigated the relationship between social media usage and policy polarization. First, we calculated bimodality coefficients for individuals who received news about the 2018 Ontario election exclusively from social media, online media sources, legacy media sources and a mix of media sources (See @fig-BC_PM). 
+|       We then investigated the relationship between social media usage and policy polarization. First, we calculated bimodality coefficients for individuals who received news about the 2018 Ontario election exclusively from social media, online media sources, legacy media sources and a mix of media sources (See @fig-BC_PM).
+
 ```{r}
 #| label: tbl-bimodality
 #| echo: false
+#| message: false
 library(gt)
+library(mousetrap)
 on18 %>% 
   group_by(Primary_media) %>% 
   summarize(Bimodality=bimodality_coefficient(policy_polarization)) %>% 
@@ -238,7 +242,7 @@ arrange(., desc(Bimodality)) %>%
 ```
 
 
-These results indicate that individuals who received news about the 2018 election from online news sources have the most bimodal distribution of policy positions (`r bimodality_coefficient(policy_online, na.rm=T)`) and individuals who received news exclusively from legacy media sources have the least bimodal distributions (`r bimodality_coefficient(policy_legacy, na.rm=T)`). However, none of these distributions surpass the threshold of 0.55 to be considered bimodal SOURCE. These results indicate that individuals who receive news about elections from online media have the highest levels of policy polarization and those who receive news from legacy media sources have the lowest level of policy polarization. 
+|       These results indicate that individuals who received news about the 2018 election from online news sources have the most bimodal distribution of policy positions (`r mousetrap::bimodality_coefficient(policy_online, na.rm=T)`) and individuals who received news exclusively from legacy media sources have the least bimodal distributions (`r mousetrap::bimodality_coefficient(policy_legacy, na.rm=T)`). However, none of these distributions surpass the threshold of 0.55 to be considered bimodal SOURCE. These results indicate that individuals who receive news about elections from online media have the highest levels of policy polarization and those who receive news from legacy media sources have the lowest level of policy polarization. 
 
 ```{r BC_PM, fig.align='center', fig.cap='Bimodality Coefficents and Policy Position Distributions by Primary Media Source'}
 #| echo: false
@@ -269,6 +273,7 @@ ggpubr::ggarrange(overlap_legacy, overlap_online, overlap_smedia, overlap_mixed)
 ```{r OVL_SU, fig.align='center', fig.cap='Overlap Coefficents by Social Media Usage'}
 #| echo: false
 #| warning: false
+#| results: hide
 #| label: fig-OVL_SU
 ggpubr::ggarrange(overlap_often, overlap_rarely, ncol = 1)
 ```
@@ -284,6 +289,9 @@ ggpubr::ggarrange(overlap_often, overlap_rarely, ncol = 1)
 |   These results indicate that consuming news from social media or mixed media sources is negatively related to levels of affective polarization for those who are not interested in politics and this relationship disappears for individuals who are very interested in politics. The opposite relationship is present for those who use primarily online media sources. There is no relationship between using online media sources and affective polarization for those who are not interested in politics, and a negative relationship between online media usage and affective polarization for those who are very interested in politics. Similarly, the relationship between social media usage and levels of affective polarization is conditioned by political interest. 
 
 # Discussion
+
+ This study demonstrates that social media usage was not related to higher levels of affective or policy based polarization during the 2018 Ontario election. Instead individuals who primarily used social media for election news were less affectively polarized than those who used legacy media sources. Additionally, those who primarily received news from online media sources displayed also display lower levels of affective polarization than those who received news from legacy news sources, even when controlling for age. These results indicate that during the 2018 Ontario election consuming election related news on television or in newspapers was related to higher levels of affective polarization. They support recent findings that indicate that online news audiences are not always more polarized than legacy news audiences in all countries. Similar to individuals in Poland, Czechia, Finland, and Italy offline polarization appears to be higher than online polarization in Canada [@fletcherHowPolarizedAre2020]. 
+|       These findings contradict the common assumption that social media usage fuels affective polarization. During the 2018 Ontario election individuals who primarily consumed news from social media were the least polarized compared to those who used online media sources, legacy media sources and a mix of social media sources. This finding may be a result of an increasingly partisan television news market and a tendency for Canadians to consume polarized American news channels [@priorMediaPoliticalPolarization2013]. Additionally, 
 
 # Conclusion
 

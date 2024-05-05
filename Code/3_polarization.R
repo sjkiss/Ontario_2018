@@ -1,4 +1,5 @@
 #### LOAD SCRIPTS ####
+library(here)
 source(here("Code/1_load_on18.R")) #clean and load dataset
 source(here("Code/0_functions.R")) #load custom functions and packages needed for these analyses
 #source("Code/2_LSD_emotions.R")
@@ -579,7 +580,7 @@ summary(cfa_policies, fit.measures = T, standardized = T)
 WAP_reg <- list()
 WAP_graph <- list()
 
-WAP_reg[[1]] <- lm(WAP ~ Primary_media, data = on18, na.action = na.omit);summary(WAP_reg[[1]]) 
+WAP_reg[[1]] <- lm(WAP_sd ~ Primary_media, data = on18, na.action = na.omit);summary(WAP_reg[[1]]) 
 WAP_graph[[1]] <- graph_regression(WAP_reg[[1]]); WAP_graph[[1]]
 
 WAP_reg[[2]] <- lm(WAP_sd ~ Interest, data = on18, na.action = na.omit); summary(WAP_reg[[2]]) 
@@ -777,23 +778,25 @@ bimodality_coefficient(policy_mixed, na.rm = T)
 
 bimod_legacy <- policy_legacy %>% 
   ggplot() + geom_density(aes(policy_polarization), col = "seagreen", fill = "seagreen", alpha = 0.4) + 
-  labs(title = "Legacy Media", subtitle = "Bimodality Coefficent (0.29)", x = "Policy Positions", y = NULL) +
+  labs(title = "Legacy Media", x = "Policy Positions", y = NULL) +
  theme_bw()
 
 bimod_online <- policy_online %>% 
   ggplot() + geom_density(aes(policy_polarization), col = "seagreen", fill = "seagreen", alpha = 0.4) + 
-  labs(title = "Online Media", subtitle = "Bimodality Coefficent (0.36)", x = "Policy Positions", y = NULL) +
+  labs(title = "Online Media", x = "Policy Positions", y = NULL) +
   theme_bw()
 
 bimod_social <- policy_social_media %>% 
   ggplot() + geom_density(aes(policy_polarization), col = "seagreen", fill = "seagreen", alpha = 0.4) + 
-  labs(title = "Social Media", subtitle = "Bimodality Coefficent (0.31)", x = "Policy Positions", y = NULL) +
+  labs(title = "Social Media", x = "Policy Positions", y = NULL) +
   theme_bw()
 
 bimod_mixed <- policy_mixed %>% 
   ggplot() + geom_density(aes(policy_polarization), col = "seagreen", fill = "seagreen", alpha = 0.4) + 
-  labs(title = "Mixed media", subtitle = "Bimodality Coefficent (0.32)", x = "Policy Positions", y = NULL) +
+  labs(title = "Mixed media", x = "Policy Positions", y = NULL) +
   theme_bw()
+
+#Nice to have fake distributions of the different kinds of distribution
 
 gridExtra::grid.arrange(bimod_legacy, bimod_online, bimod_social, bimod_mixed) 
 
@@ -805,12 +808,12 @@ bimodality_coefficient(policy_rarely, na.rm = T)
 
 bimod_often <- policy_often %>% 
   ggplot() + geom_density(aes(policy_polarization), col = "seagreen", fill = "seagreen", alpha = 0.4) + 
-  labs(title = "Uses Social Media Often", subtitle = "Bimodality Coefficent (0.29)", x = "Policy Positions", y = NULL) +
+  labs(title = "Uses Social Media Often", x = "Policy Positions", y = NULL) +
   theme_bw()
 
 bimod_rarely <- policy_rarely %>% 
   ggplot() + geom_density(aes(policy_polarization), col = "seagreen", fill = "seagreen", alpha = 0.4) + 
-  labs(title = "Uses Social Media Rarely", subtitle = "Bimodality Coefficent (0.33)", x = "Policy Positions", y = NULL) +
+  labs(title = "Uses Social Media Rarely", x = "Policy Positions", y = NULL) +
   theme_bw()
 
 gridExtra::grid.arrange(bimod_often, bimod_rarely) 
@@ -840,7 +843,7 @@ policy_conservatives_legacy_vector <- as.double(policy_conservatives_legacy$poli
 
 
 overlapping::overlap(list(policy_left_legacy_vector, policy_conservatives_legacy_vector))
-overlapping::boot.overlap(list(policy_left_legacy_vector, policy_conservatives_legacy_vector), B = 1000)
+#overlapping::boot.overlap(list(policy_left_legacy_vector, policy_conservatives_legacy_vector), B = 1000)
 
 
 #bayestestR::overlap(policy_left_legacy_vector, policy_conservatives_legacy_vector)

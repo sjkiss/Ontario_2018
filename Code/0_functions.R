@@ -48,7 +48,22 @@ ggplot(r, aes(x = Variable, y = Coefficient)) +  geom_hline(yintercept = 0, colo
 # integral(f(100,100), bounds = list(x = c(-Inf, Inf)))
 
 
-#Calculate WAP score
+#Calculate Affective Polarization Scores
+
+unweighted_like_scores <- function(parties, df){
+  
+  data <- df[, parties]
+  
+  data$mean_like <- ifelse(
+    rowSums(!is.na(data)) >= 2, 
+    rowMeans(data, na.rm = T)
+    , NA
+  )
+  data$distance <- rowSums((data[, parties] - data$mean_like)^2, na.rm = T)/(rowSums(!is.na(data[, parties])))
+  data$spread <- modify(data$distance, sqrt)
+  data$spread
+  
+}
 
 
 
