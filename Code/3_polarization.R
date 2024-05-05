@@ -66,6 +66,7 @@ lookfor(on18, "seats in the House of Commons")
 #political knowledge variable
 on18$pol_knowledge <- (on18$unsg_correct + on18$financename_correct +
                          on18$ggname_correct + on18$nhse_correct)/4
+
 table(on18$pol_knowledge)
 
 
@@ -306,6 +307,14 @@ bimodality_coefficient(policy_rarely, na.rm = T)
 
 #Extract _out and create a new dataset to calculate affective polarization scores
 
+on18 <- on18 %>% 
+  rename(Green_Like = partyeval_4_out, 
+         Liberal_Like = partyeval_1_out, 
+         NDP_Like = partyeval_3_out,
+         PC_Like = partyeval_2_out)
+
+
+
 on18 %>% 
   select(id,starts_with("partyeval")&ends_with("out"))->affect
 
@@ -350,6 +359,10 @@ Soc_dis_scores$Soc_dis <- sqrt(Soc_dis_scores$Soc_dis/4)
 
 
 full_join(on18, Soc_dis_scores, by = join_by(id)) -> on18
+
+PARTIES <- c("Green_Like", "Liberal_Like", "NDP_Like", "PC_Like")
+
+on18$Spread <- unweighted_like_scores(PARTIES, on18)
 
 
 #### Weighted Affective Polarization (WAP) Scores ####
