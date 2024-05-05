@@ -306,6 +306,8 @@ bimodality_coefficient(policy_rarely, na.rm = T)
 # 0 (0) is Really dislike and 5 (1) is really like. 
 
 #Extract _out and create a new dataset to calculate affective polarization scores
+on18 %>% 
+  select(id,starts_with("partyeval")&ends_with("out"))->affect
 
 on18 <- on18 %>% 
   rename(Green_Like = partyeval_4_out, 
@@ -315,8 +317,7 @@ on18 <- on18 %>%
 
 
 
-on18 %>% 
-  select(id,starts_with("partyeval")&ends_with("out"))->affect
+
 
 names(affect)
 
