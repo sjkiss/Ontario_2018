@@ -1,12 +1,16 @@
 #### LOAD SCRIPTS ####
-source("Code/1_load_on18.R") #clean and load dataset
-source("Code/0_functions.R") #load custom functions and packages needed for these analyses
-source("Code/2_LSD_emotions.R")
-
+library(here)
+source(here("Code/1_load_on18.R")) #clean and load dataset
+source(here("Code/0_functions.R")) #load custom functions and packages needed for these analyses
+#source("Code/2_LSD_emotions.R")
+library(estimatr)
 #### CHECK THE DATASET ####
 head(on18)
 names(on18)
 glimpse(on18)
+
+
+
 
 #### CREATE VARIABLES FOR POLARIZATION ANALYSIS ####
 
@@ -307,6 +311,14 @@ on18 %>%
 on18 %>% 
   select(id,starts_with("partyeval")&ends_with("out"))->affect
 
+
+on18 <- on18 %>% 
+  rename(Green_Like = partyeval_4_out, 
+         Liberal_Like = partyeval_1_out, 
+         NDP_Like = partyeval_3_out,
+         PC_Like = partyeval_2_out)
+
+
 names(affect)
 
 affect %>% 
@@ -344,6 +356,13 @@ Soc_dis_scores$Soc_dis <- sqrt(Soc_dis_scores$Soc_dis/4)
 
 full_join(on18, Soc_dis_scores, by = join_by(id)) -> on18
 
+
+PARTIES <- c("Green_Like", "Liberal_Like", "NDP_Like", "PC_Like")
+
+on18$Spread <- unweighted_like_scores(PARTIES, on18)
+
+on18 <- on18 %>% 
+  mutate(Spread_sd = scale(Spread))
 
 #### Weighted Affective Polarization (WAP) Scores ####
 
@@ -566,7 +585,7 @@ summary(cfa_policies, fit.measures = T, standardized = T)
 WAP_reg <- list()
 WAP_graph <- list()
 
-WAP_reg[[1]] <- lm(WAP ~ Primary_media, data = on18, na.action = na.omit);summary(WAP_reg[[1]]) 
+WAP_reg[[1]] <- lm(WAP_sd ~ Primary_media, data = on18, na.action = na.omit);summary(WAP_reg[[1]]) 
 WAP_graph[[1]] <- graph_regression(WAP_reg[[1]]); WAP_graph[[1]]
 
 WAP_reg[[2]] <- lm(WAP_sd ~ Interest, data = on18, na.action = na.omit); summary(WAP_reg[[2]]) 
@@ -588,13 +607,51 @@ WAP_graph[[6]] <- graph_regression(WAP_reg[[6]]); WAP_graph[[6]]
 
 WAP_reg[[7]] <- lm(WAP_sd ~ Interest + Primary_media + age3 + degree + income3 + pol_knowledge, data = on18, na.action = na.omit); summary(WAP_reg[[7]]) 
 WAP_graph[[7]] <- graph_regression(WAP_reg[[7]]); WAP_graph[[7]]
-
+modelsummary::modelsummary(WAP_reg, stars = T)
 
 WAP_Interact <- lm(WAP_sd ~ Primary_media*Interest, data = on18, na.action = na.omit)
 summary(WAP_Interact)
 
 WAP_Interact2 <- lm(WAP_sd ~ Primary_media*Interest  + age3 + degree + income3 + pol_knowledge, data = on18, na.action = na.omit)
 summary(WAP_Interact2)
+
+WAP_regdf <- map(WAP_reg, tidy, conf.int = TRUE) 
+WAP_regdf <- bind_rows(WAP_regdf, .id = "model_num")
+
+WAP_regdf <- WAP_regdf %>% 
+  filter(!term == "(Intercept)") %>% 
+  mutate(term = case_match(term, 
+                             "Primary_mediaSocial_Media" ~ "Social Media (ref. Legacy News)", 
+                            "Primary_mediaOnline" ~ "Online News",
+                             "Primary_mediaMixed" ~ "Mixed News",
+                           "Interest" ~ "Political Interest",
+                            "age3" ~  "Age",
+                             "degree" ~ "University Degree",
+                             "income3" ~ "Income",
+                            "pol_knowledge" ~ "Political Knowledge"
+                           ),
+         term = as.factor(term),
+         term = fct_relevel(term, 
+                            "Political Knowledge", "Income",
+                            "University Degree", "Age", "Political Interest", 
+                            "Mixed News", "Online News", 
+                            "Social Media (ref. Legacy News)"
+                             ),
+         model_num = paste0("Model ", model_num)
+         )
+
+
+
+
+WAP_regs_PM <- WAP_regdf %>% 
+  ggplot(aes(x = estimate, y = term, xmin = conf.low, xmax = conf.high)) + 
+  geom_vline(xintercept = 0, col = "red", lty = 4) +
+  geom_point() + geom_linerange() + facet_wrap(~model_num) +
+  labs(x = "Estimates with 95% Confidence Intervals", y = NULL) +
+  theme_bw() 
+
+
+
 
 #Visualize the marginal effects from the interaction effects
 marginaleffects::plot_slopes(WAP_Interact, variables = "Interest", condition = "Primary_media") + geom_hline(yintercept  = 0, lty = "dashed", col = "forestgreen") + theme_bw()
@@ -610,6 +667,16 @@ WAP_reg_df_ci <- bind_rows(WAP_reg_df_ci) %>%
   rename("conf.low" = "2.5 %", "conf.high" = "97.5 %")
 WAP_reg_df <- bind_cols(WAP_reg_df, WAP_reg_df_ci)
 
+
+COVARS <- c("Primary_media", "Interest", "age3", "degree", "income3", "pol_knowledge")
+
+Spread_primary_media <- list()
+for(i in 1:length(COVARS)){
+  Spread_primary_media[[i]] <-  lm_robust(reformulate(COVARS[1:i],
+                                                   response = "Spread_sd"), data = on18, se_type = "HC0")
+}
+modelsummary(Spread_primary_media, stars = T)
+
 model_names <- list(
   "1" = "Model 1",
   "2" = "Model 2",
@@ -622,6 +689,8 @@ model_names <- list(
 model_labeller <- function(variable, value){
   return(model_names[value])
 }
+
+
 
 WAP_reg_df %>% 
   filter(!term == "(Intercept)") %>% 
@@ -708,6 +777,44 @@ WAP_reg_soc_use[[7]] <- lm(WAP_sd ~ Interest + Social_Use2 + age3 + degree + inc
 #WAP_graph[[7]] <- graph_regression(WAP_reg_soc_use[[7]]); WAP_graph[[7]]
 modelsummary(WAP_reg_soc_use, stars = T, vcov = "HC0")
 #ggarrange(plotlist = list(WAP_primarymedia_graph, WAP_Interest_Graph, WAP_Interact_graph))
+
+
+WAP_reg_soc_usedf <- map(WAP_reg_soc_use, tidy, conf.int = TRUE) 
+WAP_reg_soc_usedf <- bind_rows(WAP_reg_soc_usedf, .id = "model_num")
+
+WAP_reg_soc_usedf <- WAP_reg_soc_usedf %>% 
+  filter(!term == "(Intercept)") %>% 
+  mutate(term = case_match(term, 
+                           "Social_Use2Less than once a week" ~ "Less than once a week (ref. Never)", 
+                           "Social_Use2About once a week" ~ "Once a week",
+                           "Social_Use2Several times a week" ~ "Several Times a Week",
+                           "Social_Use2About once a day" ~ "Once a Day",
+                           "Social_Use2Several times a day" ~ "Several Times a Day",
+                           "Interest" ~ "Political Interest",
+                           "age3" ~  "Age",
+                           "degree" ~ "University Degree",
+                           "income3" ~ "Income",
+                           "pol_knowledge" ~ "Political Knowledge"
+  ),
+  term = as.factor(term),
+  term = fct_relevel(term, 
+                     "Political Knowledge", "Income",
+                     "University Degree", "Age", "Political Interest", 
+                     "Several Times a Day", "Once a Day", 
+                     "Several Times a Week", 
+                     "Once a week",
+                     "Less than once a week (ref. Never)"
+  ),
+  model_num = paste0("Model ", model_num)
+  )
+
+
+WAP_regs_SU <- WAP_reg_soc_usedf %>% 
+  ggplot(aes(x = estimate, y = term, xmin = conf.low, xmax = conf.high)) + 
+  geom_vline(xintercept = 0, col = "red", lty = 4) +
+  geom_point() + geom_linerange() + facet_wrap(~model_num) +
+  labs(x = "Estimates with 95% Confidence Intervals", y = NULL) +
+  theme_bw() 
 
 #### Affective polarization models ####
 
@@ -941,6 +1048,50 @@ summary(WAP_Interact2)
 marginaleffects::plot_slopes(WAP_Interact, variables = "Primary_media", condition = "Interest") + geom_hline(yintercept  = 0, lty = "dashed", col = "forestgreen") + labs(y = "Marginal Effect of Primary Media Variable") + theme_bw()
 
 marginaleffects::plot_slopes(WAP_Interact2, variables = "Social_Use2", condition = "Interest") + geom_hline(yintercept  = 0, lty = "dashed", col = "forestgreen") + theme_bw()
-
 gam_model <- mgcv::gam(WAP_sd ~ s(age) + Primary_media + Interest + degree + income3 + pol_knowledge, data = on18)
-draw(gam_model, residuals = T)
+#draw(gam_model, residuals = T)
+
+#Theoretical distributions
+
+set.seed(1234)
+unimodal_data1 <- rnorm(1000, 0, 2)
+unimodal_data2 <- rnorm(1000, 0, 1)
+unimodal_data3 <- rnorm(1000, 0, 3)
+unimodal_data4 <- rnorm(1000, 0, 1)
+unimodal_data5 <- rnorm(1000, 0, 1)
+unimodal_data <- c(unimodal_data1, unimodal_data2, unimodal_data3, unimodal_data4, unimodal_data5)
+bimodality_coefficient(unimodal_data)
+
+uni_modal <- as_tibble(unimodal_data) %>% 
+  ggplot(aes(x = value)) +
+  geom_density(col = "forestgreen", fill = "forestgreen", alpha = 0.4) +
+  labs(subtitle = paste0("Bimodality Coefficent ",
+                      round(bimodality_coefficient(unimodal_data), 2))) +
+  theme_bw()
+
+
+semimodal_data1 <- rnorm(1000, -2, 1)
+semimodal_data2 <- rnorm(100, 0, 1)
+semimodal_data3 <- rnorm(1000, 2, 1)
+semimodal_data <- c(semimodal_data1, semimodal_data2, semimodal_data3)
+bimodality_coefficient(semimodal_data)
+semi_modal <- as_tibble(semimodal_data) %>% 
+  ggplot(aes(x = value)) +
+  geom_density(col = "forestgreen", fill = "forestgreen", alpha = 0.4) +
+  labs(subtitle = paste0("Bimodality Coefficent ",
+                      round(bimodality_coefficient(semimodal_data), 2))) +
+  theme_bw()
+
+
+bimod1 <- rnorm(1000, -1, 0.1)
+bimod2 <- rnorm(1000, 1, 0.1)
+bimodal_data <- c(bimod1, bimod2)
+bimodality_coefficient(bimodal_data)
+bimodal <- as_tibble(bimodal_data) %>% 
+  ggplot(aes(x = value)) + 
+  geom_density(col = "forestgreen", fill = "forestgreen", alpha = 0.4) + 
+  labs(subtitle = paste0("Bimodality Coefficent ",
+                         round(bimodality_coefficient(bimodal_data),2))) +
+  theme_bw()
+
+

@@ -37,3 +37,4 @@ on18 %>%
     TRUE~0
   ))->on18
 table(on18$straightliner)
+

@@ -11,10 +11,12 @@ library(ggpubr)
 on18<-read_sav(file=here("Data/Ontario ES 2018 LISPOP.sav"))
 
 #### Run straightliner ####
-source("Code/2_straightlining.r")
+source(here("Code/2_straightlining.r"))
 #### Remove straighliners###
+straightliners <- on18 %>% 
+  filter(straightliner == 1)
 on18 %>% 
-  filter(straightliner>0)->on18
+  filter(!straightliner>0)->on18
 names(on18)
 table(on18$`filter_$`)
 library(car)
