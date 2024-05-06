@@ -242,8 +242,6 @@ WAP_regs_PM
 WAP_regs_SU
 ```
 
-
-
 By contrast, for all the models political interest is correlated with a 1.50 to 1.67 standard deviation increase in levels of affective polarization. We investigate the relationship between political interest and levels of affective polarization further in section ... Additionally, and contrary to to theoretical expectations when controlling for an individual's primary media source age is negatively related to levels of affective polarization, in that older individuals are less affectively polarized. In order to investigate this phenomenon further we estimate an OLS regression model that includes age as a polynomial term and can be expressed as follows:
 \singlespace
 $$
