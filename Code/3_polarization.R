@@ -561,6 +561,20 @@ on18 %>%
   group_by(Primary_media) %>%
   summarise(mean = mean(Soc_dis, na.rm = T), sd = sd(Soc_dis, na.rm = T))
 
+#### RE-RUN MAIN ANALYSES WITHOUT STRAIGHT LINERS ####
+
+COVARS <- c("Interest", "age3", "degree", "income3", "pol_knowledge")
+
+WAP_primary_media <- list()
+for(i in 1:length(COVARS)){
+  data <- on18 |> filter(straightliner == 0)
+  WAP_primary_media[[i]] <-  lm_robust(reformulate(c("Primary_media", COVARS[1:i]),
+                                                   response = "WAP_sd"), data = data, se_type = "HC0")
+}
+lm_robust(reformulate(c("Primary_media"),
+                      response = "WAP_sd"), data = data, se_type = "HC0")
+modelsummary(WAP_primary_media, stars = T)
+
 
 
 #### Policy Position Distribution ####

@@ -30,6 +30,8 @@ link-citations: true
 csl: apa.csl
 execute: 
   cache: true
+  message: false
+  warning: false
 ---
 
 
@@ -70,7 +72,7 @@ source(here("Code/3_polarization.R"))
 
 ## What is Polarization
 
-|     In the literature on polarization there has been much debate on the relationship between ideology and partisanship. Scholars studying polarization, particularly in the United States, have contrasting views on the nature of modern political polarization. Some scholars argue that ideological or policy polarization has been increasing for both political elites and the electorate more broadly [@abramowitzPolarizationMyth2008]. Another group argues that partisan sorting has led parties to become more ideologically homogeneous, while party elites have become more polarized, which leads to the perception that the electorate is becoming more polarized [@fiorinaCultureWarMyth2011; @masonDisrespectfullyAgreeDifferential2015]. Finally, a third group argues that despite opposing partisans being similar when it comes to policy issue they increasingly dislike and distrust members of the opposing party [@iyengarOriginsConsequencesAffective2019; @masonIdeologuesIssuesPolarizing2018]. These divergences in understandings of political polarization have led studies on polarization to differentiate between what is called called issues based polarization [@masonIdeologuesIssuesPolarizing2018] and affective identity based polarization [@masonUncivilAgreementHow2018] in their analyses of the causes and consequences of political polarization. 
+It is Some scholars argue that ideological or policy polarization has been increasing for both political elites and the electorate more broadly [@abramowitzPolarizationMyth2008]. Another group argues that partisan sorting has led parties to become more ideologically homogeneous, while party elites have become more polarized, which leads to the perception that the electorate is becoming more polarized [@fiorinaCultureWarMyth2011; @masonDisrespectfullyAgreeDifferential2015]. Finally, a third group argues that despite opposing partisans being similar when it comes to policy issue they increasingly dislike and distrust members of the opposing party [@iyengarOriginsConsequencesAffective2019; @masonIdeologuesIssuesPolarizing2018]. These divergences in understandings of political polarization have led studies on polarization to differentiate between what is called called issues based polarization [@masonIdeologuesIssuesPolarizing2018] and affective identity based polarization [@masonUncivilAgreementHow2018] in their analyses of the causes and consequences of political polarization. 
 
 ### Ideological Polarization
 |       Ideological polarization refers to the idea that the elites and the public are ideologically divided and supporters of opposing parties have significantly different views on key policy issues. There is clear evidence that the elite in the United States is ideologically polarized and that these ideological divisions have important consequences for American politics. However, there have been far fewer studies examining elite polarization in Canada. One of the most consequential studies on elite level ideological polarization in Canada found that the emergence of the Reform and the Canadian Alliance in the 1990s transformed Canada's brokerage parties into ideological parties [@cochraneLeftRightSmall2015]. Due to these developments, Canada's political parties began polarizing along the left/right political division, in a similar manner to the party systems in other industrialized Western democracies. However, despite the rise of elite ideological polarization in Canada partisan consensus can still emerge during times of crisis such as the COVID-19 pandemic [@merkleyRareMomentCrossPartisan2020]. Therefore, there is evidence that Canada's political elite is not as ideologically polarized as the American political elite which politicized the COVID-19 pandemic and undermined health experts for partisan gains [@gadarianPartisanshipHealthBehavior2021].
@@ -237,14 +239,10 @@ Where $Y_i$ is and individual's level of affective polarization and $\boldsymbol
 age_predicted_graph
 ```
 
-<<<<<<< HEAD
-## Social Media Usage and Policy Polarization
-|       To investigate the relationship between social media usage and policy polarization we first calculate the mean policy positions of individuals by primary media source, social media usage, and vote choice in the 2018 election. 
-|       We then investigated the relationship between social media usage and policy polarization. First, we calculated bimodality coefficients for individuals who received news about the 2018 Ontario election exclusively from social media, online media sources, legacy media sources and a mix of media sources (See @fig-BC_PM).
-=======
+
 ## Media Consumption and Policy Polarization
 |       To investigate the relationship between media consumption and policy polarization we first calculate the mean policy positions of individuals by primary media source, social media usage, and vote choice in the 2018 election. To reiterate, these run from 0 to 11, with 0 being left-wing and 11 being right-wing. The results are in @tbl-desccript-policy and show that those who report getting news about the provincial from legacy media exclusively are the most conservative (5.56) while those who report getting news only from social media are the most liberal (5.04). A similar pattern holds for self-reports of social media usage in general. Respondents report never using social media are the most conservative while those who are the most frequent users of social media are the most left-wing. 
->>>>>>> aad0a0fd00a56ed23c944c2d31872d275a3823cb
+
 
 ```{r}
 #| label: tbl-descript-policy
@@ -275,24 +273,18 @@ arrange(., desc(Bimodality)) %>%
   gt() 
 ```
 
-
-<<<<<<< HEAD
 |       These results indicate that individuals who received news about the 2018 election from online news sources have the most bimodal distribution of policy positions (`r mousetrap::bimodality_coefficient(policy_online, na.rm=T)`) and individuals who received news exclusively from legacy media sources have the least bimodal distributions (`r mousetrap::bimodality_coefficient(policy_legacy, na.rm=T)`). However, none of these distributions surpass the threshold of 0.55 to be considered bimodal SOURCE. These results indicate that individuals who receive news about elections from online media have the highest levels of policy polarization and those who receive news from legacy media sources have the lowest level of policy polarization. 
 
-```{r BC_PM, fig.align='center', fig.cap='Bimodality Coefficents and Policy Position Distributions by Primary Media Source'}
-=======
+
 ```{r}
->>>>>>> aad0a0fd00a56ed23c944c2d31872d275a3823cb
-#| echo: false
-#| warning: false
+
+
 #| label: fig-BC_PM
 #| fig-cap: Probability distributions of policy positions by primary media source
 #| 
 gridExtra::grid.arrange(bimod_legacy, bimod_online, bimod_social, bimod_mixed) 
 
 ```
-
-
 
 |       Second, we calculated bimodility coefficients by self-reported social media usage which are reported in @tbl-bimodality-social-media-policy (@tbl-bimodality-social-media-policy). Again, there is minimal evidence of any polarization, and to the degree that there is a trend, it runs *against* the social media hypothesis. These results are consistent with the findings above that showed that interest in politics was a significant predictor of affective polarization. Presumably, self-reported heavy social media users are investing more cognitive energy consuming entertainment that taking positions.   
 ```{r}
@@ -344,13 +336,9 @@ ggpubr::ggarrange(overlap_often, overlap_rarely, ncol = 1)
 |   These results indicate that consuming news from social media or mixed media sources is negatively related to levels of affective polarization for those who are not interested in politics and this relationship disappears for individuals who are very interested in politics. The opposite relationship is present for those who use primarily online media sources. There is no relationship between using online media sources and affective polarization for those who are not interested in politics, and a negative relationship between online media usage and affective polarization for those who are very interested in politics. Similarly, the relationship between social media usage and levels of affective polarization is conditioned by political interest. 
 
 # Discussion
-
-<<<<<<< HEAD
  This study demonstrates that social media usage was not related to higher levels of affective or policy based polarization during the 2018 Ontario election. Instead individuals who primarily used social media for election news were less affectively polarized than those who used legacy media sources. Additionally, those who primarily received news from online media sources displayed also display lower levels of affective polarization than those who received news from legacy news sources, even when controlling for age. These results indicate that during the 2018 Ontario election consuming election related news on television or in newspapers was related to higher levels of affective polarization. They support recent findings that indicate that online news audiences are not always more polarized than legacy news audiences in all countries. Similar to individuals in Poland, Czechia, Finland, and Italy offline polarization appears to be higher than online polarization in Canada [@fletcherHowPolarizedAre2020]. 
-=======
-|       This study demonstrates that social media usage was not related to higher levels of affective or policy based polarization during the 2018 Ontario election. Instead individuals who primarily used social media for election news were less affectively polarized than those who used legacy media sources. Additionally, those who primarily received news from online media sources displayed also display lower levels of affective polarization than those who received news from legacy news sources, even when controlling for age. These results indicate that during the 2018 Ontario election consuming election related news on television or in newspapers was related to higher levels of affective polarization. They support recent findings that indicate that online news audiences are not always more polarized than legacy news audiences in all countries. Similar to individuals in Poland, Czechia, Finland, and Italy offline polarization appears to be higher than online polarization in Canada [@fletcherHowPolarizedAre2020]. 
->>>>>>> aad0a0fd00a56ed23c944c2d31872d275a3823cb
-|       These findings contradict the common assumption that social media usage fuels affective polarization. During the 2018 Ontario election individuals who primarily consumed news from social media were the least polarized compared to those who used online media sources, legacy media sources and a mix of social media sources. This finding may be a result of an increasingly partisan television news market and a tendency for Canadians to consume polarized American news channels [@priorMediaPoliticalPolarization2013]. Additionally, 
+
+These findings contradict the common assumption that social media usage fuels affective polarization. During the 2018 Ontario election individuals who primarily consumed news from social media were the least polarized compared to those who used online media sources, legacy media sources and a mix of social media sources. This finding may be a result of an increasingly partisan television news market and a tendency for Canadians to consume polarized American news channels [@priorMediaPoliticalPolarization2013]. Additionally, 
 
 # Conclusion
 

@@ -1,4 +1,5 @@
 knitr
+mousetrap
 here
 tidyverse
 ggplot2
@@ -9,7 +10,6 @@ purrr
 dplyr
 stringr
 forcats
-lubridate
 haven
 labelled
 broom
@@ -17,10 +17,10 @@ ggeffects
 modelsummary
 ggpubr
 careless
+estimatr
 carData
 car
 bayestestR
-mousetrap
 lavaan
 psych
 testthat
