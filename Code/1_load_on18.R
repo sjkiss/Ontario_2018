@@ -13,13 +13,26 @@ on18<-read_sav(file=here("Data/Ontario ES 2018 LISPOP.sav"))
 #### Run straightliner ####
 source(here("Code/2_straightlining.r"))
 nrow(on18)
+#### Filter out non consenters ####
+on18 %>% 
+  filter(consent!=1) ->non_consenters
+on18 %>% 
+  filter(consent==1)->on18
 #### Remove straighliners###
 on18 %>% 
   filter(straightliner==1)->straightliners
 on18 %>% 
   filter(straightliner==0)->on18
+#### Remove Rs with missing values on do they use social media
+on18 %>% 
+  filter(is.na(socialmedia))->social_missing
+on18 %>% 
+  filter(!is.na(socialmedia))->on18
+
+#Counts
 nrow(straightliners)
-names(on18)
+nrow(non_consenters)
+nrow(on18)
 
 library(car)
 #### Individual Finanical Situation Questions ####
@@ -483,7 +496,10 @@ on18$trustfactnews2
 on18 %>% 
 mutate(trust_media=rowMeans(across(c(trustbiasnews2,trustfactnews)), na.rm=T))->on18
   #### Create Social Media Users####
-
+table(on18$socialmedia,on18$freqsocialmedia, useNA = "ifany")
+# on18 %>% 
+#   select(contains("privacy"), socialmedia, freqsocialmedia) %>% 
+#   View()
 on18 %>% 
   mutate(Social_Use=case_when(
     socialmedia==1 ~ freqsocialmedia,
@@ -491,8 +507,13 @@ on18 %>%
   ))->on18
 on18 %>% 
   add_value_labels(Social_Use=c(Never=0))->on18
+
+
 table(as_factor(on18$Social_Use))
 on18$Social_Use<-as_factor(on18$Social_Use)
+table(on18$freqsocialmedia, useNA = "ifany")
+table(on18$Social_Use, useNA = "ifany")
+names(on18)
 on18$Social_Use2<-car::Recode(on18$Social_Use, "'Never'='Never' ; 
 'Several times in a year'='Less than once a week' ;
                               'About once a month'='Less than once a week' ;

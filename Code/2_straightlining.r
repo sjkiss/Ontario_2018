@@ -11,9 +11,12 @@ on18$irv_party<-irv_party
 on18 %>% 
   filter(irv_party==0)
 on18 %>% 
-  select(matches("leader_[0-9]$")) %>% 
+  select(contains("leader"))
+on18 %>% 
+  select(matches("^leadereval_[0-9]$")) %>% 
   irv(.)->irv_leader
 on18$irv_leader<-irv_leader
+irv_leader
 on18 %>% 
   filter(irv_party==0|irv_leader==0)
 lookfor(on18, "taxes")
@@ -28,14 +31,24 @@ on18 %>%
 on18$irv_spending<-irv_spending
 on18 %>% 
   filter(if_any(contains("irv"), ~.==0))
-
+on18 %>% 
+  select(matches("privacy_[0-9]$")) %>% 
+  irv(.)->irv_privacy
+on18$irv_privacy<-irv_privacy
+on18 %>% 
+  filter(if_any(contains("irv"), ~.==0))
 on18 %>% 
   mutate(straightliner=case_when(
     irv_party==0~ 1,
     irv_agreement==0~1,
     irv_spending==0~1,
     irv_leader==0~1,
+    irv_privacy==0~1,
     TRUE~0
   ))->on18
 table(on18$straightliner)
 
+on18 %>% 
+  select(contains("irv"), straightliner) %>% view()
+on18 %>% 
+  filter(if_any(contains("irv"), ~is.na(.))) %>% view()
