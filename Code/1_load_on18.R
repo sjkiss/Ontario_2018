@@ -12,13 +12,17 @@ on18<-read_sav(file=here("Data/Ontario ES 2018 LISPOP.sav"))
 
 #### Run straightliner ####
 source(here("Code/2_straightlining.r"))
+
 nrow(on18)
 #### Filter out non consenters ####
 on18 %>% 
   filter(consent!=1) ->non_consenters
 on18 %>% 
   filter(consent==1)->on18
+
 #### Remove straighliners###
+straightliners <- on18 %>% 
+  filter(straightliner == 1)
 on18 %>% 
   filter(straightliner==1)->straightliners
 on18 %>% 

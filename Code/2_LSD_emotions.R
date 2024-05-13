@@ -1,6 +1,8 @@
+library(here)
 source("Code/1_LSDprep_dec2017.R")
 source("Code/2_add_emotion_variables.R")
-library(here)
+
+
 on18 %>% 
   ungroup() ->on18
 
@@ -29,8 +31,10 @@ on18 %>%
 on18$fin.y.LSD3<-LSDprep_negation(on18$fin.y.LSD2)
 on18$imm.y.LSD3<-LSDprep_negation(on18$imm.y.LSD2)
 on18 %>% 
-  select(ends_with("LSD3")) %>% 
-  print(n=100)
+  select(ends_with("LSD3")) 
+
+# %>% 
+#   print(n=100)
 
 on18 %>% 
   filter(str_detect(fin.y, pattern = " (N|n)ot much " )) %>% 
@@ -97,22 +101,23 @@ imm_dfm %>%
 
 #Create Discrete emotions dictionary - Emotions are too scarce to do anything
 
-# Discrete_emotions <- dictionary(
-#                     list(
-#                         anger = scan("Data/DED.Mar22.anger.txt", character(), quote = ""),
-#                         aniexty = scan("Data/DED.Mar22.anxiety.txt", character(), quote = ""), 
-#                         sadness = scan("Data/DED.Mar22.sadness.txt", character(), quote = ""), 
-#                         optimism = scan("Data/DED.Mar22.optimism.txt", character(), quote = "")
-#                     ))
+Discrete_emotions <- dictionary(
+                    list(
+                        anger = scan("Data/DED.Mar22.anger.txt", character(), quote = ""),
+                        aniexty = scan("Data/DED.Mar22.anxiety.txt", character(), quote = ""),
+                        sadness = scan("Data/DED.Mar22.sadness.txt", character(), quote = ""),
+                        optimism = scan("Data/DED.Mar22.optimism.txt", character(), quote = "")
+                    ))
 # 
-# tokens(on18$fin.y.LSD4) %>% 
-#   dfm() %>%
-#   dfm_weight(., scheme="prop") %>% 
-#   dfm_lookup(., dictionary=Discrete_emotions) ->fin_des_dfm
-# tokens(on18$imm.y.LSD4) %>% 
-#   dfm() %>%
-#   dfm_weight(., scheme="prop") %>% 
-#   dfm_lookup(., dictionary=Discrete_emotions) ->imm_des_dfm
+tokens(on18$fin.y.LSD4) %>%
+  dfm() %>%
+  dfm_weight(., scheme="prop") %>%
+  dfm_lookup(., dictionary=Discrete_emotions) ->fin_des_dfm
+
+tokens(on18$imm.y.LSD4) %>%
+  dfm() %>%
+  dfm_weight(., scheme="prop") %>%
+  dfm_lookup(., dictionary=Discrete_emotions) ->imm_des_dfm
 
 #Correlate
 cor(on18$fin_sentiment, on18$imm_sentiment)
@@ -141,6 +146,7 @@ names(on18)
 on18$Media
 summary(lm(fin_sentiment~Media, data=on18))
 summary(lm(imm_sentiment~Media, data=on18))
-summary(lm(imm_sentiment ~ WAP, data = on18))
+lm(imm_sentiment ~ WAP*Primary_Media, data = on18) %>% 
+  marginaleffects::plot_slopes(by = "Primary_Media", variables = "WAP")
 summary(lm(fin_sentiment ~ WAP, data = on18))
 

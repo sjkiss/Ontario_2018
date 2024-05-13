@@ -48,7 +48,11 @@ ggplot(r, aes(x = Variable, y = Coefficient)) +  geom_hline(yintercept = 0, colo
 # integral(f(100,100), bounds = list(x = c(-Inf, Inf)))
 
 
+<<<<<<< HEAD
 #Calculate Affective Polarization Scores
+=======
+#Calculate affective polarization scores
+>>>>>>> 9cd867d37dfe59154474f9c7c3ec82b62eccf811
 
 unweighted_like_scores <- function(parties, df){
   
@@ -60,7 +64,11 @@ unweighted_like_scores <- function(parties, df){
     , NA
   )
   data$distance <- rowSums((data[, parties] - data$mean_like)^2, na.rm = T)/(rowSums(!is.na(data[, parties])))
+<<<<<<< HEAD
   data$spread <- modify(data$distance, sqrt)
+=======
+  data$spread <- sqrt(data$distance)
+>>>>>>> 9cd867d37dfe59154474f9c7c3ec82b62eccf811
   data$spread
   
 }

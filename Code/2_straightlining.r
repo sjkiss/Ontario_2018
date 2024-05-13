@@ -48,7 +48,3 @@ on18 %>%
   ))->on18
 table(on18$straightliner)
 
-on18 %>% 
-  select(contains("irv"), straightliner) %>% view()
-on18 %>% 
-  filter(if_any(contains("irv"), ~is.na(.))) %>% view()
