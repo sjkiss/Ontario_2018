@@ -1,8 +1,5 @@
 knitr
-<<<<<<< HEAD
 mousetrap
-=======
->>>>>>> 9cd867d37dfe59154474f9c7c3ec82b62eccf811
 here
 tidyverse
 ggplot2
@@ -13,6 +10,7 @@ purrr
 dplyr
 stringr
 forcats
+lubridate
 haven
 labelled
 broom
@@ -20,10 +18,7 @@ ggeffects
 modelsummary
 ggpubr
 careless
-<<<<<<< HEAD
 estimatr
-=======
->>>>>>> 9cd867d37dfe59154474f9c7c3ec82b62eccf811
 carData
 car
 bayestestR
@@ -31,9 +26,6 @@ lavaan
 psych
 testthat
 overlapping
-<<<<<<< HEAD
-=======
-estimatr
->>>>>>> 9cd867d37dfe59154474f9c7c3ec82b62eccf811
+marginaleffects
 gtsummary
 gt

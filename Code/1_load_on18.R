@@ -333,7 +333,10 @@ on18 %>%
     CBConline == 1 ~ 1,
     TRUE ~ 0
   ))-> on18
-
+names(on18)
+on18 %>% 
+  mutate(media_diversity=rowSums(across(CBCTV:HuffingtonPostonline),na.rm=T))->on18
+on18$CBCTV
 # #Find exclusive media
 #
 # names(on18)
@@ -552,5 +555,4 @@ table(on18$Social_Use3, on18$Social_Use)
 #### Export to SPSS File ####
 names(on18)
 #write_sav(on18, path=here("data/on18_with_emotion_responses.sav"))
-
 
