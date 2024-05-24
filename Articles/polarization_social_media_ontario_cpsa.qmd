@@ -141,7 +141,7 @@ data.frame(Party=c("Liberal Party of Ontario", "Progressive Conservative Party o
 library(gtsummary)
 on18 %>% 
   as_factor() %>%
-#filter(partyvote2018!="Undecided") %>% 
+filter(partyvote2018!="Undecided") %>% 
 group_by(partyvote2018) %>% 
 summarize(n=n()) %>% 
 mutate(Vote=(n/sum(n)), Sample=rep("OPES", nrow(.))) %>% 
@@ -219,10 +219,12 @@ Here, $s$ represents the skewedness of the distribution, $k$ represents the dist
 #| warning: false
 #| fig-cap: Theoretical distibutions representing various levels of bimodality
 #| label: fig-sim_bimod
+#| fig-width: 8
+#| fig-height: 4
 ggarrange(uni_modal, semi_modal, bimodal, nrow = 1)
 ```
 
-#### Distinctiveness Coefficent
+#### Overlap Coefficent
 
 As noted by @lelkesMassPolarizationManifestations2016 the bimodality coefficient can be used to examine polarization in the mass electorate but it cannot be used to examine the difference between two groups. Therefore another measure is needed to examine the overlap between two ideological distributions.
 
@@ -338,7 +340,7 @@ WAP_models %>%
   geom_pointrange(aes(xmin=estimate-(1.96*std.error), xmax=estimate+(1.96*std.error)))+geom_vline(xintercept=0, linetype=2, col="red")+labs(y="Variable", x="Coefficient")
 ```
 
-It is worth noting that the positive relationship between political interest and affective polarization is somewhat at odds with Dubois and Blank's  @duboisEchoChamberOverstated2018 that interest in politics moderates the likelihood of citizens being in an echo chamber. The standard story about polarization echo chambers and polarization, which is *not* what Dubois and Blank find,  is that high levels of interest would lead to selective exposure to similar views and increased polarization. Our initial results about the relationship between political interest and polarization fit that story. However, it is not clear whether and how these *interact* with media consumption. In fact, we do find a significant *negative* interaction between political interest and social media usage that is more compatible with what Dubois and Blank find. Specifically, heavy users of social media in general who are interested in politics tend to have lower levels of polarization than people with similar levels of political interest but who never use social media at all. The full table is in the appendix and here, @fig-interactions visualizes the effects.
+It is worth noting that the positive relationship between political interest and affective polarization is somewhat at odds with Dubois and Blank's  [-@duboisEchoChamberOverstated2018] finding that interest in politics moderates the likelihood of citizens being in an echo chamber. The standard story about polarization echo chambers and polarization, which is *not* what Dubois and Blank find,  is that high levels of interest would lead to selective exposure to similar views and increased polarization. Our initial results about the relationship between political interest and polarization fit that story. However, it is not clear whether and how these *interact* with media consumption. In fact, we do find a significant *negative* interaction between political interest and social media usage that is more compatible with what Dubois and Blank find. Specifically, heavy users of social media in general who are interested in politics tend to have lower levels of polarization than people with similar levels of political interest but who never use social media at all. The full table is in the appendix and @fig-interactions visualizes the effects. At lower levels of political interest, heavier users of social media are more polarized.
 
 ```{r}
 #| label: fig-interactions
@@ -429,7 +431,7 @@ gt()
 ```
 
 
-Second, we calculated bimodality coefficients by self-reported social media usage which are reported in @tbl-bimodality-social-media-policy. Here, however, there is minimal evidence of any polarization. 
+Second, we calculated bimodality coefficients by self-reported social media usage which are reported in @tbl-bimodality-social-media-policy. Here, however, there is minimal evidence of any polarization. Moreover, we also did not see the pattern noted above whereby polarization increased with online news consumption for voters with low levels of interest. 
 
 ```{r}
 #| label: tbl-bimodality-social-media-policy
@@ -453,6 +455,22 @@ fmt_number(., columns=2, decimals=2)
 #| fig-cap: Bimodality Coefficents and policy position distributions by social media usage
 gridExtra::grid.arrange(bimod_often, bimod_rarely) 
 ```
+
+
+```{r}
+#| label: tbl-social-use-interest-bimodality
+#| tbl-cap: Policy polarization bimodality coefficients by general social media usage and political interest.  
+#| eval: false
+library(gt)
+on18 %>% 
+  group_by(Social_Use3, Interest_cat) %>% 
+  filter(!is.na(Interest_cat)) %>% 
+  summarize(Bimodality=bimodality_coefficient(policy_polarization)) %>% 
+rename(Interest=Interest_cat) %>% 
+mutate(Bimodality=round(Bimodality,2)) %>% 
+gt()
+```
+
 
 As a last measure, we also estimated the overlap coefficients for the policy position distributions of for people who exclusively receive news from social media, online news sources, legacy news sources, and a mix of news sources. For these analyses, the measure runs in the opposite direction to the bimodality coefficient; a larger overlap coefficient indicates that the distributions overlap more and distribution of policy attitudes are *less* polarized. The plots presented in @fig-OVL-PM indicate that individuals who primarily use online media are the most polarized (OVL `r ov_policy_online`) and those who primarily use social media were the least polarized (OVL `r ov_policy_media`).
 
@@ -479,20 +497,21 @@ Finally, we calculated the overlap coefficient for individuals who use social me
 ggpubr::ggarrange(overlap_often, overlap_rarely, ncol = 1)
 ```
 
-Overall, the results presented in this section provide mixed results on the relationship between social media usage and both affective and policy polarization. In terms of policy polarization, the results indicate that individuals who use social media or online news sources as their primary news source are less affectively polarized. Furthermore, these results indicate that whether an individual regularly uses social media is not significantly related to their level of affective polarization. The results from the bimodality coefficients and the overlap coefficients for individuals' primary media source lead to similar conclusions. Specifically, they indicate that using social media is correlated with less policy polarization. However, the overlap coefficients for level of social media usage indicate that individuals who use social media more often have higher levels of policy polarization. Therefore, in order to better understand these results seemingly contradictory results in this section the next section further investigates the relationship between political interest, social media usage and levels of affective polarization.
+Overall, the results presented in this section provide mixed results on the relationship between social media usage and both affective and policy polarization. Individuals who used social media or online news sources as their primary news source for the 2018 campaignh were less affectively polarized than consumers of news from legacy media. Furthermore, these results indicate that whether an individual regularly uses social media in general is not significantly related to their level of affective polarization about Ontario's political parties. Instead, affective polarization increased clearly with an interest in the campaign. Interest in the campaign did interact with general social media usage such that the relationship between interest and affective polarization was *weaker* for heavy social media users than it was for others. High interest, heavy social media users were less polarized than high interest, low socia media users while low interest heavy social media users were *more* polarized than low interest voters who never used social media. Turning to policy polarization, we find that digital news consumption , rather than social media usage, interacts significantly with interest in the campaign to generate / facilitate polarized attitudes.  
 
 # Discussion 
 
-Overall this analysis has demonstrated limited evidence of polarization - affective or policy-based - a sample of Ontario voters during the 2018 provincial election.  Voters who consumed online news were slightly less affectively polarized than voters who consumed legacy news media about the campaign while there was weak albeit consistent evidence that self-reported frequent use of social media was positively related to rates of affective polarization. However, both of these were dwarfed by the effects of interest in politics. Reflecting findings by Dubois and Blank that interest in politics reduced the likelihood that voters might find themselves in an echo chamber, our results also show that political interest moderated the relationship between political social media usage and affective polarization. 
+Overall this analysis has demonstrated some evidence of polarization - affective or policy-based - in a sample of Ontario voters during the 2018 provincial election.  Voters who consumed online news were slightly less affectively polarized than voters who consumed legacy news media about the campaign while there was weak, albeit consistent evidence, that self-reported frequent use of social media was positively related to rates of affective polarization. However, both of these were dwarfed by the relationship between interest in politics. 
+REVISE THIS 
+Reflecting findings by Dubois and Blank that interest in politics reduced the likelihood that voters might find themselves in an echo chamber, our results also show that political interest moderated the relationship between general social media usage and affective polarization. Voters who never used social media and not interested in the campaign were less polarized than voters who did use social media frequently. 
 
+<!-- They support recent findings that indicate that online news audiences are not always more polarized than legacy news audiences in all countries. Similar to individuals in Poland, Czechia, Finland, and Italy offline polarization appears to be higher than online polarization in Canada [@fletcherHowPolarizedAre2020]. -->
 
-They support recent findings that indicate that online news audiences are not always more polarized than legacy news audiences in all countries. Similar to individuals in Poland, Czechia, Finland, and Italy offline polarization appears to be higher than online polarization in Canada [@fletcherHowPolarizedAre2020].
+However, the picture was somewhat different for policy polarization. In this regard, we found that voters who consumed news about the election campaign from online news sources were more polarized than voters who consumed legacy media, although by most standards, it did not qualify as a bimodal distribution. The source of this increased polarization appeared to come from voters who were the least interested in politics. 
 
-However, the picture was somewhat different for policy polarization. In this regard, we found that voters who consumed news about the election campaign from online news sources were more polarized than voters who consumed legacy media, although by most standards, it did not meet a bimodal distribution. The source of this increased polarization appeared to come from voters who were the least interested in politics. This pattern was evident with two different measures of polarization. 
+It bears emphasizing this is entirely consistent with what we know about a fairly standard Converse-Zaller model of attitude formation where low information voters are the most responsive to exposure of fragments of information. 
 
-While this observation is consistent with a moderating role for political interest Dubois and Blank found, it is also somewhat disconcerting. Dubois and Blank (2020) found that for respondents with no interest at all, diverse media diets were inversely related to the likelihood that respondents were in an echo chamber. She did not specifically test whether that lead to polarized attitudes or not. It bears emphasizing this is entirely consistent with what we know about a fairly standard Converse-Zaller model of attitude formation where low information voters are the most responsive to exposure of fragments of information. 
-
-It is also consistent with the pattern Merkeley observed in the Canada Election Studies. This study potentially adds to that finding emphasizing the way in which online media and digital journalism in particular might be responsible for any observed increases in policy polarization in Canada. 
+It is also consistent with the pattern Merkeley observed in the Canada Election Studies. The overall levels of polarization we measured are roughly in line with what he measured. This analysis differs from his however, in identifying that policy polarization increases dramatically for voters with low levels of interest when they consume strictly digital and online news.  
 
 # Conclusion
 

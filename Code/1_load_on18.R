@@ -28,6 +28,7 @@ on18 %>%
 on18 %>% 
   filter(straightliner==0)->on18
 #### Remove Rs with missing values on do they use social media
+#table(on18$socialmedia, useNA = "ifany")
 on18 %>% 
   filter(is.na(socialmedia))->social_missing
 on18 %>% 
@@ -337,6 +338,11 @@ names(on18)
 on18 %>% 
   mutate(media_diversity=rowSums(across(CBCTV:HuffingtonPostonline),na.rm=T))->on18
 on18$CBCTV
+on18 %>% 
+  select(CBCTV:HuffingtonPostonline) %>% View()
+
+# on18 %>% 
+#   ggplot(., aes(x=media_diversity))+geom_histogram()
 # #Find exclusive media
 #
 # names(on18)

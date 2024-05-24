@@ -677,6 +677,8 @@ model6_pm <- lm(WAP_sd ~ Primary_media*Interest+ media_diversity+age3 + gender+d
 summary(model6_pm)
 
 model6_su <- lm(WAP_sd ~ Social_Use2*Interest  + media_diversity+age3 + gender+degree + income3 + pol_knowledge, data = on18, na.action = na.omit)
+
+lm(media_diversity~Interest, data=on18) %>% summary()
 summary(model6_su)
 #**** Start thinking about control variables 
 WAP_reg <- list()
@@ -1027,3 +1029,8 @@ bimodal <- as_tibble(bimodal_data) %>%
   labs(subtitle = paste0("Bimodality Coefficent ",
                          round(bimodality_coefficient(bimodal_data),2))) +
   theme_bw()
+
+#### media diversity by media consumption #### 
+on18 %>% 
+  group_by(Primary_media) %>% 
+  summarize(mean(media_diversity, na.rm=T))
