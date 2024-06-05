@@ -1,0 +1,25 @@
+---
+title: "Social Media, Digital News Consumption and Polarization"
+subtitle: "Ontario 2018"
+format: beamer
+editor: visual
+execute: 
+  echo: false
+  results: hide:
+---
+
+## Introduction
+
+## Methods
+
+```{r}
+#| label: setup
+
+library(lubridate)
+
+```
+
+- Ontario Provincial Election Study
+- Produced by [LISPOP](http://lispop.ca)
+- Available for public use at [https://doi.org/10.5683/SP3/VFGL0E](https://doi.org/10.5683/SP3/VFGL0E)
+- Campaign survey fielded between `r paste(format(min(on18$datestamp),"%B %d"),format(max(on18$datestamp),"%B %d, %Y"), sep="-")`

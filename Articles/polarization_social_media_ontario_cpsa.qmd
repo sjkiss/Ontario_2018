@@ -1,14 +1,21 @@
 ---
-title: "Social Media Use and Polarization In Ontario: 2018 Case Study"
+title: "Online News Consumption, Social Media Use and Political Polarization in the 2018 Ontario general election"
+subtitle: "Working Paper: Do not cite without permission of the authors"
 format: 
   pdf:
     pdf-engine: xelatex
+    documentclass: article
+    indent: true
     number-sections: true
+    papersize: letter
+    geometry: margin=1in
     colorlinks: true
     keeptex: true
     mathspec: true
+    cite-method: citeproc
     include-in-header: 
       text: |
+          \usepackage{typearea}
           \usepackage{booktabs}
           \usepackage{siunitx}
           \usepackage{setspace}
@@ -26,20 +33,25 @@ author:
   - name: Simon Kiss^[Wilfrid Laurier University; skiss@wlu.ca]
     affiliations:
       - name: Wilfrid Laurier University
-bibliography: Polarization_Canada.bib
+bibliography: PolarizationCanada.bib
 link-citations: true
 csl: apa.csl
 execute: 
   message: false
   warning: false
   echo: false
+  cache: false
 ---
 
-\doublespace
+\maketitle
 
 # Introduction
 
-In the following we use the 2018 Ontario Provincial Election Study to examine the extent to which digital and social media consumption is implicated in any perceivable level of polarization - affective or policy-based - in Ontario. We deploy several measures of each construct and find that overall there is limited evidence that social media usage or digital media consumption is implicated. Instead, we find that political interest is a much more powerful predictor of polarization and in fact partially interacts with social media usage to reduce polarization. However, in contrast to Dubois and Blank [-@duboisEchoChamberOverstated2018], we find that high interest individuals who regularly use social media are less polarized than high interest individuals who never use social media. Therefore, we provide evidence that the presence of echo chambers among high interest individuals may not be the primary driver of affective polarization. First, we survey the literature on polarization and its relationship with different types of polarization. Second, we describe the conditions of the Ontario 2018 provincial election and explain why we might expect to see high levels of polarization in that election campaign. Third, we describe the Ontario Provincial Election Survey and various measures of polarization. We conclude with our results and discussion.
+In the following we use the 2018 Ontario Provincial Election Study to examine the extent to which digital and social media consumption is implicated in any perceivable level of polarization - affective or policy-based - in Ontario. We deploy several measures of each construct and find that overall there is limited evidence that social media usage or digital media consumption is directly implicated in increasing polarization. There is a weak, albeit consistent curvilinear relationship whereby moderate users of social media are less affectively polarized than those who never use social media or those who are heavy users. Instead, we find that political interest is a much more powerful predictor of polarization and in fact partially interacts with social media usage to reduce affective polarization. High interest individuals who regularly use social media are less affectively polarized than high interest individuals who never use social media.
+
+However, for policy polarization, we find a different pattern. High interest individuals who consume only legacy media for news about the campaign are as polarized as high interest individuals who only consume digital media. However, low-interest individuals who consume only legacy media are barely polarized in policy terms, while low-interest individuals who consume online digital news are as polarized as high-interested individuals.
+
+First, we survey the literature on polarization and its relationship with different types of polarization. Second, we describe the conditions of the Ontario 2018 provincial election and explain why we might expect to see high levels of polarization in that election campaign. Third, we describe the Ontario Provincial Election Survey and various measures of polarization. We conclude with our results and discussion.
 
 ```{r}
 #| label: setup
@@ -70,7 +82,8 @@ source(here("Code/3a_bimodality_coefficients.R"))
 #| message: false
 #| results: 'hide'
 #| output: false
-#| cache: false
+#| cache: true
+library(here)
 source(here("Code/3a_overlapping.R"))
 ```
 
@@ -90,19 +103,19 @@ theme_set(theme_bw())
 
 ## What is Polarization
 
-It is a truism that political life is polarized, but it is surprisingly difficult to measure this phenomenon. Some American scholars argue that ideological, or policy polarization, has been increasing for both political elites and the electorate more broadly [@abramowitzPolarizationMyth2008]. Another group argues that partisan sorting has led parties to become more ideologically homogeneous, while party elites have become more polarized, which leads to the perception that the electorate is becoming more polarized [@fiorinaCultureWarMyth2011; @masonDisrespectfullyAgreeDifferential2015]. Finally, a third group argues that despite holding similar policy views, opposing partisans simply increasingly dislike and distrust people who support a different political party [@iyengarOriginsConsequencesAffective2019; @masonIdeologuesIssuesPolarizing2018]. These different understandings of political polarization have led studies on polarization to differentiate between what is called called issues based polarization and affective based polarization [@masonUncivilAgreementHow2018; @masonIdeologuesIssuesPolarizing2018].
+It is a truism that political life is polarized, but it is surprisingly difficult to measure this phenomenon. Some American scholars argue that ideological, or policy polarization, has been increasing for both political elites and the electorate more broadly [@abramowitzPolarizationMyth2008]. Another group argues that partisan sorting has led party electorates to become more ideologically homogeneous, while party elites have become more polarized, which leads to the perception that the electorate is becoming more polarized [@fiorinaCultureWarMyth2011; @masonDisrespectfullyAgreeDifferential2015]. Finally, a third group argues that despite holding similar policy views, opposing partisans simply increasingly dislike and distrust people who support a different political party [@iyengarOriginsConsequencesAffective2019; @masonIdeologuesIssuesPolarizing2018]. These different understandings of political polarization have led studies on polarization to differentiate between what is called called issues based polarization and affective polarization [@masonUncivilAgreementHow2018; @masonIdeologuesIssuesPolarizing2018].
 
-Beyond competing conceptualizations of measures, it is also not clear how much of this phenomenon applies in the Canadian context. There is clear evidence that the elite in the United States is ideologically polarized and that these ideological divisions have important consequences for American politics. However, there have been far fewer studies examining elite polarization in Canada. Cochrane [-@cochraneLeftRightSmall2015] has shown that the rise of the Reform Party and the Canadian Alliance on the right helped to transform the Canadian party system dominated by bland, a-ideological, brokerage parties into one organized more coherently on a left-right continuum. However, despite the rise of elite ideological polarization in Canada partisan consensus can still emerge during times of crisis such as the COVID-19 pandemic, while the United States was marked by more partisan conflict over these issues [@merkleyRareMomentCrossPartisan2020; @gadarianPartisanshipHealthBehavior2021]. Evidence of ideological polarization in the mass public is even less clear in both Canada and the United States. One the one hand, one of the bedrock foundations of public opinion literature is that people tend to not have constrained ideological belief systems, or stable attitudes [@converseNatureBeliefSystems1964]. However, some say that this feature of public opinion is changing, with the number of voters adhering to clear ideological systems or bundles of policies that "hang together" increasing dramatically [@wattenbergChangingNatureMass2019; See also @daltonModelingIdeologicalPolarization2021]. As a result mass ideological polarization generally refers to one of two ideas. First, that supporters of opposing parties or camps have distinct political beliefs, which is also referred to as policy polarization. Studies have provided evidence that Americans are increasingly divided on various emotionally charged issues including abortion, gay marriage and religion [@abramowitzPolarizationMyth2008]. Second, that partisans are increasingly supportive of left or right-wing ideology and place themselves on the left or right of the political spectrum. These competing definitions of ideological polarization have led to different conclusions on the scale of ideological polarization in the United States and other advanced industrialized democracies.
+Beyond competing conceptualizations of measures, it is also not clear how much of this phenomenon applies in the Canadian context. There is clear evidence that the elite in the United States is ideologically polarized and that these ideological divisions have important consequences for American politics. However, there have been far fewer studies examining elite polarization in Canada. Cochrane [-@cochraneLeftRightSmall2015] has shown that the rise of the Reform Party and the Canadian Alliance on the right helped to transform the Canadian party system dominated by bland, a-ideological, brokerage parties into one organized more coherently on a left-right continuum. However, despite the rise of elite ideological polarization in Canada partisan consensus can still emerge during times of crisis such as the COVID-19 pandemic, while the United States was marked by more partisan conflict over these issues [@merkleyRareMomentCrossPartisan2020; @gadarianPartisanshipHealthBehavior2021].
 
-Additionally, despite the increasing number of studies that examine policy polarization in the U.S. there are far few studies that examine this phenomenon in Canada. Furthermore, the studies that do exist provide mixed evidence about the nature of ideological and policy-based polarization in Canada. One of the policy issues over which Canadians are the most polarized is climate change, with supporters of the Conservative Party of Canada being less likely to believe in the existence of climate change in 2012 [@lachapellePublicAttitudesClimate2012]. However, Merkley [-@merkleyPolarizationEhIdeological2022] finds virtually no systematic evidence that Canadians' attitudes are becoming more bimodal, drifting to ideological extremes. That said, it does appear that Canadians are sorting themselves into more consistent groups and more correctly aligning themselves with ideological parties [@kevinsGrowingApartPartisan2018].  However, other studies have shown that policy polarization and partisan sorting only exists in certain regions of Canada. For example, McLay and Ramos [-@mclayPolarizationNarrativesApply2021] found that Atlantic Canada is not experiencing the same levels of ideological polarization as the rest of Canada. Overall, there is some evidence that Canadians are becoming more ideologically polarized, particularly through increased sorting. However, this ideological polarization is not to the same extent as in the United States.
+Evidence of ideological polarization in the mass public is even less clear in both Canada and the United States. On the one hand, [@abramowitzPolarizationMyth2008] have provided evidence that Americans are increasingly divided on various emotionally charged issues including abortion, gay marriage and religion. On the other hand, one of the bedrock foundations of public opinion literature is that people tend to not have constrained ideological belief systems, or stable attitudes [@converseNatureBeliefSystems1964]. Even if issue-specific cleavages might emerge, this might limit overall ideological polarization However, some say that this feature of public opinion is changing, with the number of voters adhering to clear ideological systems or bundles of policies that "hang together" increasing dramatically, thus contributing to polarization [@wattenbergChangingNatureMass2019; See also @daltonModelingIdeologicalPolarization2021]. These competing definitions of ideological polarization have led to different conclusions on the scale of ideological polarization in the United States and other advanced industrialized democracies.
 
-Beyond the issue of increased ideological sorting, there is also evidence that Americans simply increasingly dislike partisans of the other party.  While the evidence about policy-based polarization in the mass public is fairly mixed, evidence for increasing affective polarization seems to be clearer [@iyengarOriginsConsequencesAffective2019]. Worse, affective polarization is perhaps an even greater threat to the viability of liberal democratic competition which requires that partisan competitors for power acknowledge that the other party, even if they are wildly misguided in the eyes of in-partisans, are at least legitimate participants in the system [@rosenblumSideAngels2010]. However, despite being recognized as one of the greatest threats to Liberal democracy [@kalmoeRadicalAmericanPartisanship2022], affective polarization has been less studied in the Canadian context. Most studies that examine affective polarization in Canada include Canada as one of many cases when examining American polarization in a comparative perspective [@boxellCrossCountryTrendsAffective2024; @garziaAffectivePolarizationComparative2023; @gidronAmericanAffectivePolarization2020]. Using different measures, these studies had conflicting results regarding levels of affective polarization in Canada. Using the Canadian Election Study (CES) and a measure of affective polarization developed by @reiljanFearLoathingParty2020, Garzia et al. [-@garziaAffectivePolarizationComparative2023] find that levels of affective polarization have been increasing in Canada but have not reached levels seen in the U.S. In contrast, @gidronAmericanAffectivePolarization2020 found that levels of affective polarization have actually decreased in Canada since 1995. This study used the Comparative Study of Electoral Systems (CSES) and measured the level of affective polarization as the difference between an individual's rating of their in-party and their average rating of all out-parties. @boxellCrossCountryTrendsAffective2024 use the CES and their own novel measure of affective polarization similar to that developed by @reiljanFearLoathingParty2020. This study also found that levels of affective polarization have been increasing moderately in Canada. Lastly, @johnstonAffectivePolarizationCanadian2023 uses the standard deviations of feeling thermometers to conclude that feelings towards all of Canada's political parties have become more dispersed, that is to say, polarized, since 1965, with feelings towards the Liberal and Conservative Parties being the most polarized. Other Canadian studies have found that levels of affective polarization have been increasing in Canada since the 1990s [@merkleyPolarizationEhIdeological2022]. Therefore, there is evidence that affective polarization is increasing in Canada, however the evidence is not as conclusive as in other countries such as the U.S.
+Additionally, there are far fewer studies that examine this phenomenon in Canada. The studies that do exist provide mixed evidence about the extent of ideological and policy-based polarization in Canada. Lachapelle [-@lachapellePublicAttitudesClimate2012] finds deep divisions in the Canadian electorate over climate change, with Conservative voters being less likely to believe in the existence of climate change in 2012 \]. However, Merkley [-@merkleyPolarizationEhIdeological2022] finds virtually no systematic evidence that Canadians' attitudes are becoming more bimodal and drifting to ideological extremes. That said, it does appear that Canadians are sorting themselves into more consistent groups and more correctly aligning themselves with ideological parties [@kevinsGrowingApartPartisan2018]. However, other studies have shown that policy polarization and partisan sorting only exists in certain regions of Canada. For example, McLay and Ramos [-@mclayPolarizationNarrativesApply2021] found that Atlantic Canada is not experiencing the same levels of ideological polarization as the rest of Canada. Overall, there is some evidence that Canadians are becoming more ideologically polarized, particularly through increased sorting. However, this ideological polarization is not occuring to the same extent as in the United States.
 
-It is often considered a forgone conclusion that the rise of digital and social media are implicated in these phenomena. On the one hand, digital news media derive their income overwhelmingly from subscriptions, rather than advertising CHECK THIS. As a consequence, they tend to produce more ideologically tinted coverage CHECK THIS. On the other hand, social media platforms are said to facilitate or create "echo chambers" or "filter bubbles" where users only encounter ideas and policies that they already agree with [@terrenEchoChambersSocial2021]. On social media echo chambers occur because these platforms' algorithms only show users ideologically agreeable materials based on their past behaviour [@raynauldTweetClickVote2014]. Since the internet is a high choice media environment individuals can either choose to be exposed to diverse information or select media that reinforce their pre-existing opinions [@duboisEchoChamberOverstated2018].
+Beyond the issue of increased ideological sorting, there is also evidence that Americans simply increasingly dislike partisans of the other party. While the evidence about policy-based polarization in the mass public is fairly mixed, evidence for increasing affective polarization seems to be clearer [@iyengarOriginsConsequencesAffective2019]. Worse, affective polarization is perhaps an even greater threat to the viability of liberal democratic competition which requires that partisan competitors for power acknowledge that the other party, even if they are wildly misguided in the eyes of in-partisans, are at least legitimate participants in the system [@rosenblumSideAngels2010]. However, despite being recognized as one of the greatest threats to Liberal democracy [@kalmoeRadicalAmericanPartisanship2022], affective polarization has been less studied in the Canadian context. Most studies that examine affective polarization in Canada include Canada as one of many cases when examining American polarization in a comparative perspective [@boxellCrossCountryTrendsAffective2024; @garziaAffectivePolarizationComparative2023; @gidronAmericanAffectivePolarization2020]. Using different measures, these studies had conflicting results regarding levels of affective polarization in Canada. Using the Canadian Election Study (CES) and a measure of affective polarization developed by @reiljanFearLoathingParty2020, Garzia et al. [-@garziaAffectivePolarizationComparative2023] find that levels of affective polarization have been increasing in Canada but have not reached levels seen in the U.S. In contrast, @gidronAmericanAffectivePolarization2020 found that levels of affective polarization have actually decreased in Canada since 1995. This study used the Comparative Study of Electoral Systems (CSES) and measured the level of affective polarization as the difference between an individual's rating of their in-party and their average rating of all out-parties. @boxellCrossCountryTrendsAffective2024 use the CES and their own novel measure of affective polarization similar to that developed by @reiljanFearLoathingParty2020. This study also found that levels of affective polarization have been increasing moderately in Canada. Lastly, @johnstonAffectivePolarizationCanadian2023 uses the standard deviations of feeling thermometers to conclude that feelings towards all of Canada's political parties have become more dispersed, that is to say, polarized, since 1965, with feelings towards the Liberal and Conservative Parties being the most polarized. Other Canadian studies have found that levels of affective polarization have been increasing in Canada since the 1990s [@merkleyPolarizationEhIdeological2022]. Therefore, there is evidence that affective polarization is increasing in Canada, however the evidence is not as conclusive as in other countries such as the U.S.
 
-However, the empirical evidence supporting the existence of echo chambers on social media has been mixed. Most studies in the United States find that Republicans and Democrats have similar media diets, both online and offline [@guessAlmostEverythingModeration2021]. Additionally, studies have found that there is some evidence that echo chambers exist on Twitter (now known as X) but not on Facebook. Notably, Terren and Borge [-@terrenEchoChambersSocial2021] found that studies that used digital trace evidence provided more evidence of echo-chambers and polarization than studies that used self-reported data. However, using Facebook trace evidence, @bakshyExposureIdeologicallyDiverse2015 find that most users have Facebook friends who belong to the other party and that individuals are exposed to cross cutting content. They also find that individual choices, not algorithms, are what determine if an individual engages with opposing viewpoints. Lastly, using self reported social media usage, Dubois and Blank [-@duboisEchoChamberOverstated2018] find that the majority of social media users encounter information they disagree with, use multiple sources, and often attempt to confirm the information they are presented in Canada. Therefore, it seems like the existence of echo chambers on the internet may be overstated.
+It is often considered a forgone conclusion that the rise of digital and social media are implicated in these phenomena. Social media platforms are said to facilitate or create "echo chambers" or "filter bubbles" where users only encounter ideas and policies that they already agree with [@terrenEchoChambersSocial2021, @raynauldTweetClickVote2014]. However, the empirical evidence supporting the existence of echo chambers on social media, and its broader role in cultivating polarization, has been mixed. Most studies in the United States find that Republicans and Democrats have similar media diets, both online and offline [@guessAlmostEverythingModeration2021]. Similarly, using self reported social media usage, Dubois and Blank [-@duboisEchoChamberOverstated2018] find that the majority of social media users encounter information they disagree with, use multiple sources, and often attempt to confirm the information they are presented in Canada. However, methodology often matters. Notably, Terren and Borge [-@terrenEchoChambersSocial2021] found that studies that used digital trace evidence provided more evidence of echo-chambers and polarization than studies that used self-reported data. Yet even here, using Facebook trace evidence,@bakshyExposureIdeologicallyDiverse2015 find that most users have Facebook friends who belong to the other party and that individuals are usually exposed to ideologically discongruent content.
 
-Moreover, the evidence linking the presence of echo chambers to increased polarization is unclear [@kubinRoleSocialMedia2021a]. Some studies find that increased social media usage predicts increased polarization [@choInfluencingMyselfSelfReinforcement2018; @tuckerLiberationTurmoilSocial2017a]. This relationship is also re-enforced by posting more on social media and sharing politically relevant content. However, other studies have found that social media usage has a small or no effect on polarization. Through a review of recent studies on the relationship between social media usage and polarization, @bavelHowSocialMedia2021 posit that although social media usage is unlikely to be the main driver of polarization it is often a key facilitator. Additionally, recent experimental evidence has found that individuals who de-activated their Facebook accounts became less polarized due to less exposure to polarizing political news and opinions [@allcottWelfareEffectsSocial2020]. Other studies have demonstrated that the "echo chamber" aspect of social media is not what drives polarization. Instead, exposure to hyper-partisan messages from the *opposing* party leads to a significant increase in levels of policy polarization for both Democrats and Republicans [@bailExposureOpposingViews2018].
+Moreover, the evidence linking the presence of echo chambers to increased polarization is unclear [@kubinRoleSocialMedia2021a]. Some studies find that increased social media usage predicts increased polarization [@choInfluencingMyselfSelfReinforcement2018; @tuckerLiberationTurmoilSocial2017]. This relationship is also re-enforced by posting more on social media and sharing politically relevant content. However, other studies have found that social media usage has a small or no effect on polarization. Through a review of recent studies on the relationship between social media usage and polarization, @bavelHowSocialMedia2021 posit that although social media usage is unlikely to be the main driver of polarization it is often a key facilitator. Additionally, recent experimental evidence has found that individuals who de-activated their Facebook accounts became less polarized due to less exposure to polarizing political news and opinions [@allcottWelfareEffectsSocial2020]. Other studies have demonstrated that the "echo chamber" aspect of social media is not what drives polarization. Instead, exposure to hyper-partisan messages from the *opposing* party leads to a significant increase in levels of policy polarization for both Democrats and Republicans [@bailExposureOpposingViews2018].
 
 Lastly, using strictly observational data, @boxellInternetCausingPolitical2017 observe that adults over 75 years old are becoming polarized at a faster rate than those under 40 years old, while also being far less likely to use social media. Therefore, any account that links social media usage to increased polarization must also account for why individuals who do not use social media are becoming more polarized than social media users.
 
@@ -110,11 +123,11 @@ Lastly, using strictly observational data, @boxellInternetCausingPolitical2017 o
 
 In contrast to the contested relationship between polarization and social media usage, there is clearer evidence that increased online news consumption is linked to increased polarization. Early studies on, online news media found that partisan online sources engage in greater partisan filtering of content than traditional news wires [@baumNewMediaPolarization2008]. Additionally, studies have found that individuals who consume news online are often more polarized than those who only use offline "legacy" news sources [@fletcherHowPolarizedAre2020]. @garimellaPoliticalPolarizationOnline2021 find that it is both the structure of news sites, and the behaviour of online news consumers that contributes to users only consuming news that reinforces their ideological priors. Specifically, they find that the online news environment allows users to actively seek out news sources that are ideologically aligned with their prior beliefs. Another potential explanation for the increased levels of polarization among online news users is through the comment section. Asker and Dinas [-@askerThinkingFastFurious2019] find that exposure to emotionally intense comments on online news articles increases levels of polarization. These findings suggest that even when users are exposed to heterogeneous online news sources their levels of polarization increase.
 
-Overall, the literature on polarization and social media usage in Canada suggests that Canadians have become slightly more affectively and ideologically polarized since the 1990s [@cochraneLeftRightSmall2015; @johnstonAffectivePolarizationCanadian2023; @merkleyPolarizationEhIdeological2022]. Additionally, social media usage may be one of the factors that is contributing to higher levels of affective polarization in Canada [@kubinRoleSocialMedia2021a]. However, there are clearly other factors including age [@boxellInternetCausingPolitical2017], and political interest [@duboisEchoChamberOverstated2018], that are contributing to these increased levels of affective polarization. Therefore, this study seeks to better understand the relationship between news consumption, social media usage, and polarization in Canada by drawing on data collected during the 2018 Ontario Provincial election.
+Overall, the literature on polarization and social media usage in Canada suggests that Canadians have become slightly more affectively and ideologically polarized since the 1990s [@cochraneLeftRightSmall2015; @johnstonAffectivePolarizationCanadian2023; @merkleyPolarizationEhIdeological2022]. Additionally, social media usage may be one of the factors that is contributing to higher levels of affective polarization in Canada [@kubinRoleSocialMedia2021a]. However, evidence is often mixed. Therefore, this study seeks to better understand the relationship between news consumption, social media usage, and polarization in Canada by drawing on data collected during the 2018 Ontario provincial election.
 
 # Ontario 2018 Summary
 
-There are several reasons to think that the Ontario 2018 general election might feature some degrees of polarization. First, it was the fifth election since the Ontario Liberals were first elected in 2003. As with any government with such a long tenure, the government had endured the consequences of many decisions gone wrong. For example, the provincial government's attempts to increase the amount of renewable energy in the provincial electricity supply had lead to an increase in electricity rates [@auditorgeneralofontarioElectricitySectorRenewable2011]. In 2011, the government suddenly cancelled the construction of two natural gas electricity plants in electorally-sensitive districts, incurring hundreds of millions of dollars in penalties [@ontario.officeoftheauditor-general.OakvillePowerPlant2013; @ontario.officeoftheauditor-general.MississaugaPowerPlant2013]. Additionally, in 2012, it emerged that the provincial air transportation agency for patients had become embroiled in complicated contractual arrangements, incurring millions of dollars in liabilities [@ontario.officeoftheauditor-general.ORNGEAirAmbulance2012]. Finally, in 2015, a new provincial sex education curriculum was adopted, including some controversial material incurring the wrath of social conservatives.
+There are several reasons to think that the Ontario 2018 general election might feature some degrees of polarization. First, it was the fifth election since the Ontario Liberals were first elected in 2003. As with any government with such a long tenure, the government had endured the consequences of many decisions gone wrong. For example, the provincial government's attempts to increase the amount of renewable energy in the provincial electricity supply had lead to an increase in electricity rates [@ontario.officeoftheauditor-general.ElectricitySectorRenewable2011]. In 2011, the government suddenly cancelled the construction of two natural gas electricity plants in electorally-sensitive districts, incurring hundreds of millions of dollars in penalties [@ontario.officeoftheauditor-general.OakvillePowerPlant2013; @ontario.officeoftheauditor-general.MississaugaPowerPlant2013]. Additionally, in 2012, it emerged that the provincial air transportation agency for patients had become embroiled in complicated contractual arrangements, incurring millions of dollars in liabilities [@ontario.officeoftheauditor-general.ORNGEAirAmbulance2012]. Finally, in 2015, a new provincial sex education curriculum was adopted, including some controversial material incurring the wrath of social conservatives.
 
 Second, the two primary party leaders in the election campaign, Kathleen Wynne for the Liberals and Doug Ford for the Progressive Conservatives were individuals with traits and backgrounds that might incur distinct enmity from out-partisans. Wynne is a gay woman, contributing to some of the hostility by social conservatives.[^1] On the other side of the campaign, the PCs were led by leader Doug Ford, a new entrant to provincial politics, but a veteran of Toronto municipal politics. He was the brother of former Toronto mayor Rob Ford who had a tumultuous term of office featuring accusations of sexual assault, physical fights on the floor of city council, associations with purported gangsters and videotaped recordings of him consuming crack cocaine [@doolittleCrazyTownRob2014]. All of these scandals developed after having built a reputation as a populist politician who profited from a reputation of being outside elite and regular circles of political participation [@kissRightwingPopulismMetropolis2020]. While Doug Ford lacked his brother's substance abuse and crudity, he very much represented the populist strain and railed against elites in politics as much as his brother did [@buddPeopleChampDoug2020; @perrellaConservativePopulismUnpopular2020].
 
@@ -126,12 +139,11 @@ All this is to say that the Ontario 2018 election featured an incumbent governme
 
 ## The 2018 Ontario Post Election Study
 
-The Laurier Institute for the Study of Public Opinion and Policy commissioned an online consumer sample of voters from SSI with quotas established to match the sample to the Ontario population on age, education and gender. It was fielded between the dates of `r paste(format(min(on18$datestamp),"%B %d"),format(max(on18$datestamp),"%B %d, %Y"), sep="-")`. The initial sample size was `r nrow(on18)+nrow(straightliners)+nrow(social_missing)+nrow(non_consenters)`. We removed `r nrow(non_consenters)` respondents who did not consent to the survey, and `r nrow(straightliners)` respondents who straightlined on any of five batteries of questions.[^2] We also removed `r nrow(social_missing)` who did not respond to a question on social media usage, one of our key variables of interest. This left `r nrow(on18)` respondents.
+The Laurier Institute for the Study of Public Opinion and Policy commissioned an online consumer sample of voters from SSI with quotas established to match the sample to the Ontario population on age, education and gender. One of the merits of the survey is that the questionnaire included detailed questions on self-reported media consumption habits, including consumption of specific media outlets. It was fielded between the dates of `r paste(format(min(on18$datestamp),"%B %d"),format(max(on18$datestamp),"%B %d, %Y"), sep="-")`. The initial sample size was `r nrow(on18)+nrow(straightliners)+nrow(social_missing)+nrow(non_consenters)`. We removed `r nrow(non_consenters)` respondents who did not consent to the survey, and `r nrow(straightliners)` respondents who straightlined on any of five batteries of questions.[^2] We also removed `r nrow(social_missing)` respondents who did not respond to a question on social media usage, one of our key variables of interest. This left `r nrow(on18)` respondents.
 
 [^2]: For each battery, the we measured the intra-rater variability using the `careless` package in R. Subsequently, any respondent with an IRV of 0 on any of the four batteries was excluded from the study.
 
-As an initial validation strategy, we show the distribution of respondent vote intention over the whole period compared with the final vote results in the 2018 election (see @tbl-vote-choice). Although our sample overreresented NDP voters (42\% of those with a committed vote intention compared to 34\% in the final election, this is not perhaps unreasonable. The NDP did in fact lead during a two-week period in the election campaign and 16\% of the respondents in the OPES were undecided. 
-
+As an initial validation strategy, we show the distribution of respondent vote intention over the whole period compared with the final vote results in the 2018 election (see @tbl-vote-choice). Although our sample overreresented NDP voters (42% of those with a committed vote intention compared to 34% in the final election, this is not perhaps unreasonable. The NDP did in fact lead during a two-week period in the election campaign and 16% of the respondents in the OPES were undecided in our data-set, plausibly mirroring at least a pool of voters in the electorate who subsequently voted for the PCs.
 
 ```{r}
 #| label: tbl-vote-choice
@@ -157,9 +169,9 @@ kable()
 
 ## Independant Variables
 
-|       In order to test the relationship between social media usage and affective polarization we created two main independent variables, `primary media` source and `social media usage`. The first variable measures what news sources respondents used to receive information about the 2018 Ontario election. The 2018 Ontario Election Study asked respondents "What is/are your primary source(s) of information about the 2018 Ontario provincial election?" and provided respondents with the options to select "Television," "Radio," "Print Newspaper," "Online Newspaper," "Other online news source," "Your Facebook Feed," "Your Twitter feed," "none," or "other". Those who responded that they **only** received news from Radio, Television, and/or print newspaper were coded as legacy media users, respondents who **only** selected that they received news from online newspapers and/or other online news sources were coded as online media users, and individuals who **only** selected that they received news about the 2018 Ontario election from their Facebook or Twitter feed were coded as Social media users. Finally, respondents who selected sources from multiple categories were coded as mixed media users.
+|       In order to test the relationship between social media usage and affective polarization we created two main independent variables, `primary media` source and `social media usage`. The first variable measures what news sources respondents used to receive information about the 2018 Ontario election. The 2018 Ontario Election Study asked respondents "What is/are your primary source(s) of information about the 2018 Ontario provincial election?" and provided respondents with the options to select "Television," "Radio," "Print Newspaper," "Online Newspaper," "Other online news source," "Your Facebook Feed," "Your Twitter feed," "none," or "other". Those who responded that they **only** received news from radio, television, and/or print newspaper were coded as legacy media users, respondents who **only** selected that they received news from online newspapers and/or other online news sources were coded as online media users, and individuals who **only** selected that they received news about the 2018 Ontario election from their Facebook or Twitter feed were coded as social media users. Finally, respondents who selected sources from multiple categories were coded as mixed media users.
 
-Our other `social media` variable measures how often respondents use social media *in general* and does not explicitly capture respondent usage of social media for news about politics or the 2018 election campaign. Respondents were asked "How often do you use social media?" and could respond with options from "several times a year" to "several times a day." We coded individuals who said they not use social media as "never" using social media, those who responded that they use social media "several times a year" to "several times a month" as using social media "less than once a week", those who use social media and left the other categories as they were in the original variable. In some analyses, we reduced this variable further, grouping individuals who use social media once a month or less as rarely using social media, and those who use social media more than once a month as using social media often. @tbl-cross shows the distribution of respondents on these variables.
+Our other `social media` variable measures how often respondents use social media *in general* and does not explicitly capture respondent usage of social media for news about politics or the 2018 election campaign. Respondents were asked "How often do you use social media?" and could respond with options from "several times a year" to "several times a day." We coded individuals who said they not use social media as "never" using social media, those who responded that they use social media "several times a year" to "several times a month" as using social media "less than once a week", those who use social media and left the other categories as they were in the original variable. In some analyses, we reduced this variable further, grouping individuals who use social media once a month or less as rarely using social media, and those who use social media more than once a month as using social media often. @tbl-cross shows a cross-tabulation of these two variables.
 
 ```{r}
 #| label: calculate-spearman
@@ -182,17 +194,15 @@ on18 %>%
 
 ```
 
-One immediate pattern that emerges is that respondents report general social media patterns that are very different from patterns of news consumption via social media. Only `r scales::percent(47/nrow(on18), accuracy=1)` respondents report using social media as their primary source of news about the election while `r scales::percent((795+488)/nrow(on18), accuracy=1)` report using social media in general at least once a day.
+One immediate pattern that emerges is that respondents report general social media usage patterns that are very different from patterns of news consumption via social media. Only `r scales::percent(47/nrow(on18), accuracy=1)` respondents report using social media as their primary source of news about the election while `r scales::percent((795+488)/nrow(on18), accuracy=1)` report using social media in general at least once a day.
 
 ## Polarization Variables
 
 ### Affective polarization
 
-We measure affective polarization using a measure developed by Wagner [-@wagnerAffectivePolarizationMultiparty2021a] to measure affective polarization in multi-party democracies. It creates an individual affective polarization score for each respondent based on the *spread* of party-like scores from their mean like score for each respondent. Like scores for the parties are drawn from feelings thermometers that ask respondents to rate the parties on a scale from 0 to 5 (See the Supplemental Materials for full question wordings). Formally the Weighted Affective Polarization (WAP) equation measured spread is:
-$$
+We measure affective polarization using a measure developed by Wagner [-@wagnerAffectivePolarizationMultiparty2021] to measure affective polarization in multi-party democracies. It creates an individual affective polarization score for each respondent based on the *spread* of party-like scores from their mean like score for each respondent. Like scores for the parties are drawn from feelings thermometers that ask respondents to rate the parties on a scale from 0 to 5 (See the Supplemental Materials for full question wordings). Formally the Weighted Affective Polarization (WAP) equation measured spread is: $$
     Spread_i = \sqrt{\sum^{P}_{p=1}v_p(like_{ip} - \overline{like_i})^2}
-$$ 
-where $v_p$ is the vote share of each party measured as proportion with a range of 0 to 1, and the mean affect scores are weighted by party using the following equation:
+$$ where $v_p$ is the vote share of each party measured as proportion with a range of 0 to 1, and the mean affect scores are weighted by party using the following equation:
 
 $$
     \overline{like_i} = \sum^P_{p=1}(v_p * like_{ip})
@@ -202,9 +212,9 @@ The WAP scores are then used in OLS regression with the independent variables di
 
 ### Policy polarization
 
-In order to measure policy polarization we create ideological distributions based on 12 policy issues.[^3] All the measures were re-coded so that 0 indicates the most left-wing position and 1 indicates the most right-wing position.
+In order to measure policy polarization we create ideological distributions based `r ncol(policies)` policy issues.[^3] All the measures were re-coded so that 0 indicates the most left-wing position and 1 indicates the most right-wing position.
 
-[^3]: Factor analysis revealed that these 11 items measure three distinct ideological constructs. However, for the sake of parsimony we only present a global measure of respondent policy polarization, summed from scores on all 11 items. 
+[^3]: Factor analysis revealed that these 11 items measure three distinct ideological constructs. However, for the sake of parsimony we only present a global measure of respondent policy polarization, summed from scores on all 11 items. Future research should definitely distinguish patterns of polarization by these specific ideological constructs.
 
 Following Lelkes [-@lelkesMassPolarizationManifestations2016] we generate bimodality coefficients for respondents' policy attitudes for each category of our independent variables of interest. These are derived using the formula below.[^4]
 
@@ -228,9 +238,7 @@ ggarrange(uni_modal, semi_modal, bimodal, nrow = 1)
 
 #### Overlap Coefficent
 
-As noted by @lelkesMassPolarizationManifestations2016 the bimodality coefficient can be used to examine overall levels of polarization in the mass electorate, but it cannot be used to examine the difference between two groups. Therefore, another measure is needed to examine the overlap between the ideological distributions of supporters of left-wing and right-wing parties.
-
-In addition, we also use the distinctiveness coefficient first used to measure levels of polarization which is typically referred to as the overlap coefficient (OVL) [@lelkesMassPolarizationManifestations2016, @levenduskyRedStatesVs2011]. This measure compares the overlap of the ideological distributions of two groups using the following formula:
+We also use the calculate the overlap coefficient (OVL) This measure compares the overlap of the ideological distributions of two groups using the following formula [@lelkesMassPolarizationManifestations2016, @levenduskyRedStatesVs2011]:
 
 $$
 OVL = \int^{+\infty}_{-\infty}|f(x) - g(x)|dx
@@ -240,7 +248,7 @@ where $f(x)$ is the probability density function (PDF) of one ideological distri
 
 [^5]: We calculate the the OVL using the `overlap` function from the `overlapping` package in `R` [@pastoreOverlappingEstimationOverlapping2022].
 
-We compare the distributions of those who voted for the Liberal and NDP parties (left-leaning parties) to those who voted for the Conservative Party (right-leaning party) for those primarily receive news from legacy media, online media sources, social media, and those who primarily use a mix of the three and for those who use social media regularly and those who use social media rarely.
+For this measure, we compare the distributions of those who voted for the Liberal and NDP parties (left-leaning parties) to those who voted for the Conservative Party (right-leaning party) between those who primarily receive news from legacy media, online media sources, social media, and those who primarily use a mix of the three and for those who use social media regularly and those who use social media rarely.
 
 # Results
 
@@ -288,7 +296,7 @@ plot_grid(sd_primary_media_plot, sd_social_use_plot)
 #| message: false
 library(gtsummary)
 on18 %>%
-select(WAP, Primary_media, Social_Use2, Vote) %>% 
+select(WAP, Primary_media, Social_Use2) %>% 
   #filter(!is.na(Vote)) %>% 
   tbl_continuous(variable=c(WAP), 
                  statistic=list(~"{mean} ({sd})"))
@@ -297,13 +305,15 @@ select(WAP, Primary_media, Social_Use2, Vote) %>%
 
 \doublespace
 
-First, we examine levels of affective polarization by `social media usage`, `primary media` source, and party affiliation. @tbl-descript displays the mean levels of affective polarization and standard deviations of the WAP scores for these groups. Overall these scores ranged from `r round(range(on18$WAP, na.rm = T)[1], 3)` to `r round(range(on18$WAP, na.rm = T)[2], 3)`. The sub-group analyses indicate that those who use social media several times a day have the highest WAP scores while those who use social media several times a week have the lowest WAP scores with a difference of `r 0.447 -  0.433` between the group with the highest and lowest scores. When examining vote choice in the 2018 Ontario election, supporters of the Conservative Party had the highest WAP scores and supporters of the Green Party had the lowest levels of affective polarization. For vote choice there is `r 0.489 - 0.383` point difference between those with the highest average levels of affective polarization and those with the lowest levels. Finally, for primary media source those who only received news about the 2018 Ontario election from legacy news sources or from a mixed media environment had the highest average affective polarization scores (0.45 and 0.46 respectively) and those who only used social media had the lowest average levels of affective polarization (0.43). However, levels of affective polarization were within one standard deviation of the overall mean ($\mu =$ `r round(mean(on18$WAP, na.rm = T), 3)`; $SD =$ `r round(sd(on18$WAP, na.rm = T), 3)`) for all sub-groups.
+First, we examine levels of affective polarization by primary media source and general social media usage. @tbl-descript displays the mean levels of affective polarization and standard deviations of the WAP scores for these variables. For primary media source those who only received news about the 2018 Ontario election from legacy news sources or from a mixed media environment had the highest average affective polarization scores (0.45 and 0.46 respectively) and those who only used social media had the lowest average levels of affective polarization (0.43). The sub-group analyses indicate that those who use social media several times a day have the highest WAP scores ($\mu=0.46, \sigma = 0.11$)(comparable to those who *never* use social media ($\mu=0.45, \sigma=0.1$)) while those who use social media several times a week have the *lowest* WAP scores ($\mu=0.43, \sigma=0.12$).
 
 @tbl-descript also shows a curious relationship between affective polarization and social media usage in that those who only used social media to receive news about the 2018 election had fairly low levels of affective polarization. However, those who reported using social media multiple times a day had one of highest levels of average affective polarization, equal to those who only received news about the 2018 Ontario from legacy media sources. We investigate this further in the following sections.
 
-This weak relationship is also evident in more complex models. @fig-PM-models visually displays the coefficients from ordinary least squares (OLS) regression models with WAP scores as the dependent variable and social media usage as the independent variable. In all these models the dependent variable is standardized with a mean of 0 and a standard deviation of 1 and all the continuous independent variables are scaled from 0 to 1. Therefore, the coefficients represent the change in the dependent variable correlated with a full change in the independent variable.
+We next explore correlates with weighted affective polarization in OLS regressions. @fig-PM-models visually displays the coefficients from ordinary least squares (OLS) regression models with WAP scores as the dependent variable and primary media consumption as the independent variable. In all these models the dependent variable is standardized with a mean of 0 and a standard deviation of 1 and all the continuous independent variables are scaled from 0 to 1. Therefore, the coefficients represent the change in the dependent variable correlated with a full change in the independent variable.[^6]
 
-First we estimate a model with only `primary media` as an independent variable. In this model respondents who received their news through social media or online platforms are very slightly less polarized than legacy media consumers, while respondents with a mixed media diet are slightly more polarized. We extend this with a series of models adding an additional control variable each time. We note two major findings. First, political interest is a much more significant predictor of affective polarization than media consumption is, with polarization increasing between 1 and 1.5 standard deviations from the least interested to the most interested respondent. Second, contrary to what has been shown about polarization by age CHECK SOME OTHER SOURCES, here age is negatively related to polarization. We return to this finding below.
+[^6]: All models visualized are printed in @sec-appendix.
+
+First we estimate a model with only `primary media` as an independent variable. In this model respondents who received their news through social media or online platforms are very slightly less polarized than legacy media consumers, while respondents with a mixed media diet are slightly more polarized. We extend this with a series of models adding an additional control variable each time. We note two major findings. First, political interest is a much more significant predictor of affective polarization than media consumption is, with polarization increasing between 1 and 1.5 standard deviations from the least interested to the most interested respondent. This is completely contradictory to the conclusions implicated in research by @duboisEchoChamberOverstated2018 and we address this more in depth below. Second, contrary to what has been shown about polarization by age, here age is negatively related to polarization. We return to this finding below [see @boxellInternetCausingPolitical2017].
 
 ```{r}
 #| echo: false
@@ -314,7 +324,7 @@ First we estimate a model with only `primary media` as an independent variable. 
 WAP_models %>% 
   filter(Variable=="Primary_media") %>% 
   #Filter out the interaction model
-  filter(Model_Name!="Model 6") %>% 
+  filter(Model_Name!="Model 8") %>% 
   filter(str_detect(term, "Intercept", negate=T))  %>%
   ggplot(., aes(x=estimate, y=fct_relevel(term, "Social_Media", "Online", "Mixed", after=7)))+facet_wrap(~Model_Name)+
   geom_pointrange(aes(xmin=estimate-(1.96*std.error), xmax=estimate+(1.96*std.error)))+geom_vline(xintercept=0, linetype=2, col="red")+labs(y="Variable", x="Coefficient")
@@ -322,9 +332,7 @@ WAP_models %>%
 
 ```
 
-We then re-estimate the same models that we estimated above using social media usage as the primary independent variable (See @fig-SU-models). In these models using social media more than never is not significantly correlated with levels of affective polarization.
-
-When we compare polarization to social media usage in general, we find that interest in politics is a similarly strong predictor of polarization. However, we also find a small, albeit stable curvilinear relationship where polarization decreases for moderate users of social media vis-a-vis those who reported never using social media, but increases for the heaviest users.
+We then re-estimate the same models that we estimated above using social media usage as the primary independent variable (See @fig-SU-models). In these models, a slight but consistent curvilinear relationship is evident in that respondents who use moderate levels of social media are less polarized than those who do not, respondents who use it multiple times a day are *more* affectively polarized than those who do not. The effect here is slight, but it is consistent through the models Again, however, when we compare polarization to social media usage in general, we find that interest in politics is a similarly strong predictor of polarization.
 
 ```{r}
 #| echo: false
@@ -334,24 +342,39 @@ When we compare polarization to social media usage in general, we find that inte
 #| label: fig-SU-models
 WAP_models %>% 
   filter(Variable=="Social_Use2") %>% 
-    filter(Model_Name!="Model 6") %>% 
+    filter(Model_Name!="Model 12") %>% 
   filter(str_detect(term, "Intercept", negate=T)) %>% 
   ggplot(., aes(x=estimate, y=fct_relevel(term, "Never", "Less than once a week","About once a week","Several times a week", "About once a day","Several times a day", after=7)))+facet_wrap(~Model_Name)+
   geom_pointrange(aes(xmin=estimate-(1.96*std.error), xmax=estimate+(1.96*std.error)))+geom_vline(xintercept=0, linetype=2, col="red")+labs(y="Variable", x="Coefficient")
 ```
 
-It is worth noting that the positive relationship between political interest and affective polarization is somewhat at odds with Dubois and Blank's  [-@duboisEchoChamberOverstated2018] finding that interest in politics moderates the likelihood of citizens being in an echo chamber. The standard story about polarization echo chambers and polarization, which is *not* what Dubois and Blank find,  is that high levels of interest would lead to selective exposure to similar views and increased polarization. Our initial results about the relationship between political interest and polarization fit that story. However, it is not clear whether and how political interest and polarization *interact* with media consumption. In fact, we find a significant *negative* interaction between political interest and social media usage that is more compatible with what Dubois and Blank find. Specifically, heavy users of social media in general who are interested in politics tend to have lower levels of polarization than people with similar levels of political interest but who never use social media at all. The full table is in the appendix and @fig-interactions visualizes the effects. At lower levels of political interest, heavier users of social media are more polarized.
+It is worth noting that the positive relationship between political interest and affective polarization is somewhat at odds with Dubois and Blank's [-@duboisEchoChamberOverstated2018] finding that interest in politics moderates the likelihood of citizens being in an echo chamber. The standard story about polarization echo chambers and polarization, which is *not* what Dubois and Blank find, is that high levels of interest would lead to selective exposure to similar views and increased polarization. Our initial results about the relationship between political interest and polarization fit that story. However, it is not clear whether and how political interest and polarization *interact* with media consumption. In fact, we find a significant *negative* interaction between political interest and social media usage that is more compatible with what Dubois and Blank find. Specifically, heavy users of social media in general who are interested in politics tend to have lower levels of polarization than people with similar levels of political interest but who never use social media at all. fig-interactions visualizes the effects. At lower levels of political interest, heavier users of social media are more polarized.
 
 ```{r}
 #| label: fig-interactions
 #| fig-cap: Predicted values of affective polarization by selected levels of social media use and interest in politics. 
-#| fig-width: 3
+#| fig-width: 5
 #| fig-height: 3
 
 
 plot_predictions(model6_su, 
-                 condition=list("Interest", Social_Use2=c("Never", "About once a day", "Several times a day")), vcov=F)+labs(y="Predicted WAP")+theme(legend.position="bottom")+aes(linetype=Social_Use2, col=Social_Use2)
+                 condition=list("Interest", Social_Use2=c("Never", "About once a day", "Several times a day")), vcov=F)+
+aes(linetype=Social_Use2, col=Social_Use2)+labs(y="Predicted WAP")+theme(legend.position="bottom")+
+guides(col=guide_legend(ncol=2))
 
+
+```
+
+We can explore this further be counting the number of media outlets respondents report reading regularly, admitting that number of media outlets is not a perfect measure of media diversity. A visualization of the effects of social media usage, political interest on the number of media outlets is in @fig-mod-diversity and shows that at high levels of interest, those who use social media every day consume more media outlets than those who never use social media, which would be consistent with the echo chamber thesis, that on social media, users can expose themselves more news content that reinforces pre-existing beliefs about political parties, contributing to greater polarization.
+
+```{r}
+#| label: fig-mod-diversity
+#| fig-width: 5
+#| fig-height: 3
+mod_diversity<-lm(media_diversity~Interest*Social_Use2, data=on18)
+plot_predictions(mod_diversity, 
+                 condition=list("Interest", Social_Use2=c("Never", "About once a day", "Several times a day")), vcov=F)+theme(legend.position="bottom")+
+guides(col=guide_legend(ncol=2))
 
 ```
 
@@ -361,9 +384,7 @@ As a last analysis, we also investigate the negative relationship we have found 
 
 $$
 Y_i = \beta_0 + \beta_1(Age)_i + \beta_2(Age)_i^2 + \beta_3(Interest)_i + \gamma\boldsymbol{M_i} + \varepsilon_i
-$$
-\doublespace
-Where $Y_i$ is an individual's level of affective polarization and $\gamma\boldsymbol{M}_i$ is matrix of coefficients for the primary media source variables. @fig-pred_age reports predicted levels of affective polarization for individuals aged 18 to 100 that received news about the 2018 Ontario election exclusively from legacy news sources, online news sources, social media news sources, and a mix of news sources. These results indicate that there is a non linear relationship between age and levels of affective polarization. Specifically, as individuals get older they become less affectively polarized until they reach 65 when they start becoming more affectively polarized. This partially reflects earlier findings by Boxell et al. in the United States that polarization is primarily a phenomenon of older voters [@boxellInternetCausingPolitical2017].
+$$ \doublespace Where $Y_i$ is an individual's level of affective polarization and $\gamma\boldsymbol{M}_i$ is matrix of coefficients for the primary media source variables. @fig-pred_age reports predicted levels of affective polarization for individuals aged 18 to 100 that received news about the 2018 Ontario election exclusively from legacy news sources, online news sources, social media news sources, and a mix of news sources. These results indicate that there is a non linear relationship between age and levels of affective polarization. Specifically, as individuals get older they become less affectively polarized until they reach 65 when they start becoming more affectively polarized. This partially reflects earlier findings by Boxell et al. in the United States that polarization is primarily a phenomenon of older voters [@boxellInternetCausingPolitical2017].
 
 ```{r }
 #| echo: false
@@ -375,7 +396,9 @@ age_predicted_graph
 
 ## Media Consumption and Policy Polarization
 
-To investigate the relationship between media consumption and *policy polarization*, we first calculate the mean policy positions of individuals by primary media source, social media usage, and vote choice in the 2018 election.^[Policy position distributions are commonly referred to as issue based ideology.] To reiterate, these run from 0 to 11, with 0 being left-wing and 11 being right-wing. The results are in @tbl-descript-policy and show that those who report getting news about the provincial from legacy media exclusively are the most conservative (5.56) while those who report getting news only from social media are the most liberal (5.04). A similar pattern holds for self-reports of social media usage in general. Respondents who report never using social media are the most conservative while those who are the most frequent users of social media are the most left-wing.
+To investigate the relationship between media consumption and *policy polarization*, we first calculate the mean policy positions of individuals by primary media source, social media usage, and vote choice in the 2018 election.[^7] To reiterate, these run from 0 to 11, with 0 being left-wing and 11 being right-wing. The results are in @tbl-descript-policy and show that those who report getting news about the provincial from legacy media exclusively are the most conservative (5.58) while those who report getting news only from social media are the most liberal (4.87). A similar pattern holds for self-reports of social media usage in general. Respondents who report never using social media are the most conservative while those who are the most frequent users of social media are the most left-wing.
+
+[^7]: Policy position distributions are commonly referred to as issue based ideology.
 
 ```{r}
 #| label: tbl-descript-policy
@@ -391,7 +414,7 @@ select(policy_polarization, Primary_media, Social_Use2, Vote) %>%
 
 ```
 
-To assess the level of polarization by media consumption, we calculated bimodality coefficients for individuals who received news about the 2018 Ontario election exclusively from social media, online media sources, legacy media sources and a mix of media sources. The raw distributions of policy attitudes are in @fig-BC-PM. <!-- and the corresponding bimodality coefficients are in @tbl-bimodality-media-policy. --> Overall there is not really any evidence of significant bimodality in any of these distributions; Ontario voters were not overly polarized by policy issues in the 2018 election campaign. These findings also demonstrate that degrees of bimodality in Ontario were similar to the overall levels of bimodality in Canada measured using Canada Election Study data [@merkleyPolarizationEhIdeological2022] . Moreover, none of these distributions surpass the threshold of 0.55 to be considered bimodal. That said, it is noteworthy that bimodality differed by media consumption pattern.  We find a linear reduction in bimodality from online media consumption of news to legacy media and social media consumption of news about the campaign which did not differ from each other.
+To assess the level of polarization by media consumption more formally, we calculated bimodality coefficients for individuals who received news about the 2018 Ontario election exclusively from social media, online media sources, legacy media sources and a mix of media sources. The raw distributions of policy attitudes and the corresponding bimodality coefficients are in @fig-BC-PM. Overall there is not really any evidence of significant bimodality in any of these distributions. None of these distributions surpass the threshold of 0.55 to be considered bimodal. Ontario voters were not overly polarized by policy issues in the 2018 election campaign. These findings also demonstrate that degrees of bimodality in Ontario were similar to the overall levels of bimodality in Canada measured using Canada Election Study data [@merkleyPolarizationEhIdeological2022]. That said, it is noteworthy that bimodality differed by news consumption pattern. We find a linear reduction in bimodality from online consumption of news to legacy media and social media consumption of news about the campaign.
 
 ```{r}
 #| label: tbl-bimodality-media-policy
@@ -417,14 +440,14 @@ gridExtra::grid.arrange(bimod_online, bimod_mixed,bimod_legacy, bimod_social)
 
 ```
 
-When we partial these results out by political interest, it becomes apparent that this increased bimodality associated with consuming news strictly online is real but mostly affects those who report low levels of political interest in the election. We show this relationship in @tbl-primary-media-interest-bimodality which calculates bimodality coefficients by those with high (low) levels of political interest, defined as the average level of political interest, +/- 1 standard deviation. These findings are parallel to the findings in @fig-interactions that showed that social media usage moderated the relationship between political interest and polarization. In this case, however, it is online news consumption about a provincial election campaign that does the moderating. These findings are in line with Merkeley (2022) who found larger rates of ideological polarization for those with high levels of political interest than for those with low levels of political interest although there was a greater *increase* amongst those with low levels of political interest. Our data may help explain Merkeley's observation as more individuals are now consuming news through strictly online news media.
+When we partial these results out by political interest, it becomes apparent that this increased bimodality associated with consuming news strictly online mostly affects those who report low levels of political interest in the election. We show this relationship in @tbl-primary-media-interest-bimodality which calculates bimodality coefficients by those with high (low) levels of political interest, defined as the average level of political interest, +/- 1 standard deviation. These findings are consistent with the findings in @fig-interactions that showed that social media usage moderated the relationship between political interest and polarization. In this case, however, it is online news consumption about a provincial election campaign that does the moderating. Specifically, at low levels of interest, online news consumers are more polarized by policy than legacy media consumers; but at high levels of interest, the relationship is reversed. These findings are in line with Merkeley (2022) who found larger rates of ideological polarization for those with high levels of political interest than for those with low levels of political interest although there was a greater *increase* amongst those with low levels of political interest. Our data may help explain Merkeley's observation that bimodality in the Canadian electorate is increasing as more individuals are now consuming news through strictly online news media.
 
 ```{r}
 #| label: tbl-primary-media-interest-bimodality
 #| tbl-cap: Policy polarization bimodality coefficients by media consumption and political interest.  
 library(gt)
 on18 %>% 
-  group_by(Primary_media, Interest_cat) %>% 
+  group_by(Interest_cat,Primary_media, ) %>% 
   filter(!is.na(Interest_cat)) %>% 
   summarize(Bimodality=bimodality_coefficient(policy_polarization)) %>% 
 rename(Interest=Interest_cat) %>% 
@@ -432,8 +455,7 @@ mutate(Bimodality=round(Bimodality,2)) %>%
 gt()
 ```
 
-
-Second, we calculated bimodality coefficients by self-reported social media usage which are reported in @tbl-bimodality-social-media-policy. There is minimal evidence of any polarization. Moreover, we also did not see the pattern noted above whereby polarization increased with online news consumption for voters with low levels of interest. 
+Second, we calculated bimodality coefficients by self-reported social media usage which are reported in @tbl-bimodality-social-media-policy. There is minimal evidence of any polarization. Moreover, we also did not see the pattern noted above whereby polarization increased with online news consumption for voters with low levels of interest.
 
 ```{r}
 #| label: tbl-bimodality-social-media-policy
@@ -458,7 +480,6 @@ fmt_number(., columns=2, decimals=2)
 gridExtra::grid.arrange(bimod_often, bimod_rarely) 
 ```
 
-
 ```{r}
 #| label: tbl-social-use-interest-bimodality
 #| tbl-cap: Policy polarization bimodality coefficients by general social media usage and political interest.  
@@ -472,7 +493,6 @@ rename(Interest=Interest_cat) %>%
 mutate(Bimodality=round(Bimodality,2)) %>% 
 gt()
 ```
-
 
 As a last measure, we also estimated the overlap coefficients for the policy position distributions of for people who exclusively receive news from social media, online news sources, legacy news sources, and a mix of news sources. For these analyses, the measure runs in the opposite direction to the bimodality coefficient; a larger overlap coefficient indicates that the distributions overlap more and distribution of policy attitudes are *less* polarized. The plots presented in @fig-OVL-PM indicate that individuals who primarily use online media are the most polarized (OVL `r ov_policy_online`) and those who primarily use social media were the least polarized (OVL `r ov_policy_media`).
 
@@ -499,27 +519,96 @@ We also calculated the overlap coefficient for individuals who use social media 
 ggpubr::ggarrange(overlap_often, overlap_rarely, ncol = 1)
 ```
 
-Overall, the results presented in this section provide mixed results on the relationship between social media usage and both affective and policy polarization. Individuals who used social media or online news sources as their primary news source for the 2018 campaignh were less affectively polarized than consumers of news from legacy media. Furthermore, these results indicate that whether an individual regularly uses social media in general is not significantly related to their level of affective polarization about Ontario's political parties. Instead, affective polarization increased clearly with an interest in the campaign. Interest in the campaign did interact with general social media usage such that the relationship between interest and affective polarization was *weaker* for heavy social media users than it was for others. High interest, heavy social media users were less polarized than high interest, low socia media users while low interest heavy social media users were *more* polarized than low interest voters who never used social media. Turning to policy polarization, we find that digital news consumption, rather than social media usage, interacts significantly with interest in the campaign to generate polarized attitudes.  
+<!-- Overall, the results presented in this section provide mixed results on the relationship between social media usage and both affective and policy polarization. Individuals who used social media or online news sources as their primary news source for the 2018 campaign were less affectively polarized than consumers of news from legacy media. However, social media usage *in general* is partially related to their level of affective polarization about Ontario's political parties; the heaviest users of social media, those who used social media multiple times per day, were more affectively polarized than those who reported never using social media. However, affective polarization increased clearly with an interest in the campaign. Interest in the campaign did interact with general social media usage such that the relationship between interest and affective polarization was *weaker* for heavy social media users than it was for others. High interest, heavy social media users were less polarized than high interest, low socia media users while low interest heavy social media users were *more* polarized than low interest voters who never used social media.  -->
 
-# Discussion 
+<!-- Turning to policy polarization, we find that digital news consumption, rather than social media usage, interacts significantly with interest in the campaign to generate polarized attitudes.   -->
 
-Overall these analyses have demonstrated some evidence of polarization - affective or policy-based - in a sample of Ontario voters during the 2018 provincial election.  Voters who consumed online news were slightly less affectively polarized than voters who consumed legacy news media about the campaign while there was weak, albeit consistent evidence, that self-reported frequent use of social media was positively related to rates of affective polarization. However, both of these were dwarfed by the relationship between interest in politics and affective polarization. 
+# Discussion
 
-Therefore, our findings provide a slightly more nuanced understanding of Dubois and Blank's [-@duboisEchoChamberOverstated2018] findings about echo chambers. They found that political interest reduces the likelihood that an individual finds themselves in an echo chamber. Upon first glance it appears that our findings would contradict those of Dubois and Blank [-@duboisEchoChamberOverstated2018]. Specifically, if echo chambers are the primary mechanism whereby social media news consumption leads to increased levels of polarization then it should be expected that the individuals who are the least likely to be in echo chambers are the least polarized. However, our study demonstrated that those who are the most interested in politics are the most polarized. When we examine the relationship between political interest, media consumption, and affective polarization further we find that low interest individuals who use social media are more likely to be polarized than low interest individuals who do not use social media, supporting the echo chamber hypothesis. However, among high interest individuals those who never use social media are more likely to be affectively polarized. Therefore, we find some support for the conclusion that those who are not interested in politics are more likely to be in echo chambers. In contrast, individuals who are interested in politics are more likely to be polarized only when they do not consume news in a high choice media environment. 
+Overall these analyses have demonstrated some evidence of polarization - affective or policy-based - in a sample of Ontario voters during the 2018 provincial election. Voters who consumed online news were slightly less affectively polarized than voters who consumed legacy news media about the campaign. However, the heaviest users of social media, those who used social media multiple times per day, were more affectively polarized than those who reported never using social media. However, both of these were dwarfed by the relationship between interest in politics and affective polarization.
 
+Moreover, interest in the campaign did interact with general social media usage such that the relationship between interest and affective polarization was *weaker* for heavy social media users than it was for others. High interest, heavy social media users were less polarized than high interest voters who reported never using social media media users while low interest heavy social media users were *more* polarized than low interest voters who never used social media. We observed the same pattern in terms of policy polarization and online news consumption. At low levels of interest, online news consumers were much more polarized than low interest voters; but at high levels of interest this gap disappeared and online and legacy news consumers were equally polarized.
+
+Therefore, our findings provide a different understanding of Dubois and Blank's [-@duboisEchoChamberOverstated2018] findings about echo chambers. They found that political interest reduces the likelihood that an individual finds themselves in an echo chamber. They argue in fact that political interest leads their respondents to consume a diverse range of news sources. Upon first glance it appears that our findings would contradict those of Dubois and Blank. Specifically, if echo chambers are a primary mechanism whereby social media use leads to increased levels of polarization, then it would be expected that the individuals who are the least likely to be in echo chambers are the least polarized. However, our study demonstrated that those who are the most interested in politics are the most polarized, on two measures. When we examine the relationship between political interest, media consumption, and affective polarization further we find that low interest individuals who use social media are more likely to be polarized than low interest individuals who do not use social media, which is more consistent with the echo chamber hypothesis. However, among high interest individuals those who never use social media are more likely to be affectively polarized. When we try to assess the degree to which low interest respondents are in fact in an echo chamber by modelling the number of news outlets consumed on a daily basis as a function of social media use and political interest, the echo chamber hypothesis the results are consistent with an echo chamber hypothesis. Frequent social media usage is positively related to the number of media outlets that respondents regularly consume at high and low levels of political interest. We do not have a direct measure that respondents are consuming ideologically proximate news in this analysis, although the Ontario Provincial Election Study has questions that might shed light on this question.
 
 <!-- They support recent findings that indicate that online news audiences are not always more polarized than legacy news audiences in all countries. Similar to individuals in Poland, Czechia, Finland, and Italy offline polarization appears to be higher than online polarization in Canada [@fletcherHowPolarizedAre2020]. -->
 
-However, the picture was somewhat different for policy polarization. In this regard, we found that voters who consumed news about the election campaign from online news sources were more polarized than voters who consumed legacy media, although by most standards, it did not qualify as a bimodal distribution. The source of this increased polarization appeared to come from voters who were the least interested in politics. Specifically, low interest individuals who exclusively consumed news about the 2018 Ontario election from online news sources were significantly more polarized that un-interested voters in who exclusively consumed news from other media sources. These findings provide some evidence that the nature of the online news environment is related to an increase in levels of policy polarization. Whereas, social media platforms are behaving less like "echo chambers" than is suggested in the literature. 
+In terms of policy polarization, the picture was similar we found that voters who consumed news about the election campaign from online news sources were more polarized than voters who consumed legacy media, although by most standards, it did not qualify as a bimodal distribution. The source of this increased polarization appeared to come from voters who were the least interested in politics but who only consumed news online. Specifically, low interest individuals who exclusively consumed news about the 2018 Ontario election from online news sources were significantly more polarized that un-interested voters who exclusively consumed news from other media sources. These findings provide some evidence that the nature of the online news environment is related to an increase in levels of policy polarization.
 
-It bears emphasizing that these findings are entirely consistent with what we know about the fairly standard Converse-Zaller model of attitude formation where low information voters are the most responsive to exposure of fragments of information [@converseNatureBeliefSystems1964; @zallerNatureOriginsMass1992]. Specifically, it provides evidence that low information voters are more susceptible to becoming ideologically polarized by sensationalized news stories covered in the online legacy media. Similarly, voters who are uninterested in politics but regularly use social media are more affectively polarized than those who never use social media. However, those who are interested in politics but never use social media are more affectively polarized. 
+<!-- The pattern observed in this study is also consistent with the pattern Merkeley [-@merkleyPolarizationEhIdeological2022] observed in the Canada Election Studies. The overall levels of polarization we measured are roughly in line with what he measured. However this analysis differs from Merkely [-@merkleyPolarizationEhIdeological2022] however, in identifying that policy polarization increases dramatically for voters with low levels of interest when they consume strictly digital and online news.  -->
 
-The pattern observed in this study is also consistent with the pattern Merkeley [-@merkleyPolarizationEhIdeological2022] observed in the Canada Election Studies. The overall levels of polarization we measured are roughly in line with what he measured. However this analysis differs from Merkely [-@merkleyPolarizationEhIdeological2022] however, in identifying that policy polarization increases dramatically for voters with low levels of interest when they consume strictly digital and online news. 
-
-Overall, this study indicates that individuals who are uninterested in politics are more likely to fall into and become polarized by echo-chambers. In contrast, voters who are interested in politics and use social media appear to be less likely to become polarized by their social media usage. Therefore, these results indicate that in order to depolarize voters an approach that focuses on creating more interest in politics and/or targets online and legacy media sources may be more effective than one that targets those who primarily receive news from social media. 
+Overall, this study indicates that individuals who are uninterested in politics are more likely to fall into and become polarized by echo-chambers. In contrast, voters who are interested in politics and use social media appear to be less likely to become polarized by their social media usage. Therefore, these results indicate that in order to depolarize voters an approach that focuses on creating more interest in politics and/or targets online and legacy media sources may be more effective than one that targets those who primarily receive news from social media.
 
 # Conclusion
+
+This paper examined patterns of affective and policy-based polarization in a sample of the Ontario electorate during the 2018 provincial election campaign. It found that while rates of affective and policy-based polarization are low, overall, there is evidence that frequent self-reported social media use and online news consumption facilitate polarization, particularly among low interest voters. In so far as echo chambers are responsible for polarization, our results contadict Dubois and Blank's (2018) findings which found that interest in politics was negatively correlated with the probability that respondents would be in an echo chamber. Our evidence presented here suggests that interest in politics and online or social media consumption is in fact related to polarization. We also find evidence that shows that for both low and high levels of interest, social media use is related to greater numbers of media outlets consumed regularly. While this is normally seen as evidence of *not* being in an echo chamber, perhaps that is not the case. Perhaps, even at low levels of interest, social media platforms and online news outlets facilitate the consumption of more news that is ideologically proximate, leading to greater polarization,
 
 \newpage
 
 # References
+
+\newpage
+
+<!-- \KOMAoptions{paper=landscape,pagesize} -->
+
+<!-- \recalctypearea -->
+
+<!-- \newgeometry{margin=0.4in} -->
+
+# Appendix {#sec-appendix}
+
+```{r}
+#| label: appendix-1
+#| tbl-cap: OLS regressions of weighted affective polarization on primary source of news consumption plus controls.
+library(kableExtra)
+WAP_models %>% 
+  filter(Variable=="Primary_media") %>% 
+  slice(1) %>% 
+  select(model1:model12) %>% 
+map(., ~.[[1]]) %>% 
+  modelsummary(.,fmt=2, stars=T, gof_omit = c("AIC|BIC|Log.Lik.|R2 Adj.|RMSE"), 
+               coef_rename=c("media_diversity"="Media Diversity",
+  "degree"="Degree",
+                          "age3"="Age",
+                          "pol_knowledge"="Political knowledge",
+                          "income"="Income","as_factor(gender)Female"="Female"), output="kableExtra") %>% 
+  #cols_width(1~pct(25)) %>% 
+  #opt_vertical_padding(scale=0.25)
+ landscape(margin="0.5in") %>% 
+  kable_styling(latex_options="scale_down")
+
+```
+
+```{r}
+#| label: appendix-2
+#| tbl-cap: OLS regressions of weighted affective polarization on social media usage plus controls 
+WAP_models %>% 
+  slice(1) %>% 
+  select(model1:model12) %>% 
+map(., ~.[[1]]) %>% 
+  modelsummary(.,fmt=2, stars=T, gof_omit = c("AIC|BIC|Log.Lik.|R2 Adj.|RMSE"), 
+               coef_rename=c("media_diversity"="Media Diversity",
+  "degree"="Degree",
+                          "age3"="Age",
+                          "pol_knowledge"="Political knowledge",
+                          "income"="Income","as_factor(gender)Female"="Female"), output="kableExtra") %>% 
+  #cols_width(1~pct(25)) %>% 
+  #opt_vertical_padding(scale=0.25)
+ landscape(margin="0.5in") %>% 
+  kable_styling(latex_options="scale_down")
+
+
+
+```
+
+<!-- \KOMAoptions{paper=portrait,pagesize} -->
+
+<!-- \recalctypearea -->
+
+<!-- \newgeometry{margin=1.5in} -->
+
+# Appendix 2
+
+```{r}
+
+```
