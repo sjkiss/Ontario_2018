@@ -19,8 +19,20 @@ on18 %>%
   filter(consent!=1) ->non_consenters
 on18 %>% 
   filter(consent==1)->on18
-
-#### Remove straighliners###
+#### 
+names(on18)
+on18 %>% 
+ # select(indivfinfeel, immfeel) %>% str()
+  select(-yob2, postalcode, contains("irv_"), -`filter_$`, -regions) %>% 
+ # write_sav(on18, file=here("Data/opes_2018.sav"))
+  as.data.frame() %>% 
+  #select(indivfinfeel) %>%
+  write_sav(., path=here("Data/opes_2018.sav"), compress="none")
+on18 %>% 
+  # select(indivfinfeel, immfeel) %>% str()
+  select(-yob2, postalcode, contains("irv_"), -`filter_$`, -regions) %>% 
+  save(., file=here("Data/opes_2018.rdata"))
+  #### Remove straighliners###
 straightliners <- on18 %>% 
   filter(straightliner == 1)
 on18 %>% 

@@ -37,13 +37,14 @@ bimodality_coefficient(policy_often, na.rm = T)
 bimodality_coefficient(policy_rarely, na.rm = T)
 
 bimod_often <- policy_often %>% 
-  ggplot() + geom_density(aes(policy_polarization), col = "seagreen", fill = "seagreen", alpha = 0.4) + 
-  labs(title = "Uses Social Media Often", x = "Policy Positions", y = NULL) +
+  ggplot() + 
+  geom_density(aes(policy_polarization), col = "seagreen", fill = "seagreen", alpha = 0.4) + 
+  labs(title = "Uses Social Media Often", x = "Policy Positions", y = NULL, subtitle=paste("BC =", round(bimodality_coefficient(policy_often, na.rm = T),2)))+
   theme_bw()
-
+bimod_often
 bimod_rarely <- policy_rarely %>% 
   ggplot() + geom_density(aes(policy_polarization), col = "seagreen", fill = "seagreen", alpha = 0.4) + 
-  labs(title = "Uses Social Media Rarely", x = "Policy Positions", y = NULL) +
+  labs(title = "Uses Social Media Rarely", x = "Policy Positions", y = NULL,subtitle=paste("BC =", round(bimodality_coefficient(policy_rarely, na.rm = T),2))) +
   theme_bw()
-
+bimod_rarely
 gridExtra::grid.arrange(bimod_often, bimod_rarely) 
