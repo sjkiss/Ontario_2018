@@ -16,6 +16,8 @@ format:
       text: |
           \usepackage{typearea}
           \usepackage{booktabs}
+          \usepackage{float}
+          \floatplacement{figure}{H}
           \usepackage{siunitx}
           \usepackage{setspace}
           \newcolumntype{d}{S[
@@ -582,6 +584,8 @@ map(., ~.[[1]]) %>%
   kable_styling(latex_options="scale_down")
 
 ```
+
+\clearpage
 
 ```{r}
 #| label: appendix-2

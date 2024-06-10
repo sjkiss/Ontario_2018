@@ -1,25 +1,203 @@
 ---
 title: "Social Media, Digital News Consumption and Polarization"
 subtitle: "Ontario 2018"
-format: beamer
+author: 
+  - name: Rafael Campos-Gottardo^[McGill University; rafael.campos-gottardo@mail.mcgill.ca]
+    affiliations:
+      - name: McGill University
+  - name: Simon Kiss^[Wilfrid Laurier University; skiss@wlu.ca]
+    affiliations:
+      - name: Wilfrid Laurier University 
+format: 
+  beamer:
+    navigation: horizontal
 editor: visual
 execute: 
   echo: false
-  results: hide:
+  results: hide
+bibliography: Polarization_Canada.bib
+link-citations: true
 ---
 
 ## Introduction
+
+## What is polarization?
+
+## Polarization and Social Media Usage
 
 ## Methods
 
 ```{r}
 #| label: setup
+#| echo: false
+#| results: hide
+#| output: false
 
 library(lubridate)
+library(here)
+library(knitr)
+opts_knit$set(root.dir=rprojroot::find_rstudio_root_file())
+source(here("Code/3_polarization.R"))
+source(here("Code/3a_bimodality_coefficients.R"))
+source(here("Code/3a_overlapping.R"))
 
 ```
 
-- Ontario Provincial Election Study
-- Produced by [LISPOP](http://lispop.ca)
-- Available for public use at [https://doi.org/10.5683/SP3/VFGL0E](https://doi.org/10.5683/SP3/VFGL0E)
-- Campaign survey fielded between `r paste(format(min(on18$datestamp),"%B %d"),format(max(on18$datestamp),"%B %d, %Y"), sep="-")`
+-   Ontario Provincial Election Study
+-   Produced by [LISPOP](http://lispop.ca)
+  - Available for public use at <https://doi.org/10.5683/SP3/VFGL0E> <!-- DOI doesn't work-->
+-   Campaign survey fielded between `r paste(format(min(on18$datestamp),"%B %d"),format(max(on18$datestamp),"%B %d, %Y"), sep="-")`
+
+## Key Independent Variables
+
+- **Primary media source**: individuals who *only* received news about the 2018 Ontario election from **legacy**, **online**, and **social media** sources were coded as such and all others were coded as mixed.
+- **Social media usage**: How often respondents use social media from **never** to **multiple times a day**.
+- And **political interest**, **partisan strength**, and **media diversity**.
+
+## Measuring Affective polarization
+
+- Measuring affective polarization is more difficult in multi-party democracies [@wagnerAffectivePolarizationMultiparty2021].
+- Therefore, we draw on Wagner's [-@wagnerAffectivePolarizationMultiparty2021] weighted affective polarization (WAP) measure:
+
+$$
+Spread_i = \sqrt{\sum^P_{p=1}v_p(like_{ip}-\overline{like_i})^2}
+$$
+where the mean like scores are also weighted by vote share:
+
+$$
+\overline{like_i} = \sum^P_{p = 1}(v_p*like_{ip})
+$$
+**In short this measure calculates the average weighted difference between a respondent's average like score and their like score for each party**
+
+## Measuring Policy Polarization
+
+- We create an index of 11 policy items where 0 is the most left-wing position on all issues and 11 is the most right-wing position on all issues.
+- We draw on two measures of policy polarization proposed by @lelkesMassPolarizationManifestations2016 and @levenduskyRedStatesVs2011 and tested in Canada by @merkleyPolarizationEhIdeological2022.
+- These measures examine the bimodality of a distribution of policy preferences [@pfisterGoodThingsPeak2013] and the overlap between two empirical distributions of policy preferences [@pastoreMeasuringDistributionSimilarities2019].
+
+:::: {.columns}
+
+::: {.column width="50%"}
+
+**Bimodality Coefficient**
+
+$$
+BC = \frac{s^2 + 1}{k + 3 *\frac{(n-1)^2}{(n-2)(n-3)}}
+$$
+
+:::
+
+::: {.column width="50%"}
+**Overlap Coefficent**
+$$
+OVL = \int^{+\infty}_{-\infty}|f(x) - g(x)|dx
+$$
+:::
+
+::::
+
+# Results
+
+## Affective Polarization and Primary Media Source
+
+```{r}
+WAP_models %>% 
+  filter(Model_Name %in% c("Model 1", "Model 2", "Model 12")) %>% 
+  filter(Variable=="Primary_media") %>% 
+  #Filter out the interaction model
+  filter(Model_Name!="Model 8") %>% 
+  filter(str_detect(term, "Intercept", negate=T))  %>%
+  ggplot(., aes(x=estimate, y=fct_relevel(term, "Social_Media", "Online", "Mixed", after=7)))+facet_wrap(~~fct_relevel(Model_Name, "Model 12",  after=9))+
+  geom_pointrange(aes(xmin=estimate-(1.96*std.error), xmax=estimate+(1.96*std.error)))+geom_vline(xintercept=0, linetype=2, col="red")+labs(y="Variable", x="Coefficient") + theme_bw()
+```
+
+
+## Affective Polarization and Social Media Usage
+
+```{r}
+WAP_models %>% 
+    filter(Model_Name %in% c("Model 1", "Model 2", "Model 11")) %>% 
+  filter(Variable=="Social_Use2") %>% 
+    filter(Model_Name!="Model 12") %>% 
+  filter(str_detect(term, "Intercept", negate=T)) %>% 
+  ggplot(., aes(x=estimate, y=fct_relevel(term, "Never", "Several times a day","About once a day","Several times a week","About once a week", "Less than once a week", after=7)))+facet_wrap(~fct_relevel(Model_Name, "Model 10", "Model 11",  after=9))+
+  geom_pointrange(aes(xmin=estimate-(1.96*std.error), xmax=estimate+(1.96*std.error)))+geom_vline(xintercept=0, linetype=2, col="red")+labs(y="Variable", x="Coefficient") + theme_bw()
+```
+## Notable Trends in Social Media Usage and Affective Polarization
+
+-  Online news consumption is associated with lower levels of affective polarization than legacy media consumption. 
+- Interest is positively related to levels of affective polarization. 
+- Using social media several times a day is associated with higher levels of affective polarization than never using social media. 
+
+## Policy Polarization and Primary Media Source - Bimodality Coefficient 
+
+
+:::: {.columns}
+
+::: {.column width="50%"}
+```{r}
+library(gt)
+on18 %>% 
+  group_by(Primary_media) %>% 
+  summarize(Bimodality=bimodality_coefficient(policy_polarization)) %>% 
+   mutate(Bimodality=round(Bimodality,2)) %>% 
+  gt()
+```
+
+:::
+
+::: {.column width="50%"}
+```{r}
+
+on18 %>% 
+  group_by(Interest_cat,Primary_media, ) %>% 
+  filter(!is.na(Interest_cat)) %>% 
+  summarize(Bimodality=bimodality_coefficient(policy_polarization)) %>% 
+rename(Interest=Interest_cat) %>% 
+  mutate(Bimodality=round(Bimodality,2)) %>% 
+gt()
+```
+
+:::
+
+::::
+
+## Policy Polarization and Social Media Usage - Bimodality Coefficient 
+
+
+```{r}
+
+on18 %>% 
+  group_by(Social_Use2) %>% 
+  summarize(Bimodality=bimodality_coefficient(policy_polarization)) %>% 
+  filter(!is.na(Social_Use2)) %>% 
+#arrange(., desc(Bimodality)) %>% 
+  gt() %>% 
+fmt_number(., columns=2, decimals=2)
+```
+
+**Note no real trends**
+
+## Policy Polarization - Overlap Coefficent
+
+:::: {.columns}
+
+::: {.column width="50%"}
+```{r}
+ggpubr::ggarrange(overlap_legacy, overlap_online, overlap_smedia, overlap_mixed)
+```
+
+:::
+
+::: {.column width="50%"}
+```{r}
+ggpubr::ggarrange(overlap_often, overlap_rarely, ncol = 1)
+```
+
+:::
+
+::::
+
+## Discussion & Conclusion
+
+## References
