@@ -52,22 +52,13 @@ source(here("Code/3a_overlapping.R"))
 
 - **Primary media source**: individuals who *only* received news about the 2018 Ontario election from **legacy**, **online**, and **social media** sources were coded as such and all others were coded as mixed.
 - **Social media usage**: How often respondents use social media from **never** to **multiple times a day**.
-- And **political interest**, **partisan strength**, and **media diversity**.
+- And **political interest**.
 
 ## Measuring Affective polarization
 
 - Measuring affective polarization is more difficult in multi-party democracies [@wagnerAffectivePolarizationMultiparty2021].
-- Therefore, we draw on Wagner's [-@wagnerAffectivePolarizationMultiparty2021] weighted affective polarization (WAP) measure:
-
-$$
-Spread_i = \sqrt{\sum^P_{p=1}v_p(like_{ip}-\overline{like_i})^2}
-$$
-where the mean like scores are also weighted by vote share:
-
-$$
-\overline{like_i} = \sum^P_{p = 1}(v_p*like_{ip})
-$$
-**In short this measure calculates the average weighted difference between a respondent's average like score and their like score for each party**
+- Therefore, we draw on Wagner's [-@wagnerAffectivePolarizationMultiparty2021] weighted affective polarization (WAP) measure.
+- **In short this measure calculates the average weighted difference between a respondent's average like score and their like score for each party**
 
 ## Measuring Policy Polarization
 
@@ -75,7 +66,7 @@ $$
 - We draw on two measures of policy polarization proposed by @lelkesMassPolarizationManifestations2016 and @levenduskyRedStatesVs2011 and tested in Canada by @merkleyPolarizationEhIdeological2022.
 - These measures examine the bimodality of a distribution of policy preferences [@pfisterGoodThingsPeak2013] and the overlap between two empirical distributions of policy preferences [@pastoreMeasuringDistributionSimilarities2019].
 
-:::: {.columns}
+<!--:::: {.columns}
 
 ::: {.column width="50%"}
 
@@ -94,7 +85,7 @@ OVL = \int^{+\infty}_{-\infty}|f(x) - g(x)|dx
 $$
 :::
 
-::::
+::::-->
 
 # Results
 
@@ -176,7 +167,7 @@ on18 %>%
 fmt_number(., columns=2, decimals=2)
 ```
 
-**Note no real trends**
+**Partially shows the curvalinear relationship discussed earlier**
 
 ## Policy Polarization - Overlap Coefficent
 
