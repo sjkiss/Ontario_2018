@@ -568,7 +568,18 @@ on18 %>%
                             'About once a month'='Rarely'", levels=c("Rarely", "Often")))->on18
 on18$Social_Use3
 table(on18$Social_Use3, on18$Social_Use)
-
+#### PARTISANSHIP
+on18 %>% 
+  mutate(partisan=case_when(
+    
+    pidstrngthON<3~"Strong",
+    pidstrngthON>2~ "Weak",
+    pidON==5~"Independent",
+    TRUE~ NA
+  ))->on18
+on18$partisan<-factor(on18$partisan, levels=c("Independent", "Weak", "Strong"))
+# with(on18, prop.table(table(as_factor(on18$pidON), on18$partisan),2))
+# prop.table(table(on18$partisan),2)
 
 #### Export to SPSS File ####
 names(on18)

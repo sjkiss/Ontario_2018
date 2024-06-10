@@ -267,8 +267,7 @@ policy_mixed <- on18 %>%
   filter(Primary_media == "Mixed") %>% 
   select(policy_polarization) 
 
-on18$Interest
-on18$Primary_media
+
 on18 %>% 
   ggplot(., aes(x=Interest))+geom_histogram()
 summary(on18$Interest)
@@ -631,7 +630,14 @@ COVARS <- c("Interest", "age3", "degree", "income3", "pol_knowledge")
 
 
 #### REGRESION MODELS ####
-
+lookfor(on18, "id")
+on18 %>% 
+  select(pidON, pidstrngthON) %>% 
+val_labels()
+on18$Interest
+#summary(lm(Interest~partisan, data=on18))
+on18 %>% 
+  ggplot(., aes(x=partisan, y=Interest))+geom_boxplot()
 #Create regression models for affective polarization using the weighted affective polarization (WAP) measure
 #### Simon's Way ####
 on18 %>% 
@@ -647,49 +653,52 @@ on18 %>%
 nest(-Variable) %>% 
   mutate(model1=map(data, function(x) lm(WAP_sd~Score, data=x)),
          model2=map(data, function(x) lm(WAP_sd~Score+Interest, data=x)),
-         model3=map(data, function(x) lm(WAP_sd~Score+media_diversity, data=x)),
-         model4=map(data, function(x) lm(WAP_sd~Score+pol_knowledge, data=x)),
-         model5=map(data, function(x) lm(WAP_sd~Score+Interest+media_diversity, data=x)),
-         model6=map(data, function(x) lm(WAP_sd~Score+Interest+pol_knowledge, data=x)),
-         model7=map(data, function(x) lm(WAP_sd~Score+Interest+media_diversity+pol_knowledge+age3, data=x)),
-         model8=map(data, function(x) lm(WAP_sd~Score+Interest+media_diversity+pol_knowledge+income, data=x)),
-         model9=map(data, function(x) lm(WAP_sd~Score+Interest+media_diversity+pol_knowledge+degree, data=x)),
-         model10=map(data, function(x) lm(WAP_sd~Score+Interest+media_diversity+pol_knowledge+as_factor(gender), data=x)),
-         model11=map(data, function(x) lm(WAP_sd~Score+Interest+media_diversity+pol_knowledge+age3+income+degree+as_factor(gender), data=x)),
-         model12=map(data, function(x) lm(WAP_sd~Score+Interest+media_diversity+pol_knowledge+age3+income+degree+as_factor(gender)+Score:Interest, data=x))) %>% 
+         model3=map(data, function(x) lm(WAP_sd~Score+partisan, data=x)),
+         model4=map(data, function(x) lm(WAP_sd~Score+media_diversity, data=x)),
+         model5=map(data, function(x) lm(WAP_sd~Score+pol_knowledge, data=x)),
+         model6=map(data, function(x) lm(WAP_sd~Score+Interest+partisan, data=x)),
+         model7=map(data, function(x) lm(WAP_sd~Score+Interest+media_diversity, data=x)),
+         model8=map(data, function(x) lm(WAP_sd~Score+Interest+pol_knowledge, data=x)),
+         model9=map(data, function(x) lm(WAP_sd~Score+Interest+partisan+media_diversity+pol_knowledge+age3, data=x)),
+         model10=map(data, function(x) lm(WAP_sd~Score+Interest+partisan+media_diversity+pol_knowledge+income, data=x)),
+         model11=map(data, function(x) lm(WAP_sd~Score+Interest+partisan+media_diversity+pol_knowledge+degree, data=x)),
+         model12=map(data, function(x) lm(WAP_sd~Score+Interest+partisan+media_diversity+pol_knowledge+as_factor(gender), data=x)),
+         model13=map(data, function(x) lm(WAP_sd~Score+Interest+partisan+media_diversity+pol_knowledge+age3+income+degree+as_factor(gender), data=x)),
+         model14=map(data, function(x) lm(WAP_sd~Score+Interest+partisan+media_diversity+pol_knowledge+age3+income+degree+as_factor(gender), data=x)),
+         model15=map(data, function(x) lm(WAP_sd~Score+Interest+partisan+media_diversity+pol_knowledge+age3+income+degree+as_factor(gender)+Score:Interest, data=x))) %>% 
   #Use across() to select which columns
   #function(x) to specifiy applying a function to each column
   # map(x, tidy) to say what you want to do to each column
-  mutate(across(model1:model12, function(x) map(x, tidy), .names="{col}_tidied")) %>% 
-  pivot_longer(model1_tidied:model12_tidied, names_to = "Model_Name", values_to=c("Results")) %>% 
+  mutate(across(model1:model15, function(x) map(x, tidy), .names="{col}_tidied")) %>% 
+  pivot_longer(model1_tidied:model15_tidied, names_to = "Model_Name", values_to=c("Results")) %>% 
   unnest(Results)->WAP_models
 #Tidying terms
 WAP_models %>% 
 mutate(Model_Name=str_to_title(str_remove_all(Model_Name, "_tidied"))) %>% 
-  mutate(Model_Name=str_replace_all(Model_Name, "(^Model)([0-9])", "\\1 \\2")) %>% 
+  mutate(Model_Name=str_replace_all(Model_Name, "(^Model)([0-9]+)", "\\1 \\2")) %>% 
   mutate(term=str_remove_all(term, "Score")) %>% 
   mutate(term=car::Recode(term, "'media_diversity'='Media Diversity';
   'degree'='Degree';
                           'age3'='Age';
                           'pol_knowledge'='Political knowledge';
                           'income'='Income';'as_factor(gender)Female'='Female'")) ->WAP_models
-
+WAP_models
 WAP_models %>%
   filter(Variable=="Primary_media") %>%
   #Filter out the interaction model
-  filter(Model_Name!="Model 12") %>%
+  filter(Model_Name!="Model 15") %>%
   filter(str_detect(term, "Intercept", negate=T))  %>%
   ggplot(., aes(x=estimate, y=fct_relevel(term, "Social_Media", "Online", "Mixed", after=10)))+
-  facet_wrap(~fct_relevel(Model_Name, "Model 10", "Model 11",  after=9))+
+  facet_wrap(~fct_relevel(Model_Name, "Model 10", "Model 11", "Model 12", "Model 13", "Model 14",  after=10))+
   geom_pointrange(aes(xmin=estimate-(1.96*std.error), xmax=estimate+(1.96*std.error)))+geom_vline(xintercept=0, linetype=2, col="red")+labs(y="Variable", x="Coefficient")
 table(WAP_models$term)
 WAP_models %>%
   filter(Variable=="Social_Use2") %>%
   #Filter out the interaction model
-  filter(Model_Name!="Model 12") %>%
+  filter(Model_Name!="Model 15") %>%
   filter(str_detect(term, "Intercept", negate=T))  %>%
   ggplot(., aes(x=estimate, y=fct_relevel(term, "Several times a day", "About once a day", "Several times a week", "About once a week","Less than once a week", after=10)))+
-  facet_wrap(~fct_relevel(Model_Name, "Model 10", "Model 11",  after=9))+
+  facet_wrap(~fct_relevel(Model_Name, "Model 10", "Model 11", "Model 12", "Model 13", "Model 14",  after=10))+
   geom_pointrange(aes(xmin=estimate-(1.96*std.error), xmax=estimate+(1.96*std.error)))+geom_vline(xintercept=0, linetype=2, col="red")+labs(y="Variable", x="Coefficient")
 
 # WAP_models %>% 

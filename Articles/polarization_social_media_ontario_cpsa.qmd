@@ -317,14 +317,14 @@ First we estimate a model with only `primary media` as an independent variable. 
 #| warning: false
 #| fig-cap: OLS Regression Models for Weighted Affective Polarization Scores by Media Consumption of Campaign News and Control Variables
 #| label: fig-PM-models
-#| fig-height: 6
+#| fig-height: 8
 WAP_models %>% 
   filter(Variable=="Primary_media") %>% 
   #Filter out the interaction model
   filter(Model_Name!="Model 12") %>% 
   filter(str_detect(term, "Intercept", negate=T))  %>%
   ggplot(., aes(x=estimate, y=fct_relevel(term, "Social_Media", "Online", "Mixed", after=10)))+
-  facet_wrap(~fct_relevel(Model_Name, "Model 10", "Model 11",  after=9))+
+  facet_wrap(~fct_relevel(Model_Name, "Model 10", "Model 11", "Model 12", "Model 13", "Model 14",  "Model 15", after=10))+
   geom_pointrange(aes(xmin=estimate-(1.96*std.error), xmax=estimate+(1.96*std.error)))+geom_vline(xintercept=0, linetype=2, col="red")+labs(y="Variable", x="Coefficient")
 
 ```
@@ -335,13 +335,14 @@ We then re-estimate the same models that we estimated above using social media u
 #| echo: false
 #| warning: false
 #| fig-cap: OLS regression models coefficients for weighted affective polarization scores by social media usage and control variables. "Never" using social media is the reference category for self-reported social media usage.
-#| fig-height: 6
+#| fig-height: 8
 #| label: fig-SU-models
 WAP_models %>% 
   filter(Variable=="Social_Use2") %>% 
     filter(Model_Name!="Model 12") %>% 
   filter(str_detect(term, "Intercept", negate=T)) %>% 
-  ggplot(., aes(x=estimate, y=fct_relevel(term, "Never", "Several times a day","About once a day","Several times a week","About once a week", "Less than once a week", after=7)))+facet_wrap(~fct_relevel(Model_Name, "Model 10", "Model 11",  after=9))+
+  ggplot(., aes(x=estimate, y=fct_relevel(term, "Never", "Several times a day","About once a day","Several times a week","About once a week", "Less than once a week", after=7)))+
+  facet_wrap(~fct_relevel(Model_Name, "Model 10", "Model 11", "Model 12", "Model 13", "Model 14", "Model 15", after=10))+
   geom_pointrange(aes(xmin=estimate-(1.96*std.error), xmax=estimate+(1.96*std.error)))+geom_vline(xintercept=0, linetype=2, col="red")+labs(y="Variable", x="Coefficient")
 ```
 
@@ -404,7 +405,7 @@ To investigate the relationship between media consumption and *policy polarizati
 #| message: false
 library(gtsummary)
 on18 %>%
-select(policy_polarization, Primary_media, Social_Use2, Vote) %>%
+select(policy_polarization, Primary_media, Social_Use2) %>%
   #filter(!is.na(Vote)) %>%
   tbl_continuous(variable=c(policy_polarization),
                  statistic=list(~"{mean} ({sd})"))
@@ -568,40 +569,45 @@ library(kableExtra)
 WAP_models %>% 
   filter(Variable=="Primary_media") %>% 
   slice(1) %>% 
-  select(model1:model12) %>% 
+  select(model1:model15) %>% 
 map(., ~.[[1]]) %>% 
   modelsummary(.,fmt=2, stars=T, gof_omit = c("AIC|BIC|Log.Lik.|R2 Adj.|RMSE"), 
                coef_rename=c("media_diversity"="Media Diversity",
   "degree"="Degree",
                           "age3"="Age",
                           "pol_knowledge"="Political knowledge",
-                          "income"="Income","as_factor(gender)Female"="Female"), output="kableExtra") %>% 
+                          "income"="Income","as_factor(gender)Female"="Female",
+"ScoreMixed"="News Consumption (Mixed)",
+"ScoreOnline"="News Consumption (Online)",
+"ScoreSocial_Media"="News Consumption (Social_Media)",
+"ScoreMixed:Interest"="News Consumption (Mixed)*Interest",
+"ScoreOnline:Interest"="News Consumption (Online)*Interest",
+"ScoreSocial_Media:Interest"="News Consumption (Social_Media)*Interest"), output="kableExtra") %>% 
   #cols_width(1~pct(25)) %>% 
   #opt_vertical_padding(scale=0.25)
  #landscape(margin="0.5in") %>% 
   kable_styling(latex_options="scale_down")
 
 ```
-
+\clearpage
 ```{r}
 #| label: appendix-2
 #| tbl-cap: OLS regressions of weighted affective polarization on social media usage plus controls 
 WAP_models %>% 
   slice(1) %>% 
-  select(model1:model12) %>% 
+  select(model1:model15) %>% 
 map(., ~.[[1]]) %>% 
   modelsummary(.,fmt=2, stars=T, gof_omit = c("AIC|BIC|Log.Lik.|R2 Adj.|RMSE"), 
                coef_rename=c("media_diversity"="Media Diversity",
   "degree"="Degree",
                           "age3"="Age",
                           "pol_knowledge"="Political knowledge",
-                          "income"="Income","as_factor(gender)Female"="Female"), output="kableExtra") %>% 
+                          "income"="Income","as_factor(gender)Female"="Female",
+  "ScoreLess than once a week"="Social Media Usage (Less than once a week)"), output="kableExtra") 
   #cols_width(1~pct(25)) %>% 
   #opt_vertical_padding(scale=0.25)
  #landscape(margin="0.5in") %>% 
   kable_styling(latex_options="scale_down")
-
-
 
 ```
 
