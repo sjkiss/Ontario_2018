@@ -109,12 +109,13 @@ ov_policy_social_usage_rarely<-round(overlapping::overlap(list(policy_left_rarel
                                               # policy_conservative_social_rarely_vector), B = 1000)
 #bayestestR::overlap(policy_left_rarely_vector, policy_conservative_social_rarely_vector)
 
-overlap_rarely <- ggplot() + geom_density(aes(policy_polarization), data = policy_left_rarely, col = "red", fill = "red", alpha = 0.4) + 
+overlap_rarely <- ggplot() + 
+  geom_density(aes(policy_polarization), data = policy_left_rarely, col = "red", fill = "red", alpha = 0.4) + 
   geom_density(aes(policy_polarization), data = policy_conservative_social_rarely, col = "blue", fill = "blue", alpha = 0.4) +
   labs(title = "Uses Social Media Rarely", subtitle = paste("Overlap Coefficent", ov_policy_social_usage_rarely, sep=" "), x = "Policy Positions", y = NULL) + theme_bw()
 
 
-ggpubr::ggarrange(overlap_often, overlap_rarely, ncol = 1)
+#ggpubr::ggarrange(overlap_often, overlap_rarely, ncol = 1)
 
 
 #report the null of the social media use

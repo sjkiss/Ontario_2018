@@ -24,26 +24,23 @@ link-citations: true
 
 ## Headline Findings
 
-- Evidence consistent with a polarizing role for social media usage and digital news consumption in self-reported, observational, cross-sectional data from Ontario 2018
-- Primarily occurs amongst voters low in interest in politics
-- Contra Dubois and Blank [-@duboisEchoChamberOverstated2018] political interest is positively correlated with affective and policy polarization
-@abramowitzPolarizationMyth2008; @fiorinaCultureWarMyth2005; @fiorinaCultureWarMyth2011
+-   Partial evidence for polarization by social media and online news consumption. 
+  - heavy social media use \rightarrow slight increase in affective polarization
+  - online news media consumption \rightarrow slight increase in policy polarization
+- Caution: self-reported, observational, cross-sectional data from Ontario 2018
+-   Polarization by social media use and digital news consumption mostly occurs amongst low interest voters
+-   Contra Dubois and Blank [-@duboisEchoChamberOverstated2018] political interest is directly, positively correlated with affective and policy polarization
 
 \note{this is a test}
 
-## Definition
 
-- **Affective polarization** - Increasing dislike of out-partisans
-- **Policy polarization** - Increasing disagreement over  policy issues
+<!-- ## State of the Literature -->
 
-
-## State of the Literature
-
-- Seems like affective polarization in the United States is real @iyengarOriginsConsequencesAffective2019
-- Less consensus about policy polarization in the US [@abramowitzPolarizationMyth2008; @fiorinaCultureWarMyth2005; @fiorinaCultureWarMyth2011]
-- @merkleyPolarizationEhIdeological2022 and @johnstonAffectivePolarizationCanadian2023 find increases in affective polarization in Canada, less evidence of policy polarization in Canada
-- Overall, evidence seems to acquit social media (see [@bakshyExposureIdeologicallyDiverse2015; @boxellInternetCausingPolitical2017; @allcottSocialMediaFake2017])
-- Digital news consumption might be different @gainousSurfingPoliticalExtremes2023
+<!-- -   Seems like affective polarization in the United States is real @iyengarOriginsConsequencesAffective2019 -->
+<!-- -   Less consensus about policy polarization in the US [@abramowitzPolarizationMyth2008;  @fiorinaCultureWarMyth2011] -->
+<!-- -   @merkleyPolarizationEhIdeological2022 and @johnstonAffectivePolarizationCanadian2023 find increases in affective polarization in Canada, less evidence of policy polarization in Canada -->
+<!-- -   Overall, evidence seems to acquit social media (see [@bakshyExposureIdeologicallyDiverse2015; @boxellInternetCausingPolitical2017; @allcottEffectsFacebookInstagram2024]) -->
+<!-- -   Digital news consumption might be different @gainousSurfingPoliticalExtremes2023 -->
 
 ## Methods
 
@@ -64,18 +61,18 @@ source(here("Code/3a_overlapping.R"))
 ```
 
 -   Ontario Provincial Election Study, produced by [LISPOP](http://lispop.ca)
-  - Available for public use at <https://doi.org/10.5683/SP3/VFGL0E> <!-- DOI doesn't work-->
-- Online consumer sample from SSI, weighted by gender, age and education 
+-   Available for public use at <https://doi.org/10.5683/SP3/VFGL0E> <!-- DOI doesn't work-->
+-   Online consumer sample from SSI, weighted by gender, age and education
 -   Campaign survey fielded between `r paste(format(min(on18$datestamp),"%B %d"),format(max(on18$datestamp),"%B %d, %Y"), sep="-")`
-- Rich set of questions on news consumption and social media usage
-  - observational, cross-sectional and self-reports but interesting nonetheless.
+-   Rich set of questions on news consumption and social media usage
+    -   observational, cross-sectional and self-reports but interesting nonetheless.
 
 ## Ontario 2018
 
-- End of the Liberal regime
-  - Kathleen Wynne and the party were deeply unpopular
-- Doug Ford became PC leader at the last minute
-- Ripe grounds for strong feelings about out-partisans
+-   End of the Liberal regime
+    -   Kathleen Wynne and the party were deeply unpopular
+-   Doug Ford became PC leader at the last minute
+-   Ripe grounds for strong feelings about out-partisans
 
 ## Sample Validation
 
@@ -101,25 +98,26 @@ kable()
 
 ## Key Independent Variables
 
-- **Primary media source**: respondents were asked how they primarily received news about the 2018 Ontario election 
-  - Respondents grouped into **legacy** (TV, radio, print newspapers) **online** (news aggregators, blogs, online newspaper) and **social media** (facebook or twitter feeds); otherwise **mixed**.
-- **Social media usage**: How often respondents use social media from **never** to **multiple times a day**
-  - No reference to news consumption
+-   **Primary media source**: respondents were asked how they primarily received news about the 2018 Ontario election
+    -   Respondents grouped into **legacy** (TV, radio, print newspapers) **online** (news aggregators, blogs, online newspaper) and **social media** (facebook or twitter feeds); otherwise **mixed**.
+-   **Social media usage**: How often respondents use social media from **never** to **multiple times a day**
+    -   No reference to news consumption
+
+## Key Dependent Variables
+
+**Affective polarization** 
+  - Increasing dislike of out-partisans
+  - Problem with multi-party democracies; weight by vote share [@wagnerAffectivePolarizationMultiparty2021].
+  - **Calculates the average weighted difference between a respondent's average like score and their like score for each party, weighted by party vote share**
   
-## Measuring Affective polarization
+## Key Dependent Variables
 
-- Measuring affective polarization is more difficult in multi-party democracies [@wagnerAffectivePolarizationMultiparty2021].
-- Therefore, we draw on Wagner's [-@wagnerAffectivePolarizationMultiparty2021] weighted affective polarization (WAP) measure.
-- **Calculates the average weighted difference between a respondent's average like score and their like score for each party, weighted by party vote share**
-  - Could understate polarization, of low Liberal vote share will weight feelings about the Liberals 
+**Policy polarization** 
 
-
-## Measuring Policy Polarization
-
-- Index of 11 policy items (see Appendix in the paper)
-- Two measures of policy polarization ( see [@lelkesMassPolarizationManifestations2016; @levenduskyRedStatesVs2011]
-  - bimodality coefficient to examine bimodality of a distribution of policy preferences [@pfisterGoodThingsPeak2013]
-  - the overlap coefficient to examine overlap between two empirical distributions of policy preferences [@pastoreMeasuringDistributionSimilarities2019]  
+  -   Index of 11 policy items (see Appendix in the paper)
+  -   Two measures of policy polarization ( see [@lelkesMassPolarizationManifestations2016; @levenduskyRedStatesVs2011]
+    -   bimodality coefficient to examine bimodality of a distribution of policy preferences [@pfisterGoodThingsPeak2013]
+    -   the overlap coefficient to examine overlap between two distributions of policy preferences [@pastoreMeasuringDistributionSimilarities2019]
 
 <!-- <!--:::: {.columns} -->
 
@@ -128,16 +126,23 @@ kable()
 <!-- **Bimodality Coefficient** -->
 
 <!-- $$ -->
+
 <!-- BC = \frac{s^2 + 1}{k + 3 *\frac{(n-1)^2}{(n-2)(n-3)}} -->
+
 <!-- $$ -->
 
 <!-- ::: -->
 
 <!-- ::: {.column width="50%"} -->
+
 <!-- **Overlap Coefficent** -->
+
 <!-- $$ -->
+
 <!-- OVL = \int^{+\infty}_{-\infty}|f(x) - g(x)|dx -->
+
 <!-- $$ -->
+
 <!-- ::: -->
 
 <!-- ::::-->
@@ -156,7 +161,6 @@ WAP_models %>%
   geom_pointrange(aes(xmin=estimate-(1.96*std.error), xmax=estimate+(1.96*std.error)))+geom_vline(xintercept=0, linetype=2, col="red")+labs(y="Variable", x="Coefficient") + theme_bw(base_size = 24)
 ```
 
-
 ## Affective Polarization and Social Media Usage
 
 ```{r}
@@ -169,19 +173,16 @@ WAP_models %>%
   ggplot(., aes(x=estimate, y=fct_relevel(term, "Never", "Several times a day","About once a day","Several times a week","About once a week", "Less than once a week", after=10)))+facet_wrap(~fct_relevel(Model_Name, "Model 14",  after=3))+
   geom_pointrange(aes(xmin=estimate-(1.96*std.error), xmax=estimate+(1.96*std.error)))+geom_vline(xintercept=0, linetype=2, col="red")+labs(y="Variable", x="Coefficient") + theme_bw(base_size=24)
 ```
-## Notable Trends in Social Media Usage and Affective Polarization
 
--  Online news consumption is associated with lower levels of affective polarization than legacy media consumption.
-- **But** using social media several times a day is associated with higher levels of affective polarization than never using social media.
-- Interest is positively related to levels of affective polarization, *contra* 
+<!-- ## Notable Trends in Social Media Usage and Affective Polarization -->
 
+<!-- -   Online news consumption is associated with lower levels of affective polarization than legacy media consumption. -->
+<!-- -   **But** using social media several times a day is associated with higher levels of affective polarization than never using social media. -->
+<!-- -   Interest is positively related to levels of affective polarization, *contra* -->
 
 ## Policy Polarization and Primary Media Source - Bimodality Coefficient
 
 
-:::: {.columns}
-
-::: {.column width="50%"}
 ```{r}
 library(gt)
 on18 %>%
@@ -191,9 +192,8 @@ on18 %>%
   gt()
 ```
 
-:::
+## Policy Polarization and Primary Media Source - Bimodality Coefficient
 
-::: {.column width="50%"}
 ```{r}
 
 on18 %>%
@@ -205,12 +205,7 @@ rename(Interest=Interest_cat) %>%
 gt()
 ```
 
-:::
-
-::::
-
 ## Policy Polarization and Social Media Usage - Bimodality Coefficient
-
 
 ```{r}
 
@@ -223,30 +218,30 @@ on18 %>%
 fmt_number(., columns=2, decimals=2)
 ```
 
+## Policy Polarization - Overlap Coefficent
 
+
+```{r}
+#theme_set(theme_bw(base_size=48))
+library(cowplot)
+ggpubr::ggarrange(overlap_legacy+theme_bw(base_size=24), overlap_online+theme_bw(base_size=24), overlap_smedia+theme_bw(base_size=24), overlap_mixed+theme_bw(base_size=24))
+```
 
 ## Policy Polarization - Overlap Coefficent
 
-:::: {.columns}
 
-::: {.column width="50%"}
 ```{r}
-ggpubr::ggarrange(overlap_legacy, overlap_online, overlap_smedia, overlap_mixed)
+ggpubr::ggarrange(overlap_often+theme_bw(base_size=24), overlap_rarely+theme_bw(base_size=24), ncol = 1)
 ```
 
-:::
-
-::: {.column width="50%"}
-```{r}
-ggpubr::ggarrange(overlap_often, overlap_rarely, ncol = 1)
-```
-
-:::
-
-::::
 
 ## Discussion & Conclusion
 
+- Some mild direct evidence for polarization
+- Interacts with interest in politics even after controlling for partisanship.
+- Consistent with Merkely (2022) who finds moderate increases in affective polarization, albeit we find increases amongst those with low levels of political interest
+- Contra Dubois and Blank (2018), political interest \rightarrow polarization
 
 ## References {.allowframebreaks}
+
 \footnotesize
