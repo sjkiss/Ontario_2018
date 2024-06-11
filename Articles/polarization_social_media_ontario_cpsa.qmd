@@ -156,7 +156,7 @@ data.frame(Party=c("Liberal Party of Ontario", "Progressive Conservative Party o
 library(gtsummary)
 on18 %>% 
   as_factor() %>%
-filter(partyvote2018!="Undecided") %>% 
+filter(!is.na(partyvote2018)) %>% 
 group_by(partyvote2018) %>% 
 summarize(n=n()) %>% 
 mutate(Vote=(n/sum(n)), Sample=rep("OPES", nrow(.))) %>% 
@@ -608,7 +608,7 @@ map(., ~.[[1]]) %>%
                           "age3"="Age",
                           "pol_knowledge"="Political knowledge",
                           "income"="Income","as_factor(gender)Female"="Female",
-  "ScoreLess than once a week"="Social Media Usage (Less than once a week)"), output="kableExtra") 
+  "ScoreLess than once a week"="Social Media Usage (Less than once a week)"), output="kableExtra") %>% 
   #cols_width(1~pct(25)) %>% 
   #opt_vertical_padding(scale=0.25)
  #landscape(margin="0.5in") %>% 
