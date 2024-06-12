@@ -21,13 +21,16 @@ on18 %>%
   filter(consent==1)->on18
 #### 
 names(on18)
+library(rio)
 on18 %>% 
  # select(indivfinfeel, immfeel) %>% str()
   select(-yob2, postalcode, contains("irv_"), -`filter_$`, -regions) %>% 
  # write_sav(on18, file=here("Data/opes_2018.sav"))
   as.data.frame() %>% 
   #select(indivfinfeel) %>%
-  write_sav(., path=here("Data/opes_2018.sav"), compress="none")
+  write_sav(., path=here("Data/opes_2018.sav"), compress="zsav")
+#export(., here("Data/opes_2018.sav"))
+
 on18 %>% 
   # select(indivfinfeel, immfeel) %>% str()
   select(-yob2, postalcode, contains("irv_"), -`filter_$`, -regions) %>% 

@@ -22,25 +22,7 @@ bibliography: Polarization_Canada.bib
 link-citations: true
 ---
 
-## Headline Findings
 
--   Partial evidence for polarization by social media and online news consumption. 
-  - heavy social media use \rightarrow slight increase in affective polarization
-  - online news media consumption \rightarrow slight increase in policy polarization
-- Caution: self-reported, observational, cross-sectional data from Ontario 2018
--   Polarization by social media use and digital news consumption mostly occurs amongst low interest voters
--   Contra Dubois and Blank [-@duboisEchoChamberOverstated2018] political interest is directly, positively correlated with affective and policy polarization.
-
-\note{...}
-
-
-<!-- ## State of the Literature -->
-
-<!-- -   Seems like affective polarization in the United States is real @iyengarOriginsConsequencesAffective2019 -->
-<!-- -   Less consensus about policy polarization in the US [@abramowitzPolarizationMyth2008;  @fiorinaCultureWarMyth2011] -->
-<!-- -   @merkleyPolarizationEhIdeological2022 and @johnstonAffectivePolarizationCanadian2023 find increases in affective polarization in Canada, less evidence of policy polarization in Canada -->
-<!-- -   Overall, evidence seems to acquit social media (see [@bakshyExposureIdeologicallyDiverse2015; @boxellInternetCausingPolitical2017; @allcottEffectsFacebookInstagram2024]) -->
-<!-- -   Digital news consumption might be different @gainousSurfingPoliticalExtremes2023 -->
 
 ## Methods
 
@@ -65,18 +47,8 @@ source(here("Code/3a_overlapping.R"))
 -   Online consumer sample from SSI, weighted by gender, age and education
 -   Campaign survey fielded between `r paste(format(min(on18$datestamp),"%B %d"),format(max(on18$datestamp),"%B %d, %Y"), sep="-")`
 -   Rich set of questions on news consumption and social media usage
-    -   observational, cross-sectional and self-reports but interesting nonetheless.
-    
-\note{These questions include those that ask what sources respondents received election news from, a political knowledge test, political interest, etc.}
+    -   observational, cross-sectional and self-reports, so limited 
 
-## Ontario 2018
-
--   End of the Liberal regime
-    -   Kathleen Wynne and the party were deeply unpopular
--   Doug Ford became PC leader at the last minute
--   Ripe grounds for strong feelings about out-partisans
-
-\note{...}
 
 ## Sample Validation
 
@@ -99,39 +71,43 @@ mutate(Vote=scales::percent(Vote, accuracy=1)) %>%
 pivot_wider(., names_from="Sample", values_from="Vote") %>% 
 kable()
 ```
+## Headline Findings
 
-\note{We compared the vote intentions from our sample to the final election results:
-- The NDP was over-represented and the PC party under represented. 
-- When survey was in the field NDP was leading. 
-}
+-   Partial evidence for polarization by social media and online news consumption.
+-   heavy social media use \rightarrow slight increase in affective polarization
+-   online news media consumption \rightarrow slight increase in policy polarization
+-   Caution: self-reported, observational, cross-sectional data from Ontario 2018
+-   Polarization by social media use and digital news consumption mostly occurs amongst low interest voters
+-   Contra Dubois and Blank [-@duboisEchoChamberOverstated2018] political interest is directly, positively correlated with affective and policy polarization.
+
+
 ## Key Independent Variables
 
 -   **Primary media source**: respondents were asked how they primarily received news about the 2018 Ontario election
     -   Respondents grouped into **legacy** (TV, radio, print newspapers) **online** (news aggregators, blogs, online newspaper) and **social media** (facebook or twitter feeds); otherwise **mixed**.
 -   **Social media usage**: How often respondents use social media from **never** to **multiple times a day**
     -   No reference to news consumption
-    
-\note{Due to the small proportion of our sample that only used social media for election news we wanted to include an additional measure of social use to validate our results.}
+
 
 ## Key Dependent Variables
 
 **Affective polarization** 
-  - Increasing dislike of out-partisans
-  - Problem with multi-party democracies; weight by vote share [@wagnerAffectivePolarizationMultiparty2021].
-  - **Calculates the average weighted difference between a respondent's average like score and their like score for each party, weighted by party vote share**
-  
-\note{Traditional methods of measuring affective polarization only work in two party systems (e.g. USA) or do not take into account that individuals have similar feelings towards related parties. New measures needed for multiparty systems.}
-  
+
+- Increasing dislike of out-partisans 
+   - Problem with multi-party democracies; weight by vote share [@wagnerAffectivePolarizationMultiparty2021]. 
+   - **Calculates the average weighted difference between a respondent's average like score and their like score for each party, weighted by party vote share**
+
+
 ## Key Dependent Variables
 
-**Policy polarization** 
+**Policy polarization**
 
-  -   Index of 11 policy items (see Appendix in the paper).
-  -   Two measures of policy polarization (See [@lelkesMassPolarizationManifestations2016; @levenduskyRedStatesVs2011]
-    -   bimodality coefficient to examine bimodality of a distribution of policy preferences [@pfisterGoodThingsPeak2013].
-    -   the overlap coefficient to examine overlap between two distributions of policy preferences [@pastoreMeasuringDistributionSimilarities2019].
-    
-\note{...}
+-   Index of 11 policy items (see Appendix in the paper).
+-   Two measures of policy polarization (See [@lelkesMassPolarizationManifestations2016; @levenduskyRedStatesVs2011] 
+   - bimodality coefficient to examine bimodality of a distribution of policy preferences [@pfisterGoodThingsPeak2013]. 
+  - the overlap coefficient to examine overlap between two distributions of policy preferences [@pastoreMeasuringDistributionSimilarities2019].
+
+
 
 <!-- <!--:::: {.columns} -->
 
@@ -175,9 +151,10 @@ WAP_models %>%
   geom_pointrange(aes(xmin=estimate-(1.96*std.error), xmax=estimate+(1.96*std.error)))+geom_vline(xintercept=0, linetype=2, col="red")+labs(y="Variable", x="Coefficient") + theme_bw(base_size = 24)
 ```
 
+```{=tex}
 \note{- Small significant negative coefficient online media and affective polarization.}
 \note{*MORE INTERESTING* Positive coefficent on interest. Those who are more interested are more polarization.}
-
+```
 ## Affective Polarization and Social Media Usage
 
 ```{r}
@@ -191,14 +168,26 @@ WAP_models %>%
   geom_pointrange(aes(xmin=estimate-(1.96*std.error), xmax=estimate+(1.96*std.error)))+geom_vline(xintercept=0, linetype=2, col="red")+labs(y="Variable", x="Coefficient") + theme_bw(base_size=24)
 ```
 
-<!-- ## Notable Trends in Social Media Usage and Affective Polarization -->
+## Interaction of social media use, interest and affective polarization
 
-\note{ -   Online news consumption is associated with lower levels of affective polarization than legacy media consumption. }
-\note{ -   **But** using social media several times a day is associated with higher levels of affective polarization than never using social media. }
-\note{ -   Interest is positively related to levels of affective polarization, *contra* }
+```{r}
+#| label: fig-interactions
+#| fig-cap: Predicted values of affective polarization by selected levels of social media use and interest in politics. 
+#| fig-width: 5
+#| fig-height: 3
+
+
+plot_predictions(model6_su, 
+                 condition=list("Interest", Social_Use2=c("Never", "About once a day", "Several times a day")), vcov=F)+
+aes(linetype=Social_Use2, col=Social_Use2)+labs(y="Predicted WAP", col="Social Media Use")+theme_bw()+theme(legend.position="bottom")+
+guides(col=guide_legend(ncol=2))
+
+
+```
+
+
 
 ## Policy Polarization and Primary Media Source - Bimodality Coefficient
-
 
 ```{r}
 library(gt)
@@ -224,9 +213,9 @@ rename(Interest=Interest_cat) %>%
 gt()
 ```
 
-\note{Low 1 SD below the mean or lower on interest, High 1 SD or higher on interest.
-A low levels of interest only online news users have a bimodal distribution. Legacy and online have bimodal distributions at high levels of interest. Sample size problems no high interest social media only users.}
-
+```{=tex}
+\note{}
+```
 ## Policy Polarization and Social Media Usage - Bimodality Coefficient
 
 ```{r}
@@ -244,30 +233,29 @@ fmt_number(., columns=2, decimals=2)
 
 ## Policy Polarization - Overlap Coefficent
 
-
 ```{r}
 #theme_set(theme_bw(base_size=48))
 library(cowplot)
 ggpubr::ggarrange(overlap_legacy+theme_bw(base_size=24), overlap_online+theme_bw(base_size=24), overlap_smedia+theme_bw(base_size=24), overlap_mixed+theme_bw(base_size=24))
 ```
 
-\note{Here we also observe that the same pattern as using the BC, that those who use only use online media sources are the most polarized and those who only use social media are less polarized.}
+\note{}
 
 ## Policy Polarization - Overlap Coefficent
-
 
 ```{r}
 ggpubr::ggarrange(overlap_often+theme_bw(base_size=24), overlap_rarely+theme_bw(base_size=24), ncol = 1)
 ```
 
-\note{However, those who rarely use social media are more polarized in their policy positions than those who do not use social media}
+\note{}
 
 ## Discussion & Conclusion
 
-- Some mild direct evidence for polarization
-- Interacts with interest in politics even after controlling for partisanship.
-- Consistent with Merkely (2022) who finds moderate increases in affective polarization, albeit we find increases amongst those with low levels of political interest
-- Contra Dubois and Blank (2018), political interest \rightarrow polarization
+-   Some mild direct evidence for polarization
+-   Interacts with interest in politics even after controlling for partisanship.
+-   Consistent with Merkely (2022) who finds moderate increases in affective polarization, albeit we find increases amongst those with low levels of political interest
+-  Inconsistent with Merkely (yesterday) who finds limited role for digital news consumption increasing affective polarization
+-   Contra Dubois and Blank (2018), political interest \rightarrow polarization, social media usage and digital media consumption moderates this relationship.
 
 ## References {.allowframebreaks}
 
