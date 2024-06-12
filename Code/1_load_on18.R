@@ -351,7 +351,7 @@ on18 %>%
   mutate(media_diversity=rowSums(across(CBCTV:HuffingtonPostonline),na.rm=T))->on18
 on18$CBCTV
 on18 %>% 
-  select(CBCTV:HuffingtonPostonline) %>% View()
+  select(CBCTV:HuffingtonPostonline) #%>% View()
 
 # on18 %>% 
 #   ggplot(., aes(x=media_diversity))+geom_histogram()
