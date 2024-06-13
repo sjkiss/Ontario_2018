@@ -1065,3 +1065,4 @@ bimodal <- as_tibble(bimodal_data) %>%
 on18 %>% 
   group_by(Primary_media) %>% 
   summarize(mean(media_diversity, na.rm=T))
+

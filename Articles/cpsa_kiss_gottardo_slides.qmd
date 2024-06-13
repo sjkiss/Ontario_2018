@@ -17,9 +17,13 @@ execute:
   echo: false
   results: hide
   cache: false
+pdf-engine: lualatex
 # It is necessary to double backslash the underscore
 bibliography: Polarization_Canada.bib
 link-citations: true
+include-in-header:
+      - text: |
+          \usepackage{emoji}
 ---
 
 
@@ -47,7 +51,7 @@ source(here("Code/3a_overlapping.R"))
 -   Online consumer sample from SSI, weighted by gender, age and education
 -   Campaign survey fielded between `r paste(format(min(on18$datestamp),"%B %d"),format(max(on18$datestamp),"%B %d, %Y"), sep="-")`
 -   Rich set of questions on news consumption and social media usage
-    -   observational, cross-sectional and self-reports, so limited 
+    -   observational, cross-sectional and self-reports, so ....
 
 
 ## Sample Validation
@@ -76,9 +80,8 @@ kable()
 -   Partial evidence for polarization by social media and online news consumption.
 -   heavy social media use \rightarrow slight increase in affective polarization
 -   online news media consumption \rightarrow slight increase in policy polarization
--   Caution: self-reported, observational, cross-sectional data from Ontario 2018
--   Polarization by social media use and digital news consumption mostly occurs amongst low interest voters
--   Contra Dubois and Blank [-@duboisEchoChamberOverstated2018] political interest is directly, positively correlated with affective and policy polarization.
+-   Contra Dubois and Blank [-@duboisEchoChamberOverstated2018] political interest is directly, positively correlated with affective and policy polarization. 
+  - Social media use and digital news consumption moderates this relationship; Polarization by social media use and digital news consumption mostly occurs amongst low interest voters
 
 
 ## Key Independent Variables
@@ -104,7 +107,9 @@ kable()
 
 -   Index of 11 policy items (see Appendix in the paper).
 -   Two measures of policy polarization (See [@lelkesMassPolarizationManifestations2016; @levenduskyRedStatesVs2011] 
+   
    - bimodality coefficient to examine bimodality of a distribution of policy preferences [@pfisterGoodThingsPeak2013]. 
+  
   - the overlap coefficient to examine overlap between two distributions of policy preferences [@pastoreMeasuringDistributionSimilarities2019].
 
 
@@ -151,10 +156,6 @@ WAP_models %>%
   geom_pointrange(aes(xmin=estimate-(1.96*std.error), xmax=estimate+(1.96*std.error)))+geom_vline(xintercept=0, linetype=2, col="red")+labs(y="Variable", x="Coefficient") + theme_bw(base_size = 24)
 ```
 
-```{=tex}
-\note{- Small significant negative coefficient online media and affective polarization.}
-\note{*MORE INTERESTING* Positive coefficent on interest. Those who are more interested are more polarization.}
-```
 ## Affective Polarization and Social Media Usage
 
 ```{r}
@@ -198,7 +199,7 @@ on18 %>%
   gt()
 ```
 
-\note{Here we can see that those who use online media sources have the highest bimodality coefficents. However, differences are small.}
+
 
 ## Policy Polarization and Primary Media Source - Bimodality Coefficient
 
@@ -213,9 +214,7 @@ rename(Interest=Interest_cat) %>%
 gt()
 ```
 
-```{=tex}
-\note{}
-```
+
 ## Policy Polarization and Social Media Usage - Bimodality Coefficient
 
 ```{r}
@@ -229,8 +228,6 @@ on18 %>%
 fmt_number(., columns=2, decimals=2)
 ```
 
-\note{We can observe the *slight curvilinear relationship again*}
-
 ## Policy Polarization - Overlap Coefficent
 
 ```{r}
@@ -239,15 +236,12 @@ library(cowplot)
 ggpubr::ggarrange(overlap_legacy+theme_bw(base_size=24), overlap_online+theme_bw(base_size=24), overlap_smedia+theme_bw(base_size=24), overlap_mixed+theme_bw(base_size=24))
 ```
 
-\note{}
 
 ## Policy Polarization - Overlap Coefficent
 
 ```{r}
 ggpubr::ggarrange(overlap_often+theme_bw(base_size=24), overlap_rarely+theme_bw(base_size=24), ncol = 1)
 ```
-
-\note{}
 
 ## Discussion & Conclusion
 

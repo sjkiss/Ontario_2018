@@ -30,6 +30,13 @@ on18 %>%
   #select(indivfinfeel) %>%
   write_sav(., path=here("Data/opes_2018.sav"), compress="zsav")
 #export(., here("Data/opes_2018.sav"))
+on18 %>% 
+  # select(indivfinfeel, immfeel) %>% str()
+  select(-yob2, postalcode, contains("irv_"), -`filter_$`, -regions) %>% 
+  # write_sav(on18, file=here("Data/opes_2018.sav"))
+  as.data.frame() %>% 
+  #select(indivfinfeel) %>%
+  write_dta(., path=here("Data/opes_2018.dta"))
 
 on18 %>% 
   # select(indivfinfeel, immfeel) %>% str()
